@@ -1,4 +1,5 @@
-// GOAL: demonstrate space/time contractions, and behavior of relativistic spacetime
+// GOAL: demonstrate space/length contractions, and behavior of relativistic spacetime
+// SUCCESS: visualized length contraction
 
 ArrayList<Timeline> timelines;
 Event now = new Event(0, 0, 0);
@@ -41,8 +42,8 @@ void draw() {
   // Show the objects
   for (Timeline timeline : timelines) {
     // TODO: use intersection on light cone instead of normal time
-    Event event = timeline.at(now.t).relativeTo(now);
-    Event image = lorentz(event, bx, by);
+    Event event = concurrentWith(timeline, now, bx, by);
+    Event image = lorentz(event.relativeTo(now), bx, by);
     // NOTE: use red = future, blue = past
     noStroke();
     fill(constrain(255 + image.t, 0, 255),
@@ -66,10 +67,11 @@ void clear() {
 // given (bx, by) = beta = v / c
 // returns new spacetime coordinates for an event after transformation
 Event lorentz(Event e, float bx, float by) {
-  if (bx * bx + by * by > 1) throw new IllegalArgumentException("|beta| > 1");
+  checkBeta(bx, by);
   
   float beta_sq = bx * bx + by * by;
   float gamma = 1 / sqrt(1 - beta_sq);
+
   float x = - e.t * gamma * bx * c
             + e.x * (1 + (gamma - 1) * (bx * bx) / beta_sq)
             + e.y * ((gamma - 1) * (bx * by) / beta_sq);
@@ -79,15 +81,66 @@ Event lorentz(Event e, float bx, float by) {
   float t = e.t * gamma
           - e.x * gamma * bx
           - e.y * gamma * by;
-  return new Event(x, y, t);        
+  return new Event(x, y, t);
+}
+
+// @return e such that lorentz(e.relativeTo(observer), bx, by).t = 0
+// NOTE: finds a solution using bisection method
+Event concurrentWith(Timeline timeline, Event observer, float bx, float by) {
+  checkBeta(bx, by);
+
+  float beta_sq = bx * bx + by * by;
+  float gamma = 1 / sqrt(1 - beta_sq);
+
+  // low and high guesses for time in original reference frame
+  float tLow = observer.t;
+  float tHigh = observer.t;
+
+  // crude approximation for dError/dt
+  // intentionally low by factor 1/2 to encourage overshoot and start bisection method
+  float dError = gamma / 2;
+
+  float eLow, eHigh;
+  // start with observer.t as a guess
+  eLow = eHigh = lorentz(timeline.at(observer.t).relativeTo(observer), bx, by).t;
+  // adjust high and low bounds until they are valid
+  while (eHigh < 0) {
+    tHigh -= eHigh / dError;
+    eHigh = lorentz(timeline.at(tHigh).relativeTo(observer), bx, by).t;
+  }
+  while (eLow > 0) {
+    tLow -= eLow / dError;
+    eLow = lorentz(timeline.at(tLow).relativeTo(observer), bx, by).t;
+  }
+
+  // bisection method
+  int iterations = 0;
+  float tol = 0.001;
+  float tMid = (tLow + tHigh) / 2;
+  float eMid = lorentz(timeline.at(tMid).relativeTo(observer), bx, by).t;
+  while (tHigh - tLow > tol && iterations < 1000) {
+    if (eMid < 0) {
+      tLow = tMid;
+    } else if (eMid > 0) {
+      tHigh = tMid;
+    } else {
+      return timeline.at(tMid);
+    }
+    tMid = (tLow + tHigh) / 2;
+    eMid = lorentz(timeline.at(tMid).relativeTo(observer), bx, by).t;
+  }
+  return timeline.at(tMid);
+}
+
+void checkBeta(float bx, float by) {
+  if (bx * bx + by * by > 1) throw new IllegalArgumentException("|beta| > 1");
 }
 
 interface Timeline {
   Event at(float t);
-  // TODO: Event relativeTo(Event e, float t, float vx, float vy);
 }
 
-class ConstantTimeline implements Timeline{
+class ConstantTimeline implements Timeline {
   float ix;
   float iy;
   float it;
@@ -134,10 +187,15 @@ class Event {
     this.t = t;
   }
   
+  Event plus(Event other) {
+    return new Event(this.x + other.x, this.y + other.y, this.t + other.t);
+  }
+
+  // @return 'this' as seen by 'other' event in stationary reference frame
   Event relativeTo(Event other) {
     return new Event(this.x - other.x, this.y - other.y, this.t - other.t);
   }
-  
+
   Event advance(float dt) {
     return advance(0, 0, dt);
   }
