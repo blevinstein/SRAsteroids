@@ -7,10 +7,14 @@ public class SR {
   // returns new spacetime coordinates for an event after transformation
   public static Event lorentz(Event e, float bx, float by) {
     Check.checkBeta(bx, by);
+    Check.checkEvent(e);
     
     float beta_sq = bx * bx + by * by;
     float gamma = (float) (1 / Math.sqrt(1 - beta_sq));
-  
+    
+    // avoid division by zero
+    if (beta_sq == 0f) return e;
+
     float x = - e.t * gamma * bx * c
               + e.x * (1 + (gamma - 1) * (bx * bx) / beta_sq)
               + e.y * ((gamma - 1) * (bx * by) / beta_sq);
@@ -20,6 +24,9 @@ public class SR {
     float t = e.t * gamma
             - e.x * gamma * bx / c
             - e.y * gamma * by / c;
-    return new Event(x, y, t);
+
+    Event r = new Event(x, y, t);
+    Check.checkEvent(r);
+    return r;
   }
 }

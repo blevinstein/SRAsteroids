@@ -26,4 +26,9 @@ public class Event {
   public Event advance(float dx, float dy, float dt) {
     return new Event(this.x + dx, this.y + dy, this.t + dt);
   }
+
+  @Override
+  public String toString() {
+    return "(" + this.x + ", " + this.y + ", " + this.t + ")";
+  }
 }
