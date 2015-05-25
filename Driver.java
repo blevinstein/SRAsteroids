@@ -12,6 +12,7 @@ public class Driver {
     frame.add(main);
 
     frame.setVisible(true);
+    frame.addMouseMotionListener(main);
 
     main.run();
   }
