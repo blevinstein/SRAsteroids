@@ -5,6 +5,7 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseEvent;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 import java.util.List;
@@ -116,8 +117,14 @@ public class SRAsteroids extends JPanel implements MouseMotionListener {
   }
 
   private void drawEllipse(Graphics2D g, float x, float y, float r, float bx, float by) {
-    // TODO: show contraction in ellipse shape
+    AffineTransform contraction = SR.lorentzContraction(bx, by);
+
+    AffineTransform previousTransform = g.getTransform();
+    g.translate(-x, -y);
+    g.transform(contraction);
+    g.translate(x, y);
     g.draw(new Ellipse2D.Float(x - r, y - r, 2 * r, 2 * r));
+    g.setTransform(previousTransform);
   }
 
   private float constrain(float value, float min, float max) {

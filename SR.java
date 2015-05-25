@@ -1,5 +1,8 @@
 
 
+import java.awt.geom.AffineTransform;
+import java.awt.geom.NoninvertibleTransformException;
+
 public class SR {
   public static final float c = 10;
 
@@ -26,5 +29,24 @@ public class SR {
 
     Event r = new Event(x, y, t);
     return r;
+  }
+
+  // returns an AffineTransformation for deforming a shape
+  public static AffineTransform lorentzContraction(float bx, float by) {
+    float beta_sq = bx * bx + by * by;
+    float gamma = (float) (1 / Math.sqrt(1 - beta_sq));
+
+    if (beta_sq == 0) return new AffineTransform();
+
+    try {
+      return new AffineTransform(
+          (1 + (gamma - 1) * (bx * bx) / beta_sq),
+          ((gamma - 1) * (bx * by) / beta_sq),
+          ((gamma - 1) * (bx * by) / beta_sq),
+          (1 + (gamma - 1) * (by * by) / beta_sq),
+          0, 0).createInverse();
+    } catch (NoninvertibleTransformException e) {
+      throw new RuntimeException("should not happen");
+    }
   }
 }
