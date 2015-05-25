@@ -5,6 +5,7 @@ import java.awt.geom.NoninvertibleTransformException;
 
 public class SR {
   public static final float c = 10;
+  public static final float MAX = 0.95f;
 
   // given (bx, by) = beta = v / c
   // returns new spacetime coordinates for an event after transformation

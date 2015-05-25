@@ -7,6 +7,7 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
+import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -58,8 +59,8 @@ public class SRAsteroids extends JPanel implements MouseMotionListener {
     by = 2 * (mouseY - 0.5f);
     float beta = (float) Math.sqrt(bx * bx + by * by);
     if (beta > 1) {
-      bx = bx / beta * 0.99f;
-      by = by / beta * 0.99f;
+      bx = bx / beta * SR.MAX;
+      by = by / beta * SR.MAX;
     }
     
     // TODO: replace (now : Event) with (self : Timeline)
@@ -78,9 +79,14 @@ public class SRAsteroids extends JPanel implements MouseMotionListener {
     g2.fill(new Rectangle(0, 0, getWidth(), getHeight()));
 
     // Show the observer
-    float r = 2.5f;
     g2.setColor(Color.WHITE);
     drawEllipse(g2, getWidth()/2, getHeight()/2, 2.5f, 0, 0);
+    float beta_sq = bx * bx + by * by;
+    g2.draw(new Line2D.Float(
+          getWidth()/2,
+          getHeight()/2,
+          getWidth()/2 - bx * beta_sq * 100f,
+          getHeight()/2 -  by * beta_sq * 100f));
 
     // Show the objects
     for (Timeline timeline : timelines) {
