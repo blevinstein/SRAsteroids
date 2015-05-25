@@ -61,7 +61,7 @@ public class SRAsteroids extends JPanel implements MouseMotionListener {
       // TODO: use intersection on light cone instead of normal time
       Event event = timeline.concurrentWith(now, bx, by);
       Event image = SR.lorentz(event.relativeTo(now), bx, by);
-      // TODO: if (!image.isOnScreen) continue;
+      if (offScreen(image)) continue;
       // NOTE: use red = future, blue = past
       g2.setColor(new Color((int) constrain(255 + image.t, 0, 255),
             (int) constrain(255 - Math.abs(image.t), 0, 255),
@@ -88,6 +88,12 @@ public class SRAsteroids extends JPanel implements MouseMotionListener {
   }
 
   // Convenience methods
+
+  private boolean offScreen(Event e) {
+    float margin = 10;
+    float w = getWidth() / 2 + margin, h = getHeight() / 2 + margin;
+    return e.x > w || e.x < -w || e.y > h || e.y < -h;
+  }
 
   private void fillEllipse(Graphics2D g, float x, float y, float r) {
     g.fill(new Ellipse2D.Float(x - r, y - r, 2 * r, 2 * r));
