@@ -47,6 +47,15 @@ public class SRAsteroids extends JPanel implements MouseMotionListener {
               now.x + random(-getWidth()/2, getWidth()/2), now.y + random(-getHeight()/2, getHeight()/2), now.t,
               random(-0.7f, 0.7f), random(-0.7f, 0.7f)));
     }
+
+    // Set beta < 1
+    bx = 2 * (mouseX - 0.5f);
+    by = 2 * (mouseY - 0.5f);
+    float beta = (float) Math.sqrt(bx * bx + by * by);
+    if (beta > 1) {
+      bx = bx / beta * 0.99f;
+      by = by / beta * 0.99f;
+    }
     
     // TODO: replace (now : Event) with (self : Timeline)
     now = now.advance(bx * SR.c, by * SR.c, dt);
@@ -54,16 +63,14 @@ public class SRAsteroids extends JPanel implements MouseMotionListener {
 
   // Core update loop
   public void paintComponent(Graphics g) {
+    super.paintComponent(g);
+
     BufferedImage buffer = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB);
     Graphics2D g2 = (Graphics2D) buffer.getGraphics();
     g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
     g2.setColor(Color.BLACK);
     g2.fill(new Rectangle(0, 0, getWidth(), getHeight()));
-
-    // Calculate beta
-    bx = 2 * (mouseX - 0.5f) * 0.7f;
-    by = 2 * (mouseY - 0.5f) * 0.7f;
 
     // Show the observer
     float r = 2.5f;
