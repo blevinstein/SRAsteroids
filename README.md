@@ -13,3 +13,12 @@ To build:
 To run:
 > make run
 
+TODO
+----
+- Decrease number of objects, increase radius
+- Add basic collision & split
+- Make timelines with start/end events
+
+- Refactor into package structure
+- Use apache commons math lib?
+
