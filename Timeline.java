@@ -4,7 +4,7 @@ public abstract class Timeline {
   public abstract Event at(float t);
 
   // @return e such that lorentz(e.relativeTo(observer), bx, by).t = 0
-  // NOTE: finds a solution using bisection method
+  // NOTE: naive implementation finds a solution using bisection method
   public Event concurrentWith(Event observer, float bx, float by) {
     Check.checkBeta(bx, by);
 
