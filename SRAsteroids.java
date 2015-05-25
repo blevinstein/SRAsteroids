@@ -16,7 +16,7 @@ public class SRAsteroids extends JPanel implements MouseMotionListener {
   private List<Timeline> timelines = new CopyOnWriteArrayList<>();
   private Event now = new Event(0, 0, 0);
 
-  public static final float dt = 1;
+  public static final float dt = 0.1f;
 
   // mouseX/mouseY are in range [0, 1]
   private float mouseX = 0.5f;
@@ -47,6 +47,10 @@ public class SRAsteroids extends JPanel implements MouseMotionListener {
           new ConstantTimeline(
               now.x + random(-getWidth()/2, getWidth()/2), now.y + random(-getHeight()/2, getHeight()/2), now.t,
               random(-0.7f, 0.7f), random(-0.7f, 0.7f)));
+      // remove old objects to make room
+      if (timelines.size() > 100) {
+        timelines.remove(0);
+      }
     }
 
     // Set beta < 1
@@ -59,7 +63,7 @@ public class SRAsteroids extends JPanel implements MouseMotionListener {
     }
     
     // TODO: replace (now : Event) with (self : Timeline)
-    now = now.advance(bx * SR.c, by * SR.c, dt);
+    now = now.advance(bx * SR.c * dt, by * SR.c * dt, dt);
   }
 
   // Core update loop
@@ -120,9 +124,9 @@ public class SRAsteroids extends JPanel implements MouseMotionListener {
     AffineTransform contraction = SR.lorentzContraction(bx, by);
 
     AffineTransform previousTransform = g.getTransform();
-    g.translate(-x, -y);
-    g.transform(contraction);
     g.translate(x, y);
+    g.transform(contraction);
+    g.translate(-x, -y);
     g.draw(new Ellipse2D.Float(x - r, y - r, 2 * r, 2 * r));
     g.setTransform(previousTransform);
   }
