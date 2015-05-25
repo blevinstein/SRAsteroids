@@ -9,9 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JPanel;
 
-// GOAL: demonstrate space/length contractions, and behavior of relativistic spacetime
-// SUCCESS: visualized length contraction
-
 public class SRAsteroids extends JPanel implements MouseMotionListener {
   private List<Timeline> timelines = new ArrayList<>();
   private Event now = new Event(0, 0, 0);
