@@ -2,6 +2,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Ellipse2D;
@@ -55,6 +56,7 @@ public class SRAsteroids extends JPanel implements MouseMotionListener {
   public void paintComponent(Graphics g) {
     BufferedImage buffer = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB);
     Graphics2D g2 = (Graphics2D) buffer.getGraphics();
+    g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
     g2.setColor(Color.BLACK);
     g2.fill(new Rectangle(0, 0, getWidth(), getHeight()));
