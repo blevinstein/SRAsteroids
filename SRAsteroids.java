@@ -5,12 +5,13 @@ import java.awt.Rectangle;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Ellipse2D;
-import java.util.ArrayList;
+import java.awt.image.BufferedImage;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import javax.swing.JPanel;
 
 public class SRAsteroids extends JPanel implements MouseMotionListener {
-  private List<Timeline> timelines = new ArrayList<>();
+  private List<Timeline> timelines = new CopyOnWriteArrayList<>();
   private Event now = new Event(0, 0, 0);
 
   public static final float dt = 1;
@@ -18,6 +19,10 @@ public class SRAsteroids extends JPanel implements MouseMotionListener {
   // mouseX/mouseY are in range [0, 1]
   private float mouseX = 0;
   private float mouseY = 0;
+
+  // |beta| < 1
+  private float bx = 0;
+  private float by = 0;
 
   public SRAsteroids() {
     super(null); // no layout manager
@@ -27,18 +32,13 @@ public class SRAsteroids extends JPanel implements MouseMotionListener {
   public void run() {
     Throttle t = new Throttle(100); // 100fps max
     while (true) {
+      mainLoop();
       repaint();
       t.sleep();
     }
   }
 
-  // Core update loop
-  public void paintComponent(Graphics g) {
-    Graphics2D g2 = (Graphics2D) g;
-    
-    g2.setColor(Color.BLACK);
-    g2.fill(new Rectangle(0, 0, getWidth(), getHeight()));
-    
+  public void mainLoop() {
     // Add random objects
     if (random(0, 1) < 0.3) {
       timelines.add(
@@ -47,9 +47,21 @@ public class SRAsteroids extends JPanel implements MouseMotionListener {
               random(-0.7f, 0.7f), random(-0.7f, 0.7f)));
     }
     
+    // TODO: replace (now : Event) with (self : Timeline)
+    now = now.advance(bx * SR.c, by * SR.c, dt);
+  }
+
+  // Core update loop
+  public void paintComponent(Graphics g) {
+    BufferedImage buffer = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB);
+    Graphics2D g2 = (Graphics2D) buffer.getGraphics();
+
+    g2.setColor(Color.BLACK);
+    g2.fill(new Rectangle(0, 0, getWidth(), getHeight()));
+
     // Calculate beta
-    float bx = 2 * (mouseX - 0.5f) * 0.7f;
-    float by = 2 * (mouseY - 0.5f) * 0.7f;
+    bx = 2 * (mouseX - 0.5f) * 0.7f;
+    by = 2 * (mouseY - 0.5f) * 0.7f;
 
     // Show the observer
     float r = 2.5f;
@@ -69,9 +81,8 @@ public class SRAsteroids extends JPanel implements MouseMotionListener {
       // TODO: make 3D to allow rotation into time
       fillEllipse(g2, image.x + getWidth() / 2, image.y + getHeight() / 2, 1f);
     }
-    
-    // TODO: replace (now : Event) with (self : Timeline)
-    now = now.advance(bx * SR.c, by * SR.c, dt);
+
+    g.drawImage(buffer, 0, 0, null /* observer */);
   }
 
   // MouseMotionListener
