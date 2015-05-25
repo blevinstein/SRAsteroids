@@ -15,9 +15,8 @@ To run:
 
 TODO
 ----
-- Decrease number of objects, increase radius
-- Add basic collision & split
 - Make timelines with start/end events
+- Implement basic collision, splitting, varied sizes of asteriods
 
 - Refactor into package structure
 - Use apache commons math lib?
