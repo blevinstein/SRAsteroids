@@ -79,8 +79,8 @@ Event lorentz(Event e, float bx, float by) {
             + e.x * ((gamma - 1) * (bx * by) / beta_sq)
             + e.y * (1 + (gamma - 1) * (by * by) / beta_sq);
   float t = e.t * gamma
-          - e.x * gamma * bx
-          - e.y * gamma * by;
+          - e.x * gamma * bx / c
+          - e.y * gamma * by / c;
   return new Event(x, y, t);
 }
 
