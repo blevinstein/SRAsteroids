@@ -18,8 +18,8 @@ public class SRAsteroids extends JPanel implements MouseMotionListener {
   public static final float dt = 1;
 
   // mouseX/mouseY are in range [0, 1]
-  private float mouseX = 0;
-  private float mouseY = 0;
+  private float mouseX = 0.5f;
+  private float mouseY = 0.5f;
 
   // |beta| < 1
   private float bx = 0;
@@ -41,7 +41,7 @@ public class SRAsteroids extends JPanel implements MouseMotionListener {
 
   public void mainLoop() {
     // Add random objects
-    if (random(0, 1) < 0.3) {
+    if (random(0, 1) < 0.05) {
       timelines.add(
           new ConstantTimeline(
               now.x + random(-getWidth()/2, getWidth()/2), now.y + random(-getHeight()/2, getHeight()/2), now.t,
@@ -68,7 +68,7 @@ public class SRAsteroids extends JPanel implements MouseMotionListener {
     // Show the observer
     float r = 2.5f;
     g2.setColor(Color.WHITE);
-    drawEllipse(g2, getWidth()/2, getHeight()/2, 2.5f);
+    drawEllipse(g2, getWidth()/2, getHeight()/2, 2.5f, 0, 0);
 
     // Show the objects
     for (Timeline timeline : timelines) {
@@ -81,7 +81,7 @@ public class SRAsteroids extends JPanel implements MouseMotionListener {
             (int) constrain(255 - Math.abs(image.t), 0, 255),
             (int) constrain(255 - image.t, 0, 255)));
       // TODO: make 3D to allow rotation into time
-      fillEllipse(g2, image.x + getWidth() / 2, image.y + getHeight() / 2, 1f);
+      drawEllipse(g2, image.x + getWidth() / 2, image.y + getHeight() / 2, 10f, bx, by);
     }
 
     g.drawImage(buffer, 0, 0, null /* observer */);
@@ -108,11 +108,8 @@ public class SRAsteroids extends JPanel implements MouseMotionListener {
     return e.x > w || e.x < -w || e.y > h || e.y < -h;
   }
 
-  private void fillEllipse(Graphics2D g, float x, float y, float r) {
-    g.fill(new Ellipse2D.Float(x - r, y - r, 2 * r, 2 * r));
-  }
-  
-  private void drawEllipse(Graphics2D g, float x, float y, float r) {
+  private void drawEllipse(Graphics2D g, float x, float y, float r, float bx, float by) {
+    // TODO: show contraction in ellipse shape
     g.draw(new Ellipse2D.Float(x - r, y - r, 2 * r, 2 * r));
   }
 

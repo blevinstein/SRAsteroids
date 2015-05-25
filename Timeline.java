@@ -11,6 +11,11 @@ public abstract class Timeline {
     float beta_sq = bx * bx + by * by;
     float gamma = (float) (1 / Math.sqrt(1 - beta_sq));
 
+    // avoid division by zero
+    if (beta_sq == 0f) {
+      return this.at(observer.t);
+    }
+
     // low and high guesses for time in original reference frame
     float tLow = observer.t;
     float tHigh = observer.t;
