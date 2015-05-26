@@ -1,7 +1,28 @@
 
+import java.util.function.Function;
 
 public abstract class Timeline {
   public abstract Event at(float t);
+
+  public Event bisectionMethod(Function<Event, Float> errorFunction, float tLow, float tHigh) {
+    // bisection method
+    int iterations = 0;
+    float tol = 0.001f;
+    float tMid = (tLow + tHigh) / 2;
+    float eMid = errorFunction.apply(this.at(tMid));
+    while (tHigh - tLow > tol && iterations < 1000) {
+      if (eMid < 0) {
+        tLow = tMid;
+      } else if (eMid > 0) {
+        tHigh = tMid;
+      } else {
+        return this.at(tMid);
+      }
+      tMid = (tLow + tHigh) / 2;
+      eMid = errorFunction.apply(this.at(tMid));
+    }
+    return this.at(tMid);
+  }
 
   // @return e such that lorentz(e.relativeTo(observer), bx, by).t = 0
   // NOTE: naive implementation finds a solution using bisection method
@@ -37,22 +58,9 @@ public abstract class Timeline {
       eLow = SR.lorentz(this.at(tLow).relativeTo(observer), bx, by).t;
     }
 
-    // bisection method
-    int iterations = 0;
-    float tol = 0.001f;
-    float tMid = (tLow + tHigh) / 2;
-    float eMid = SR.lorentz(this.at(tMid).relativeTo(observer), bx, by).t;
-    while (tHigh - tLow > tol && iterations < 1000) {
-      if (eMid < 0) {
-        tLow = tMid;
-      } else if (eMid > 0) {
-        tHigh = tMid;
-      } else {
-        return this.at(tMid);
-      }
-      tMid = (tLow + tHigh) / 2;
-      eMid = SR.lorentz(this.at(tMid).relativeTo(observer), bx, by).t;
-    }
-    return this.at(tMid);
+    return bisectionMethod((Event e) -> SR.lorentz(e.relativeTo(observer), bx, by).t,
+        tLow,
+        tHigh);
   }
 }
+
