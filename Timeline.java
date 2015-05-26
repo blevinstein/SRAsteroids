@@ -24,13 +24,14 @@ public abstract class Timeline {
     return this.at(tMid);
   }
 
-  public Event solve(Function<Event, Float> errorFunction, float tGuess, float gamma) {
+  /**
+   * @return the value of t that minimizes errorFunction.apply(at(t))
+   * @param tGuess starting point for solution search
+   * @param dError approximation of d(errorFunction)/dt
+   */
+  public Event solve(Function<Event, Float> errorFunction, float tGuess, float dError) {
     // low and high guesses for time in original reference frame
     float tLow = tGuess, tHigh = tGuess;
-    
-    // crude approximation for dError/dt
-    // intentionally low by factor 1/2 to encourage overshoot and start bisection method
-    float dError = gamma / 2;
 
     float eLow, eHigh;
     eLow = eHigh = errorFunction.apply(at(tGuess));
@@ -47,8 +48,10 @@ public abstract class Timeline {
     return bisectionMethod(errorFunction, tLow, tHigh);
   }
 
-  // @return e such that lorentz(e.relativeTo(observer), bx, by).t = 0
-  // NOTE: naive implementation finds a solution using bisection method
+  /**
+   * @return e such that lorentz(e.relativeTo(observer), bx, by).t = 0
+   * NOTE: naive implementation finds a solution using bisection method, can be overridden
+   */
   public Event concurrentWith(Event observer, float bx, float by) {
     Check.checkBeta(bx, by);
 
@@ -60,7 +63,9 @@ public abstract class Timeline {
       return this.at(observer.t);
     }
 
-    return solve((Event e) -> SR.lorentz(e.relativeTo(observer), bx, by).t, observer.t, gamma);
+    return solve((Event e) -> SR.lorentz(e.relativeTo(observer), bx, by).t,
+        observer.t,
+        gamma / 2);
   }
 }
 
