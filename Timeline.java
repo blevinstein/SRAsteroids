@@ -24,6 +24,29 @@ public abstract class Timeline {
     return this.at(tMid);
   }
 
+  public Event solve(Function<Event, Float> errorFunction, float tGuess, float gamma) {
+    // low and high guesses for time in original reference frame
+    float tLow = tGuess, tHigh = tGuess;
+    
+    // crude approximation for dError/dt
+    // intentionally low by factor 1/2 to encourage overshoot and start bisection method
+    float dError = gamma / 2;
+
+    float eLow, eHigh;
+    eLow = eHigh = errorFunction.apply(at(tGuess));
+    // adjust high and low bounds until they are valid
+    while (eHigh < 0) {
+      tHigh -= eHigh / dError;
+      eHigh = errorFunction.apply(at(tHigh));
+    }
+    while (eLow > 0) {
+      tLow -= eLow / dError;
+      eLow = errorFunction.apply(at(tLow));
+    }
+
+    return bisectionMethod(errorFunction, tLow, tHigh);
+  }
+
   // @return e such that lorentz(e.relativeTo(observer), bx, by).t = 0
   // NOTE: naive implementation finds a solution using bisection method
   public Event concurrentWith(Event observer, float bx, float by) {
@@ -37,30 +60,7 @@ public abstract class Timeline {
       return this.at(observer.t);
     }
 
-    // low and high guesses for time in original reference frame
-    float tLow = observer.t;
-    float tHigh = observer.t;
-
-    // crude approximation for dError/dt
-    // intentionally low by factor 1/2 to encourage overshoot and start bisection method
-    float dError = gamma / 2;
-
-    float eLow, eHigh;
-    // start with observer.t as a guess
-    eLow = eHigh = SR.lorentz(this.at(observer.t).relativeTo(observer), bx, by).t;
-    // adjust high and low bounds until they are valid
-    while (eHigh < 0) {
-      tHigh -= eHigh / dError;
-      eHigh = SR.lorentz(this.at(tHigh).relativeTo(observer), bx, by).t;
-    }
-    while (eLow > 0) {
-      tLow -= eLow / dError;
-      eLow = SR.lorentz(this.at(tLow).relativeTo(observer), bx, by).t;
-    }
-
-    return bisectionMethod((Event e) -> SR.lorentz(e.relativeTo(observer), bx, by).t,
-        tLow,
-        tHigh);
+    return solve((Event e) -> SR.lorentz(e.relativeTo(observer), bx, by).t, observer.t, gamma);
   }
 }
 
