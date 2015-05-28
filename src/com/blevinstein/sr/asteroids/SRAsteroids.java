@@ -66,7 +66,7 @@ public class SRAsteroids extends JPanel implements MouseMotionListener, KeyListe
         velocity = velocity.plus(velocity.norm().perp().times(-a));
       }
     }
-    velocity = velocity.checked();
+    velocity = velocity.checked(0.95f);
 
     // Add random objects
     if (random(0, 1) < 0.05) {

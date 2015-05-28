@@ -26,8 +26,12 @@ public class Velocity {
   }
 
   public Velocity checked() {
+    return checked(1);
+  }
+
+  public Velocity checked(float max) {
     float b = beta();
-    return b > 1 ? this.times(1 / b) : this;
+    return b > max ? this.times(max / b) : this;
   }
 
   public Event over(float t) {
