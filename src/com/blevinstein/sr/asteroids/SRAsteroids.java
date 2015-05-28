@@ -1,9 +1,10 @@
 package com.blevinstein.sr.asteroids;
 
-import com.blevinstein.sr.Event;
 import com.blevinstein.sr.ConstantTimeline;
+import com.blevinstein.sr.Event;
 import com.blevinstein.sr.SR;
 import com.blevinstein.sr.Timeline;
+import com.blevinstein.sr.Velocity;
 import com.blevinstein.util.Throttle;
 
 import java.awt.Color;
@@ -41,7 +42,7 @@ public class SRAsteroids extends JPanel implements MouseMotionListener {
 
   // Main loop that triggers repainting
   public void run() {
-    Throttle t = new Throttle(100); // 100fps max
+    Throttle t = new Throttle(60); // 60fps max
     while (true) {
       mainLoop();
       repaint();
@@ -52,10 +53,12 @@ public class SRAsteroids extends JPanel implements MouseMotionListener {
   public void mainLoop() {
     // Add random objects
     if (random(0, 1) < 0.05) {
+      Event offset = new Event(random(-getWidth()/2, getWidth()/2),
+          random(-getHeight()/2, getHeight()/2),
+          0);
+      Velocity velocity = new Velocity(random(-0.7f, 0.7f), random(-0.7f, 0.7f));
       timelines.add(
-          new ConstantTimeline(
-              now.x() + random(-getWidth()/2, getWidth()/2), now.y() + random(-getHeight()/2, getHeight()/2), now.t(),
-              random(-0.7f, 0.7f), random(-0.7f, 0.7f)));
+          new ConstantTimeline(now.plus(offset), velocity));
       // remove old objects to make room
       if (timelines.size() > 100) {
         timelines.remove(0);

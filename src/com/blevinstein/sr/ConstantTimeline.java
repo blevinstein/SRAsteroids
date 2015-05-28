@@ -1,21 +1,18 @@
 package com.blevinstein.sr;
 
 public class ConstantTimeline extends Timeline {
-  float ix;
-  float iy;
-  float it;
-  float vx;
-  float vy;
+  private Event _e;
+  private Velocity _v;
+
+  public Event e() { return _e; }
+  public Velocity v() { return _v; }
   
-  public ConstantTimeline(float ix, float iy, float it, float vx, float vy) {
-    this.ix = ix;
-    this.iy = iy;
-    this.it = it;
-    this.vx = vx;
-    this.vy = vy;
+  public ConstantTimeline(Event e, Velocity v) {
+    this._e = e;
+    this._v = v;
   }
   
   public Event at(float t) {
-    return new Event(ix + vx * (t - it), iy + vy * (t - it), t);
+    return _v.over(t).plus(_e);
   }
 }
