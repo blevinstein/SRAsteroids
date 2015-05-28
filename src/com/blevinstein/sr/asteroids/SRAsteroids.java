@@ -1,5 +1,7 @@
 package com.blevinstein.sr.asteroids;
 
+import static com.blevinstein.sr.SR.c;
+
 import com.blevinstein.sr.ConstantTimeline;
 import com.blevinstein.sr.Event;
 import com.blevinstein.sr.SR;
@@ -25,16 +27,13 @@ import javax.swing.JPanel;
 public class SRAsteroids extends JPanel implements MouseMotionListener {
   private List<Timeline> timelines = new CopyOnWriteArrayList<>();
   private Event now = new Event(0, 0, 0);
+  private Velocity velocity = new Velocity(0, 0);
 
   public static final float dt = 0.1f;
 
   // mouseX/mouseY are in range [0, 1]
   private float mouseX = 0.5f;
   private float mouseY = 0.5f;
-
-  // |beta| < 1
-  private float bx = 0;
-  private float by = 0;
 
   public SRAsteroids() {
     super(null); // no layout manager
@@ -53,29 +52,20 @@ public class SRAsteroids extends JPanel implements MouseMotionListener {
   public void mainLoop() {
     // Add random objects
     if (random(0, 1) < 0.05) {
-      Event offset = new Event(random(-getWidth()/2, getWidth()/2),
+      Event eventOffset = new Event(random(-getWidth()/2, getWidth()/2),
           random(-getHeight()/2, getHeight()/2),
           0);
-      Velocity velocity = new Velocity(random(-0.7f, 0.7f), random(-0.7f, 0.7f));
+      Velocity relativeVelocity = new Velocity(random(-0.7f, 0.7f), random(-0.7f, 0.7f));
       timelines.add(
-          new ConstantTimeline(now.plus(offset), velocity));
+          new ConstantTimeline(now.plus(eventOffset), relativeVelocity));
       // remove old objects to make room
       if (timelines.size() > 100) {
         timelines.remove(0);
       }
     }
-
-    // Set beta < 1
-    bx = 2 * (mouseX - 0.5f);
-    by = 2 * (mouseY - 0.5f);
-    float beta = (float) Math.sqrt(bx * bx + by * by);
-    if (beta > 1) {
-      bx = bx / beta * SR.MAX;
-      by = by / beta * SR.MAX;
-    }
     
     // TODO: replace (now : Event) with (self : Timeline)
-    now = now.advance(bx * SR.c * dt, by * SR.c * dt, dt);
+    now = now.plus(velocity.over(dt));
   }
 
   // Core update loop
@@ -91,26 +81,26 @@ public class SRAsteroids extends JPanel implements MouseMotionListener {
 
     // Show the observer
     g2.setColor(Color.WHITE);
-    drawEllipse(g2, getWidth()/2, getHeight()/2, 2.5f, 0, 0);
-    float beta_sq = bx * bx + by * by;
+    drawEllipse(g2, getWidth()/2, getHeight()/2, 2.5f, Velocity.ZERO);
+    float beta_sq = velocity.beta_sq();
     g2.draw(new Line2D.Float(
           getWidth()/2,
           getHeight()/2,
-          getWidth()/2 - bx * beta_sq * 100f,
-          getHeight()/2 -  by * beta_sq * 100f));
+          getWidth()/2 - velocity.x() / c * beta_sq * 100f,
+          getHeight()/2 - velocity.y() / c * beta_sq * 100f));
 
     // Show the objects
     for (Timeline timeline : timelines) {
       // TODO: use intersection on light cone instead of normal time
-      Event event = timeline.concurrentWith(now, bx, by);
-      Event image = SR.lorentz(event.relativeTo(now), bx, by);
+      Event event = timeline.concurrentWith(now, velocity);
+      Event image = SR.lorentz(event.relativeTo(now), velocity);
       if (offScreen(image)) continue;
       // NOTE: use red = future, blue = past
       g2.setColor(new Color((int) constrain(255 + image.t(), 0, 255),
             (int) constrain(255 - Math.abs(image.t()), 0, 255),
             (int) constrain(255 - image.t(), 0, 255)));
       // TODO: make 3D to allow rotation into time
-      drawEllipse(g2, image.x() + getWidth() / 2, image.y() + getHeight() / 2, 10f, bx, by);
+      drawEllipse(g2, image.x() + getWidth() / 2, image.y() + getHeight() / 2, 10f, velocity);
     }
 
     g.drawImage(buffer, 0, 0, null /* observer */);
@@ -125,8 +115,10 @@ public class SRAsteroids extends JPanel implements MouseMotionListener {
     setPosition(e);
   }
   public void setPosition(MouseEvent e) {
-    mouseX = e.getX() * 1f / getWidth();
-    mouseY = e.getY() * 1f / getHeight();
+    velocity = new Velocity(e.getX() * 1f / getWidth() - 0.5f,
+        e.getY() * 1f / getHeight() - 0.5f)
+        .times(2 * c)
+        .times(0.95f);
   }
 
   // Convenience methods
@@ -137,8 +129,8 @@ public class SRAsteroids extends JPanel implements MouseMotionListener {
     return e.x() > w || e.x() < -w || e.y() > h || e.y() < -h;
   }
 
-  private void drawEllipse(Graphics2D g, float x, float y, float r, float bx, float by) {
-    AffineTransform contraction = SR.lorentzContraction(bx, by);
+  private void drawEllipse(Graphics2D g, float x, float y, float r, Velocity v) {
+    AffineTransform contraction = SR.lorentzContraction(v);
 
     AffineTransform previousTransform = g.getTransform();
     g.translate(x, y);

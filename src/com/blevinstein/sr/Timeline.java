@@ -50,21 +50,19 @@ public abstract class Timeline {
   }
 
   /**
-   * @return e such that lorentz(e.relativeTo(observer), bx, by).t() = 0
+   * @return e such that lorentz(e.relativeTo(observer), v).t() = 0
    * NOTE: naive implementation finds a solution using bisection method, can be overridden
    */
-  public Event concurrentWith(Event observer, float bx, float by) {
-    Check.checkBeta(bx, by);
-
-    float beta_sq = bx * bx + by * by;
-    float gamma = (float) (1 / Math.sqrt(1 - beta_sq));
+  public Event concurrentWith(Event observer, Velocity v) {
+    float beta_sq = v.beta_sq();
+    float gamma = v.gamma();
 
     // avoid division by zero
     if (beta_sq == 0f) {
       return this.at(observer.t());
     }
 
-    return solve((Event e) -> SR.lorentz(e.relativeTo(observer), bx, by).t(),
+    return solve((Event e) -> SR.lorentz(e.relativeTo(observer), v).t(),
         observer.t(),
         gamma / 2);
   }

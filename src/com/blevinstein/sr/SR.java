@@ -1,5 +1,7 @@
 package com.blevinstein.sr;
 
+import static com.blevinstein.sr.SR.c;
+
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 
@@ -9,16 +11,16 @@ public class SR {
 
   // given (bx, by) = beta = v / c
   // returns new spacetime coordinates for an event after transformation
-  public static Event lorentz(Event e, float bx, float by) {
-    Check.checkBeta(bx, by);
-    
-    float beta_sq = bx * bx + by * by;
-    float gamma = (float) (1 / Math.sqrt(1 - beta_sq));
+  public static Event lorentz(Event e, Velocity v) {
+    float beta_sq = v.beta_sq();
+    float gamma = v.gamma();
+    float bx = v.x() / c;
+    float by = v.y() / c;
     
     // avoid division by zero
     if (beta_sq == 0f) return e;
 
-    float x = - e.t() * gamma * bx * c
+    float x = - e.t() * gamma * v.x()
               + e.x() * (1 + (gamma - 1) * (bx * bx) / beta_sq)
               + e.y() * ((gamma - 1) * (bx * by) / beta_sq);
     float y = - e.t() * gamma * by * c
@@ -33,9 +35,11 @@ public class SR {
   }
 
   // returns an AffineTransformation for deforming a shape
-  public static AffineTransform lorentzContraction(float bx, float by) {
-    float beta_sq = bx * bx + by * by;
-    float gamma = (float) (1 / Math.sqrt(1 - beta_sq));
+  public static AffineTransform lorentzContraction(Velocity v) {
+    float beta_sq = v.beta_sq();
+    float gamma = v.gamma();
+    float bx = v.x() / c;
+    float by = v.y() / c;
 
     if (beta_sq == 0) return new AffineTransform();
 
