@@ -9,10 +9,7 @@ default: build
 build: ${CLASSES}
 
 %.class: %.java
-	javac -cp ${CLASSPATH} -d build $<
+	javac -cp ${CLASSPATH} $<
 
-run:
-	java -cp ${CLASSPATH}:build com.blevinstein.sr.asteroids.Driver
-
-clean:
-	rm -rf *.class
+run: build
+	java -cp ${CLASSPATH} com.blevinstein.sr.asteroids.Driver
