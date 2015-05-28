@@ -14,17 +14,21 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import javax.swing.JPanel;
 
-public class SRAsteroids extends JPanel implements MouseMotionListener {
+public class SRAsteroids extends JPanel implements MouseMotionListener, KeyListener {
   private List<Timeline> timelines = new CopyOnWriteArrayList<>();
   private Event now = new Event(0, 0, 0);
   private Velocity velocity = new Velocity(0, 0);
@@ -46,6 +50,24 @@ public class SRAsteroids extends JPanel implements MouseMotionListener {
   }
 
   public void mainLoop() {
+    // Accelerate
+    float a = 0.1f;
+    if (getKeyDown(KeyEvent.VK_DOWN) != getKeyDown(KeyEvent.VK_UP)) {
+      if (getKeyDown(KeyEvent.VK_DOWN)) {
+        velocity = velocity.plus(velocity.norm().times(-a));
+      } else {
+        velocity = velocity.plus(velocity.norm().times(a));
+      }
+    }
+    if (getKeyDown(KeyEvent.VK_LEFT) != getKeyDown(KeyEvent.VK_RIGHT)) {
+      if (getKeyDown(KeyEvent.VK_LEFT)) {
+        velocity = velocity.plus(velocity.norm().perp().times(a));
+      } else {
+        velocity = velocity.plus(velocity.norm().perp().times(-a));
+      }
+    }
+    velocity = velocity.checked();
+
     // Add random objects
     if (random(0, 1) < 0.05) {
       Event eventOffset = new Event(random(-getWidth()/2, getWidth()/2),
@@ -104,17 +126,22 @@ public class SRAsteroids extends JPanel implements MouseMotionListener {
 
   // MouseMotionListener
 
-  public void mouseDragged(MouseEvent e) {
-    setPosition(e);
+  public void mouseDragged(MouseEvent e) {}
+  public void mouseMoved(MouseEvent e) {}
+  public void setPosition(MouseEvent e) {}
+
+  // KeyListener
+ 
+  private Map<Integer, Boolean> keys = new HashMap<>();
+  public void keyPressed(KeyEvent e) {
+    keys.put(e.getKeyCode(), true);
   }
-  public void mouseMoved(MouseEvent e) {
-    setPosition(e);
+  public void keyReleased(KeyEvent e) {
+    keys.put(e.getKeyCode(), false);
   }
-  public void setPosition(MouseEvent e) {
-    velocity = new Velocity(e.getX() * 1f / getWidth() - 0.5f,
-        e.getY() * 1f / getHeight() - 0.5f)
-        .times(2 * c)
-        .times(0.95f);
+  public void keyTyped(KeyEvent e) {}
+  public boolean getKeyDown(int keyCode) {
+    return keys.containsKey(keyCode) && keys.get(keyCode);
   }
 
   // Convenience methods
