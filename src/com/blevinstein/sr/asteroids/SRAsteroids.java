@@ -31,10 +31,6 @@ public class SRAsteroids extends JPanel implements MouseMotionListener {
 
   public static final float dt = 0.1f;
 
-  // mouseX/mouseY are in range [0, 1]
-  private float mouseX = 0.5f;
-  private float mouseY = 0.5f;
-
   public SRAsteroids() {
     super(null); // no layout manager
   }
