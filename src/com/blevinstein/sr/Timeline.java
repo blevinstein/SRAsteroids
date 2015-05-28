@@ -1,3 +1,4 @@
+package com.blevinstein.sr;
 
 import java.util.function.Function;
 
@@ -49,7 +50,7 @@ public abstract class Timeline {
   }
 
   /**
-   * @return e such that lorentz(e.relativeTo(observer), bx, by).t = 0
+   * @return e such that lorentz(e.relativeTo(observer), bx, by).t() = 0
    * NOTE: naive implementation finds a solution using bisection method, can be overridden
    */
   public Event concurrentWith(Event observer, float bx, float by) {
@@ -60,11 +61,11 @@ public abstract class Timeline {
 
     // avoid division by zero
     if (beta_sq == 0f) {
-      return this.at(observer.t);
+      return this.at(observer.t());
     }
 
-    return solve((Event e) -> SR.lorentz(e.relativeTo(observer), bx, by).t,
-        observer.t,
+    return solve((Event e) -> SR.lorentz(e.relativeTo(observer), bx, by).t(),
+        observer.t(),
         gamma / 2);
   }
 }

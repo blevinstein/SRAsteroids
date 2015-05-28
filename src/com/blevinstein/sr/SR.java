@@ -1,4 +1,4 @@
-
+package com.blevinstein.sr;
 
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
@@ -18,15 +18,15 @@ public class SR {
     // avoid division by zero
     if (beta_sq == 0f) return e;
 
-    float x = - e.t * gamma * bx * c
-              + e.x * (1 + (gamma - 1) * (bx * bx) / beta_sq)
-              + e.y * ((gamma - 1) * (bx * by) / beta_sq);
-    float y = - e.t * gamma * by * c
-              + e.x * ((gamma - 1) * (bx * by) / beta_sq)
-              + e.y * (1 + (gamma - 1) * (by * by) / beta_sq);
-    float t = e.t * gamma
-            - e.x * gamma * bx / c
-            - e.y * gamma * by / c;
+    float x = - e.t() * gamma * bx * c
+              + e.x() * (1 + (gamma - 1) * (bx * bx) / beta_sq)
+              + e.y() * ((gamma - 1) * (bx * by) / beta_sq);
+    float y = - e.t() * gamma * by * c
+              + e.x() * ((gamma - 1) * (bx * by) / beta_sq)
+              + e.y() * (1 + (gamma - 1) * (by * by) / beta_sq);
+    float t = e.t() * gamma
+            - e.x() * gamma * bx / c
+            - e.y() * gamma * by / c;
 
     Event r = new Event(x, y, t);
     return r;

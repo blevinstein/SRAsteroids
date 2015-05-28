@@ -1,4 +1,4 @@
-
+package com.blevinstein.sr;
 
 public class Check {
   public static void checkBeta(float bx, float by) {

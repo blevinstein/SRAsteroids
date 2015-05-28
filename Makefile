@@ -1,10 +1,18 @@
+CLASSPATH = src
+
+CLASSES = $(subst .java,.class, \
+		$(wildcard src/*/*/*/*.java) \
+		$(wildcard src/*/*/*/*/*.java))
+
 default: build
 
-build: *.java
-	javac *.java
+build: ${CLASSES}
+
+%.class: %.java
+	javac -cp ${CLASSPATH} -d build $<
 
 run:
-	java Driver
+	java -cp ${CLASSPATH}:build com.blevinstein.sr.asteroids.Driver
 
 clean:
 	rm -rf *.class

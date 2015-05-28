@@ -1,3 +1,11 @@
+package com.blevinstein.sr.asteroids;
+
+import com.blevinstein.sr.Event;
+import com.blevinstein.sr.ConstantTimeline;
+import com.blevinstein.sr.SR;
+import com.blevinstein.sr.Timeline;
+import com.blevinstein.util.Throttle;
+
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -46,7 +54,7 @@ public class SRAsteroids extends JPanel implements MouseMotionListener {
     if (random(0, 1) < 0.05) {
       timelines.add(
           new ConstantTimeline(
-              now.x + random(-getWidth()/2, getWidth()/2), now.y + random(-getHeight()/2, getHeight()/2), now.t,
+              now.x() + random(-getWidth()/2, getWidth()/2), now.y() + random(-getHeight()/2, getHeight()/2), now.t(),
               random(-0.7f, 0.7f), random(-0.7f, 0.7f)));
       // remove old objects to make room
       if (timelines.size() > 100) {
@@ -95,11 +103,11 @@ public class SRAsteroids extends JPanel implements MouseMotionListener {
       Event image = SR.lorentz(event.relativeTo(now), bx, by);
       if (offScreen(image)) continue;
       // NOTE: use red = future, blue = past
-      g2.setColor(new Color((int) constrain(255 + image.t, 0, 255),
-            (int) constrain(255 - Math.abs(image.t), 0, 255),
-            (int) constrain(255 - image.t, 0, 255)));
+      g2.setColor(new Color((int) constrain(255 + image.t(), 0, 255),
+            (int) constrain(255 - Math.abs(image.t()), 0, 255),
+            (int) constrain(255 - image.t(), 0, 255)));
       // TODO: make 3D to allow rotation into time
-      drawEllipse(g2, image.x + getWidth() / 2, image.y + getHeight() / 2, 10f, bx, by);
+      drawEllipse(g2, image.x() + getWidth() / 2, image.y() + getHeight() / 2, 10f, bx, by);
     }
 
     g.drawImage(buffer, 0, 0, null /* observer */);
@@ -123,7 +131,7 @@ public class SRAsteroids extends JPanel implements MouseMotionListener {
   private boolean offScreen(Event e) {
     float margin = 10;
     float w = getWidth() / 2 + margin, h = getHeight() / 2 + margin;
-    return e.x > w || e.x < -w || e.y > h || e.y < -h;
+    return e.x() > w || e.x() < -w || e.y() > h || e.y() < -h;
   }
 
   private void drawEllipse(Graphics2D g, float x, float y, float r, float bx, float by) {

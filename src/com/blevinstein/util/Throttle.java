@@ -1,3 +1,5 @@
+package com.blevinstein.util;
+
 // sleep timing logic inspired by Processing
 // https://code.google.com/p/processing/source/browse/trunk/processing/android/core/src/processing/core/PApplet.java?r=7046
 
