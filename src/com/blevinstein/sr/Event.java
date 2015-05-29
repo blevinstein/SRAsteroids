@@ -1,5 +1,7 @@
 package com.blevinstein.sr;
 
+import static com.blevinstein.sr.SR.c;
+
 public class Event {
   private float _x;
   private float _y;
@@ -35,6 +37,28 @@ public class Event {
     return new Event(this._x + dx,
         this._y + dy,
         this._t + dt);
+  }
+
+  /**
+   * @return length squared of the spacetime interval between this event and the observer/origin
+   */
+  public float interval_sq() {
+    return - (c * _t) * (c * _t)
+        + _x * _x + _y * _y;
+  }
+
+  /**
+   * @return whether the spacetime interval is spacelike, x^2 + y^2 > (ct)^2
+   */
+  public boolean isSpaceLike() {
+    return interval_sq() > 0;
+  }
+
+  /**
+   * @return whether the spacetime interval is timelike, (ct)^2 > x^2 + y^2
+   */
+  public boolean isTimeLike() {
+    return interval_sq() < 0;
   }
 
   @Override
