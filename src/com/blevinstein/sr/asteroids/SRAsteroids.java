@@ -111,6 +111,10 @@ public class SRAsteroids extends JPanel implements MouseMotionListener, KeyListe
     for (Timeline timeline : timelines) {
       // TODO: use intersection on light cone instead of normal time
       Event event = timeline.concurrentWith(now, velocity);
+      if (event == null) {
+        // Timeline is in the past or future
+        continue;
+      }
       Event image = SR.lorentz(event.relativeTo(now), velocity);
       if (offScreen(image)) continue;
       // NOTE: use red = future, blue = past

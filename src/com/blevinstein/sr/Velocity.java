@@ -51,6 +51,7 @@ public class Velocity {
   }
 
   // BROKEN
+  // http://en.wikipedia.org/wiki/Velocity-addition_formula#Special_theory_of_relativity
   public Velocity relativePlus(Velocity other) {
     Velocity otherNorm = other.norm();
     Velocity otherParallel = otherNorm.times(this.dot(otherNorm));

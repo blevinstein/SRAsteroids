@@ -3,7 +3,23 @@ package com.blevinstein.sr;
 import java.util.function.Function;
 
 public abstract class Timeline {
+  /**
+   * Describes the position of an object over time in a particular reference frame.
+   */
+  @Nullable
   public abstract Event at(float t);
+
+  /**
+   * @return the event which represents the beginning of this timeline
+   * Should return null if the timeline has no start.
+   */
+  public Event start() { return null; }
+
+  /**
+   * @return the event which represents the termination of this timeline
+   * Should return null if the timeline doesn't end, or the end is undetermined.
+   */
+  public Event end() { return null; }
 
   public Event bisectionMethod(Function<Event, Float> errorFunction, float tLow, float tHigh) {
     // bisection method
@@ -62,9 +78,22 @@ public abstract class Timeline {
       return this.at(observer.t());
     }
 
-    return solve((Event e) -> SR.lorentz(e.relativeTo(observer), v).t(),
+    Event solution = solve((Event e) -> SR.lorentz(e.relativeTo(observer), v).t(),
         observer.t(),
         gamma / 2);
+    return this.contains(solution) ? solution : null;
+  }
+
+  public boolean contains(Event e) {
+    if (start() != null && start().t() > e.t()) {
+      // e is before start of timeline
+      return false;
+    }
+    if (end() != null && end().t() < e.t()) {
+      // e is after end of timeline
+      return false;
+    }
+    return true;
   }
 }
 
