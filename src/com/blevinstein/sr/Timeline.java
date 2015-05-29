@@ -2,11 +2,11 @@ package com.blevinstein.sr;
 
 import java.util.function.Function;
 
+// TODO: add velocity to timeline
 public abstract class Timeline {
   /**
    * Describes the position of an object over time in a particular reference frame.
    */
-  @Nullable
   public abstract Event at(float t);
 
   /**

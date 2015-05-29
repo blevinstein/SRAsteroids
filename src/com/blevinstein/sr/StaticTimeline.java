@@ -1,6 +1,5 @@
 package com.blevinstein.sr;
 
-// TODO: implement arbitrary timelines?
 public class StaticTimeline extends Timeline {
   float x;
   float y;
