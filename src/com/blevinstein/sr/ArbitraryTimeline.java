@@ -87,9 +87,18 @@ public class ArbitraryTimeline extends Timeline {
   }
 
   public double timeElapsed(double tStart, double tEnd) {
+    // Handle inverted intervals
+    if (tEnd < tStart) {
+      return -timeElapsed(tEnd, tStart);
+    }
     double totalTimeElapsed = 0;
     int iStart = findSegment(tStart); // index of last event before tStart
     int iEnd = findSegment(tEnd); // index of last event before tEnd
+
+    if (iStart == iEnd) {
+      // Only one relevant segment
+      return this.at(tEnd).relativeTo(this.at(tStart)).timeElapsed();
+    }
 
     // segment from tStart to events[iStart+1]
     totalTimeElapsed += events.get(iStart + 1).relativeTo(this.at(tStart)).timeElapsed();
