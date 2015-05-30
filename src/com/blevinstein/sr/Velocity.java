@@ -51,19 +51,16 @@ public class Velocity {
   }
 
   // BROKEN
-  // http://en.wikipedia.org/wiki/Velocity-addition_formula#Special_theory_of_relativity
+  // http://en.wikipedia.org/wiki/Velocity-addition_formula
+  // w = v + u =
+  // 1 / (1 + v dot u / c^2) * (v + (1 / g) u + (1 / c^2) (g / (1 + g)) (v dot u) v)
+  // where g = v.gamma()
   public Velocity relativePlus(Velocity other) {
-    Velocity otherNorm = other.norm();
-    Velocity otherParallel = otherNorm.times(this.dot(otherNorm));
-    Velocity otherPerp = other.minus(otherParallel);
-
-    // DEBUG
-    //System.out.println("otherNorm " + otherNorm.mag() + " @ " + angleTo(otherNorm));
-    //System.out.println("otherParallel " + otherParallel.mag() + " @ " + angleTo(otherParallel));
-    //System.out.println("otherPerp " + otherPerp.mag() + " @ " + angleTo(otherPerp));
-
-    return this.plus(otherParallel).plus(otherPerp.div(gamma()))
-        .div(1 + this.dot(other) / (c * c));
+    double g = this.gamma();
+    double dotProduct = this.dot(other);
+    return this.times(1 + 1 / (c * c) * g / (1 + g) * dotProduct)
+      .plus(other.times(1 / g))
+      .times(1 / (1 + dotProduct / (c * c)));
   }
 
   public double angleTo(Velocity other) {

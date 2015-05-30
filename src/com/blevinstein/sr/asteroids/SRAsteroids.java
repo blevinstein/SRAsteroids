@@ -59,16 +59,16 @@ public class SRAsteroids extends JPanel implements MouseMotionListener, KeyListe
     double a = 0.1f;
     if (getKeyDown(KeyEvent.VK_DOWN) != getKeyDown(KeyEvent.VK_UP)) {
       if (getKeyDown(KeyEvent.VK_DOWN)) {
-        velocity = velocity.plus(velocity.norm().times(-a));
+        velocity = velocity.relativePlus(velocity.norm().times(-a));
       } else {
-        velocity = velocity.plus(velocity.norm().times(a));
+        velocity = velocity.relativePlus(velocity.norm().times(a));
       }
     }
     if (getKeyDown(KeyEvent.VK_LEFT) != getKeyDown(KeyEvent.VK_RIGHT)) {
       if (getKeyDown(KeyEvent.VK_LEFT)) {
-        velocity = velocity.plus(velocity.norm().perp().times(a));
+        velocity = velocity.relativePlus(velocity.norm().perp().times(a));
       } else {
-        velocity = velocity.plus(velocity.norm().perp().times(-a));
+        velocity = velocity.relativePlus(velocity.norm().perp().times(-a));
       }
     }
     velocity = velocity.checked(0.95f);
