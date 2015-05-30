@@ -21,7 +21,8 @@ public abstract class Timeline {
    */
   public Event end() { return null; }
 
-  public Event bisectionMethod(Function<Event, Double> errorFunction, double tLow, double tHigh) {
+  public Event bisectionMethod(Function<Event, Double> errorFunction,
+      double tLow, double tHigh) {
     // bisection method
     int iterations = 0;
     double tol = 0.001f;
