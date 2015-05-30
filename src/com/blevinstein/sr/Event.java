@@ -3,15 +3,15 @@ package com.blevinstein.sr;
 import static com.blevinstein.sr.SR.c;
 
 public class Event {
-  private float _x;
-  private float _y;
-  private float _t;
+  private double _x;
+  private double _y;
+  private double _t;
 
-  public float x() { return _x; }
-  public float y() { return _y; }
-  public float t() { return _t; }
+  public double x() { return _x; }
+  public double y() { return _y; }
+  public double t() { return _t; }
   
-  public Event(float x, float y, float t) {
+  public Event(double x, double y, double t) {
     this._x = x;
     this._y = y;
     this._t = t;
@@ -29,7 +29,7 @@ public class Event {
         this._t - other._t);
   }
 
-  public Event times(float k) {
+  public Event times(double k) {
     return new Event(this._x * k,
         this._y * k,
         this._t * k);
@@ -42,10 +42,10 @@ public class Event {
         this._t - other._t);
   }
 
-  public Event advance(float dt) {
+  public Event advance(double dt) {
     return advance(0, 0, dt);
   }
-  public Event advance(float dx, float dy, float dt) {
+  public Event advance(double dx, double dy, double dt) {
     return new Event(this._x + dx,
         this._y + dy,
         this._t + dt);
@@ -54,7 +54,7 @@ public class Event {
   /**
    * @return length squared of the spacetime interval between this event and the observer/origin
    */
-  public float interval_sq() {
+  public double interval_sq() {
     return - (c * _t) * (c * _t)
         + _x * _x + _y * _y;
   }

@@ -29,7 +29,7 @@ public class ArbitraryTimeline extends Timeline {
         events.size()));
   }
 
-  public Event at(float t) {
+  public Event at(double t) {
     if (events.isEmpty()) {
       throw new IllegalArgumentException();
     }
@@ -39,7 +39,7 @@ public class ArbitraryTimeline extends Timeline {
     }
     while (iHigh - iLow > 1) {
       int iMid = (iLow + iHigh) / 2;
-      float tMid = events.get(iMid).t();
+      double tMid = events.get(iMid).t();
       if (tMid < t) {
         iLow = iMid;
       } else if(tMid > t) {
@@ -56,7 +56,7 @@ public class ArbitraryTimeline extends Timeline {
    * @return Event c on the interval between a and b, such that c.t() == t
    * Requires that a.t() < t < b.t()
    */
-  private Event interpolate(Event a, Event b, float t) {
+  private Event interpolate(Event a, Event b, double t) {
     if (a.t() > t || b.t() < t) {
       throw new IllegalArgumentException();
     }
@@ -65,7 +65,7 @@ public class ArbitraryTimeline extends Timeline {
     // Find x such that:
     // a * (1 - x) + b * x = c
     // a  + (b - a) * x = c
-    float x = (t - a.t()) / (b.t() - a.t());
+    double x = (t - a.t()) / (b.t() - a.t());
     return a.plus(b.minus(a).times(x));
   }
 }

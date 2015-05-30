@@ -35,7 +35,7 @@ public class SRAsteroids extends JPanel implements MouseMotionListener, KeyListe
   private ArbitraryTimeline myTimeline = new ArbitraryTimeline();
   private Velocity velocity = new Velocity(0, 0);
 
-  public static final float dt = 0.1f;
+  public static final double dt = 0.1f;
 
   public SRAsteroids() {
     super(null); // no layout manager
@@ -56,7 +56,7 @@ public class SRAsteroids extends JPanel implements MouseMotionListener, KeyListe
   // Core update loop
   public void mainLoop() {
     // Accelerate
-    float a = 0.1f;
+    double a = 0.1f;
     if (getKeyDown(KeyEvent.VK_DOWN) != getKeyDown(KeyEvent.VK_UP)) {
       if (getKeyDown(KeyEvent.VK_DOWN)) {
         velocity = velocity.plus(velocity.norm().times(-a));
@@ -105,7 +105,7 @@ public class SRAsteroids extends JPanel implements MouseMotionListener, KeyListe
     // Show the observer
     g2.setColor(Color.WHITE);
     drawEllipse(g2, getWidth()/2, getHeight()/2, 2.5f, Velocity.ZERO);
-    float beta_sq = velocity.beta_sq();
+    double beta_sq = velocity.beta_sq();
     List<Event> historyEvents = myTimeline.history(100);
     for (int i = 0; i < historyEvents.size() - 1; i++) {
       Event event1 = historyEvents.get(i);
@@ -115,7 +115,7 @@ public class SRAsteroids extends JPanel implements MouseMotionListener, KeyListe
       // TODO: refactor so that (timeline, observer, velocity) -> image isn't so obtuse?
       Event image1 = SR.lorentz(trail1.concurrentWith(now, velocity).relativeTo(now), velocity);
       Event image2 = SR.lorentz(trail2.concurrentWith(now, velocity).relativeTo(now), velocity);
-      g2.draw(new Line2D.Float(
+      g2.draw(new Line2D.Double(
             getWidth()/2 + image1.x(),
             getHeight()/2 + image1.y(),
             getWidth()/2 + image2.x(),
@@ -166,30 +166,30 @@ public class SRAsteroids extends JPanel implements MouseMotionListener, KeyListe
   // Convenience methods
 
   private boolean offScreen(Event e) {
-    float margin = 10;
-    float w = getWidth() / 2 + margin, h = getHeight() / 2 + margin;
+    double margin = 10;
+    double w = getWidth() / 2 + margin, h = getHeight() / 2 + margin;
     return e.x() > w || e.x() < -w || e.y() > h || e.y() < -h;
   }
 
-  private void drawEllipse(Graphics2D g, float x, float y, float r, Velocity v) {
+  private void drawEllipse(Graphics2D g, double x, double y, double r, Velocity v) {
     AffineTransform contraction = SR.lorentzContraction(v);
 
     AffineTransform previousTransform = g.getTransform();
     g.translate(x, y);
     g.transform(contraction);
     g.translate(-x, -y);
-    g.draw(new Ellipse2D.Float(x - r, y - r, 2 * r, 2 * r));
+    g.draw(new Ellipse2D.Double(x - r, y - r, 2 * r, 2 * r));
     g.setTransform(previousTransform);
   }
 
-  private float constrain(float value, float min, float max) {
+  private double constrain(double value, double min, double max) {
     if (value < min) return min;
     if (value > max) return max;
     return value;
   }
 
-  private float random(float min, float max) {
-    return (float) (min + Math.random() * (max - min));
+  private double random(double min, double max) {
+    return (min + Math.random() * (max - min));
   }
 
   // Compatibility

@@ -7,14 +7,14 @@ public class Velocity {
   public static final Velocity I = new Velocity(1, 0);
   public static final Velocity J = new Velocity(0, 1);
 
-  private float vx;
-  private float vy;
+  private double vx;
+  private double vy;
 
-  public float x() { return vx; }
-  public float y() { return vy; }
+  public double x() { return vx; }
+  public double y() { return vy; }
 
-  public Velocity(float vx, float vy) {
-    if (Float.isNaN(vx) || Float.isNaN(vy)) {
+  public Velocity(double vx, double vy) {
+    if (Double.isNaN(vx) || Double.isNaN(vy)) {
       throw new IllegalArgumentException();
     }
     this.vx = vx;
@@ -29,24 +29,24 @@ public class Velocity {
     return checked(1);
   }
 
-  public Velocity checked(float max) {
-    float b = beta();
+  public Velocity checked(double max) {
+    double b = beta();
     return b > max ? this.times(max / b) : this;
   }
 
-  public Event over(float t) {
+  public Event over(double t) {
     return new Event(vx * t, vy * t, t);
   }
 
-  public Velocity times(float k) {
+  public Velocity times(double k) {
     return new Velocity(vx * k, vy * k);
   }
 
-  public Velocity times(float kx, float ky) {
+  public Velocity times(double kx, double ky) {
     return new Velocity(kx * vx, ky * vy);
   }
 
-  public Velocity div(float k) {
+  public Velocity div(double k) {
     return new Velocity(vx / k, vy / k);
   }
 
@@ -66,35 +66,35 @@ public class Velocity {
         .div(1 + this.dot(other) / (c * c));
   }
 
-  public float angleTo(Velocity other) {
-    return (float) Math.acos(this.dot(other) / this.mag() / other.mag());
+  public double angleTo(Velocity other) {
+    return Math.acos(this.dot(other) / this.mag() / other.mag());
   }
 
-  public float gamma() {
-    return (float) (1 / Math.sqrt(1 - beta_sq()));
+  public double gamma() {
+    return (1 / Math.sqrt(1 - beta_sq()));
   }
 
-  public float beta() {
-    return (float) Math.sqrt(beta_sq());
+  public double beta() {
+    return Math.sqrt(beta_sq());
   }
 
-  public float beta_sq() {
-    float bx = vx / c;
-    float by = vy / c;
+  public double beta_sq() {
+    double bx = vx / c;
+    double by = vy / c;
     return bx * bx + by * by;
   }
 
-  public float mag() {
-    return (float) Math.sqrt(vx * vx + vy * vy);
+  public double mag() {
+    return Math.sqrt(vx * vx + vy * vy);
   }
 
   public Velocity norm() {
-    float m = mag();
+    double m = mag();
     if (m == 0) return Velocity.I;
     return this.times(1 / m);
   }
 
-  public float dot(Velocity other) {
+  public double dot(Velocity other) {
     return this.vx * other.vx + this.vy * other.vy;
   }
 
@@ -110,8 +110,8 @@ public class Velocity {
    * @return a random Velocity with magnitude of 1
    */
   public static Velocity randomUnit() {
-    float angle = (float) (Math.random() * 2 * Math.PI);
-    return new Velocity((float) Math.cos(angle), (float) Math.sin(angle));
+    double angle = Math.random() * 2 * Math.PI;
+    return new Velocity(Math.cos(angle), Math.sin(angle));
   }
 
   @Override

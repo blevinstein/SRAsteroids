@@ -7,7 +7,7 @@ public abstract class Timeline {
   /**
    * Describes the position of an object over time in a particular reference frame.
    */
-  public abstract Event at(float t);
+  public abstract Event at(double t);
 
   /**
    * @return the event which represents the beginning of this timeline
@@ -21,12 +21,12 @@ public abstract class Timeline {
    */
   public Event end() { return null; }
 
-  public Event bisectionMethod(Function<Event, Float> errorFunction, float tLow, float tHigh) {
+  public Event bisectionMethod(Function<Event, Double> errorFunction, double tLow, double tHigh) {
     // bisection method
     int iterations = 0;
-    float tol = 0.001f;
-    float tMid = (tLow + tHigh) / 2;
-    float eMid = errorFunction.apply(this.at(tMid));
+    double tol = 0.001f;
+    double tMid = (tLow + tHigh) / 2;
+    double eMid = errorFunction.apply(this.at(tMid));
     while (tHigh - tLow > tol && iterations < 1000) {
       if (eMid < 0) {
         tLow = tMid;
@@ -46,11 +46,11 @@ public abstract class Timeline {
    * @param tGuess starting point for solution search
    * @param dError approximation of d(errorFunction)/dt
    */
-  public Event solve(Function<Event, Float> errorFunction, float tGuess, float dError) {
+  public Event solve(Function<Event, Double> errorFunction, double tGuess, double dError) {
     // low and high guesses for time in original reference frame
-    float tLow = tGuess, tHigh = tGuess;
+    double tLow = tGuess, tHigh = tGuess;
 
-    float eLow, eHigh;
+    double eLow, eHigh;
     eLow = eHigh = errorFunction.apply(at(tGuess));
     // adjust high and low bounds until they are valid
     while (eHigh < 0) {
@@ -70,8 +70,8 @@ public abstract class Timeline {
    * NOTE: naive implementation finds a solution using bisection method, can be overridden
    */
   public Event concurrentWith(Event observer, Velocity v) {
-    float beta_sq = v.beta_sq();
-    float gamma = v.gamma();
+    double beta_sq = v.beta_sq();
+    double gamma = v.gamma();
 
     // avoid division by zero
     if (beta_sq == 0f) {

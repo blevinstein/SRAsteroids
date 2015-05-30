@@ -1,15 +1,15 @@
 package com.blevinstein.sr;
 
 public class StaticTimeline extends Timeline {
-  float x;
-  float y;
+  double x;
+  double y;
   
-  public StaticTimeline(float x, float y) {
+  public StaticTimeline(double x, double y) {
     this.x = x;
     this.y = y;
   }
   
-  public Event at(float t) {
+  public Event at(double t) {
     return new Event(x, y, t);
   }
 }

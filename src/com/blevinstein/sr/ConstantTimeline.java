@@ -12,7 +12,7 @@ public class ConstantTimeline extends Timeline {
     this._v = v;
   }
   
-  public Event at(float t) {
+  public Event at(double t) {
     return _v.over(t).plus(_e);
   }
 }
