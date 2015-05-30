@@ -1,8 +1,11 @@
 package com.blevinstein.sr;
 
+import static com.blevinstein.sr.SR.c;
+
 import java.util.function.Function;
 
-// TODO: add velocity to timeline
+// TODO: test concurrentWith
+// TODO: test seenBy
 public abstract class Timeline {
   /**
    * Get the position of an object over time in a particular reference frame.
@@ -82,17 +85,27 @@ public abstract class Timeline {
    * NOTE: naive implementation finds a solution using bisection method, can be overridden
    */
   public Event concurrentWith(Event observer, Velocity v) {
-    double beta_sq = v.beta_sq();
-    double gamma = v.gamma();
-
     // avoid division by zero
-    if (beta_sq == 0f) {
+    if (v.beta_sq() == 0f) {
       return this.at(observer.t());
     }
 
     Event solution = solve((Event e) -> SR.lorentz(e.relativeTo(observer), v).t(),
         observer.t(),
-        gamma / 2);
+        v.gamma() / 2);
+    return this.contains(solution) ? solution : null;
+  }
+
+  // NOTE: This method only works when a timeline is timelike
+  public Event seenBy(Event observer, Velocity v) {
+    // avoid division by zero
+    if (v.beta_sq() == 0f) {
+      return this.at(observer.t());
+    }
+
+    Event solution = solve((Event e) -> SR.lorentz(e.relativeTo(observer), v).interval_sq(),
+        observer.t() - this.at(observer.t()).relativeTo(observer).dist() / c,
+        v.gamma() / 2);
     return this.contains(solution) ? solution : null;
   }
 

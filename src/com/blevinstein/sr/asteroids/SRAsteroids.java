@@ -104,7 +104,7 @@ public class SRAsteroids extends JPanel implements MouseMotionListener, KeyListe
 
     // Show the observer
     g2.setColor(Color.WHITE);
-    drawEllipse(g2, getWidth()/2, getHeight()/2, 2.5f, Velocity.ZERO);
+    fillEllipse(g2, getWidth()/2, getHeight()/2, 2.5f, Velocity.ZERO);
     double beta_sq = velocity.beta_sq();
     List<Event> historyEvents = myTimeline.history(100);
     for (int i = 0; i < historyEvents.size() - 1; i++) {
@@ -124,7 +124,7 @@ public class SRAsteroids extends JPanel implements MouseMotionListener, KeyListe
 
     // Show the objects
     for (Timeline timeline : timelines) {
-      // TODO: use intersection on light cone instead of normal time
+      // TODO: use seenBy instead of concurrentWith
       Event event = timeline.concurrentWith(now, velocity);
       if (event == null) {
         // Timeline is in the past or future
@@ -138,7 +138,7 @@ public class SRAsteroids extends JPanel implements MouseMotionListener, KeyListe
             (int) constrain(255 - Math.abs(image.t()), 0, 255),
             (int) constrain(255 - image.t(), 0, 255)));
       // TODO: make 3D to allow rotation into time
-      drawEllipse(g2, image.x() + getWidth() / 2, image.y() + getHeight() / 2, 10f, relativeVelocity);
+      fillEllipse(g2, image.x() + getWidth() / 2, image.y() + getHeight() / 2, 10f, relativeVelocity);
     }
 
     g.drawImage(buffer, 0, 0, null /* observer */);
@@ -172,14 +172,14 @@ public class SRAsteroids extends JPanel implements MouseMotionListener, KeyListe
     return e.x() > w || e.x() < -w || e.y() > h || e.y() < -h;
   }
 
-  private void drawEllipse(Graphics2D g, double x, double y, double r, Velocity v) {
+  private void fillEllipse(Graphics2D g, double x, double y, double r, Velocity v) {
     AffineTransform contraction = SR.lorentzContraction(v);
 
     AffineTransform previousTransform = g.getTransform();
     g.translate(x, y);
     g.transform(contraction);
     g.translate(-x, -y);
-    g.draw(new Ellipse2D.Double(x - r, y - r, 2 * r, 2 * r));
+    g.fill(new Ellipse2D.Double(x - r, y - r, 2 * r, 2 * r));
     g.setTransform(previousTransform);
   }
 

@@ -52,11 +52,23 @@ public class Event {
   }
 
   /**
-   * @return length squared of the spacetime interval between this event and the observer/origin
+   * @return length of the spacetime interval between this event and the observer/origin
    */
+  public double interval() {
+    return Math.sqrt(interval_sq());
+  }
   public double interval_sq() {
-    return (c * _t) * (c * _t)
-        - _x * _x - _y * _y;
+    return (c * _t) * (c * _t) - dist_sq();
+  }
+
+  /**
+   * @return the length of the distance between this event and the observer
+   */
+  public double dist() {
+    return Math.sqrt(dist_sq());
+  }
+  public double dist_sq() {
+    return _x * _x + _y * _y;
   }
 
   /**
