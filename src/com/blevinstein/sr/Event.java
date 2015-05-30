@@ -74,6 +74,18 @@ public class Event {
   }
 
   @Override
+  public boolean equals(Object obj) {
+    if (obj instanceof Event) {
+      Event other = (Event) obj;
+      return this._x == other._x &&
+        this._y == other._y &&
+        this._t == other._t;
+    } else {
+      return false;
+    }
+  }
+
+  @Override
   public String toString() {
     return "(" + this._x + ", " + this._y + ", " + this._t + ")";
   }
