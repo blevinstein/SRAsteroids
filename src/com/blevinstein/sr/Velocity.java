@@ -15,7 +15,7 @@ public class Velocity {
 
   public Velocity(double vx, double vy) {
     if (Double.isNaN(vx) || Double.isNaN(vy)) {
-      throw new IllegalArgumentException();
+      throw new IllegalArgumentException("Component isNaN.");
     }
     this.vx = vx;
     this.vy = vy;
@@ -109,6 +109,17 @@ public class Velocity {
   public static Velocity randomUnit() {
     double angle = Math.random() * 2 * Math.PI;
     return new Velocity(Math.cos(angle), Math.sin(angle));
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj instanceof Velocity) {
+      Velocity other = (Velocity) obj;
+      return this.vx == other.vx
+        && this.vy == other.vy;
+    } else {
+      return false;
+    }
   }
 
   @Override

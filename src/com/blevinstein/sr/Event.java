@@ -77,6 +77,10 @@ public class Event {
     return new Velocity(_x / _t, _y / _t);
   }
 
+  public double timeElapsed() {
+    return this.toVelocity().gamma() * _t;
+  }
+
   @Override
   public boolean equals(Object obj) {
     if (obj instanceof Event) {

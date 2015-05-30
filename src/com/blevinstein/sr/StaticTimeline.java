@@ -16,4 +16,8 @@ public class StaticTimeline extends Timeline {
   public Velocity velocityAt(double t) {
     return Velocity.ZERO;
   }
+
+  public double timeElapsed(double tStart, double tEnd) {
+    return tEnd - tStart;
+  }
 }

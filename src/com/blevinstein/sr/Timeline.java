@@ -5,7 +5,7 @@ import java.util.function.Function;
 // TODO: add velocity to timeline
 public abstract class Timeline {
   /**
-   * Describes the position of an object over time in a particular reference frame.
+   * Get the position of an object over time in a particular reference frame.
    */
   public abstract Event at(double t);
 
@@ -13,6 +13,12 @@ public abstract class Timeline {
    * Get the instantaneous velocity of this timeline.
    */
   public abstract Velocity velocityAt(double t);
+
+  /**
+   * Get the 'subjective' time elapsed for this timeline over the interval [tStart, tEnd] in the
+   * reference frame.
+   */
+  public abstract double timeElapsed(double tStart, double tEnd);
 
   /**
    * @return the event which represents the beginning of this timeline

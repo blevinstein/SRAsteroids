@@ -19,4 +19,8 @@ public class ConstantTimeline extends Timeline {
   public Velocity velocityAt(double t) {
     return _v;
   }
+
+  public double timeElapsed(double tStart, double tEnd) {
+    return _v.gamma() * (tEnd - tStart);
+  }
 }

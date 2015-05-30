@@ -8,7 +8,7 @@ public class ArbitraryTimeline extends Timeline {
 
   public void add(Event e) {
     if (!events.isEmpty() && e.t() <= end().t()) {
-      throw new IllegalArgumentException();
+      throw new IllegalArgumentException("Must move forwards in time.");
     }
     events.add(e);
   }
@@ -30,6 +30,13 @@ public class ArbitraryTimeline extends Timeline {
   }
 
   public Event at(double t) {
+    if (events.size() == 1) {
+      if (events.get(0).t() == t) {
+        return events.get(0);
+      } else {
+        throw new IllegalArgumentException("Out of bounds.");
+      }
+    }
     int i = findSegment(t);
     return interpolate(events.get(i), events.get(i+1), t);
   }
@@ -44,11 +51,11 @@ public class ArbitraryTimeline extends Timeline {
    */
   private int findSegment(double t) {
     if (events.isEmpty()) {
-      throw new IllegalArgumentException();
+      throw new IllegalArgumentException("Empty.");
     }
     int iLow = 0, iHigh = events.size() - 1;
     if (events.get(iLow).t() > t || events.get(iHigh).t() < t) {
-      throw new IllegalArgumentException();
+      throw new IllegalArgumentException("Out of bounds.");
     }
     while (iHigh - iLow > 1) {
       int iMid = (iLow + iHigh) / 2;
@@ -77,5 +84,24 @@ public class ArbitraryTimeline extends Timeline {
     // a  + (b - a) * x = c
     double x = (t - a.t()) / (b.t() - a.t());
     return a.plus(b.minus(a).times(x));
+  }
+
+  public double timeElapsed(double tStart, double tEnd) {
+    double totalTimeElapsed = 0;
+    int iStart = findSegment(tStart); // index of last event before tStart
+    int iEnd = findSegment(tEnd); // index of last event before tEnd
+
+    // segment from tStart to events[iStart+1]
+    totalTimeElapsed += events.get(iStart + 1).relativeTo(this.at(tStart)).timeElapsed();
+
+    // segments from events[iStart+1] to events[iEnd]
+    for (int i = iStart + 1; i < iEnd; i++) {
+      totalTimeElapsed += events.get(i + 1).relativeTo(events.get(i)).timeElapsed();
+    }
+
+    // segment from events[iEnd] to tEnd
+    totalTimeElapsed += this.at(tEnd).relativeTo(events.get(iEnd)).timeElapsed();
+
+    return totalTimeElapsed;
   }
 }
