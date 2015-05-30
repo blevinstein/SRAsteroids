@@ -46,9 +46,8 @@ public class ArbitraryTimeline extends Timeline {
   /**
    * @return Event c on the interval between a and b, such that c.t() == t
    * Requires that a.t() < t < b.t()
-   * Package private for testing
    */
-  Event interpolate(Event a, Event b, float t) {
+  private Event interpolate(Event a, Event b, float t) {
     if (a.t() > t || b.t() < t) {
       throw new IllegalArgumentException();
     }
