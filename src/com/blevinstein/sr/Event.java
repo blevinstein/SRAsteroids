@@ -46,31 +46,35 @@ public class Event {
     return advance(0, 0, dt);
   }
   public Event advance(double dx, double dy, double dt) {
-    return new Event(this._x + dx,
-        this._y + dy,
-        this._t + dt);
+    return new Event(_x + dx,
+        _y + dy,
+        _t + dt);
   }
 
   /**
    * @return length squared of the spacetime interval between this event and the observer/origin
    */
   public double interval_sq() {
-    return - (c * _t) * (c * _t)
-        + _x * _x + _y * _y;
+    return (c * _t) * (c * _t)
+        - _x * _x - _y * _y;
   }
 
   /**
    * @return whether the spacetime interval is spacelike, x^2 + y^2 > (ct)^2
    */
   public boolean isSpaceLike() {
-    return interval_sq() > 0;
+    return interval_sq() < 0;
   }
 
   /**
    * @return whether the spacetime interval is timelike, (ct)^2 > x^2 + y^2
    */
   public boolean isTimeLike() {
-    return interval_sq() < 0;
+    return interval_sq() > 0;
+  }
+
+  public Velocity toVelocity() {
+    return new Velocity(_x / _t, _y / _t);
   }
 
   @Override

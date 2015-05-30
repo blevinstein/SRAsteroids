@@ -131,13 +131,14 @@ public class SRAsteroids extends JPanel implements MouseMotionListener, KeyListe
         continue;
       }
       Event image = SR.lorentz(event.relativeTo(now), velocity);
+      Velocity relativeVelocity = timeline.velocityAt(event.t()).relativePlus(velocity);
       if (offScreen(image)) continue;
       // NOTE: use red = future, blue = past
       g2.setColor(new Color((int) constrain(255 + image.t(), 0, 255),
             (int) constrain(255 - Math.abs(image.t()), 0, 255),
             (int) constrain(255 - image.t(), 0, 255)));
       // TODO: make 3D to allow rotation into time
-      drawEllipse(g2, image.x() + getWidth() / 2, image.y() + getHeight() / 2, 10f, velocity);
+      drawEllipse(g2, image.x() + getWidth() / 2, image.y() + getHeight() / 2, 10f, relativeVelocity);
     }
 
     g.drawImage(buffer, 0, 0, null /* observer */);

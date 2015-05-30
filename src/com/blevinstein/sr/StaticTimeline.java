@@ -12,4 +12,8 @@ public class StaticTimeline extends Timeline {
   public Event at(double t) {
     return new Event(x, y, t);
   }
+
+  public Velocity velocityAt(double t) {
+    return Velocity.ZERO;
+  }
 }

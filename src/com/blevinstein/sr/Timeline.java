@@ -10,6 +10,11 @@ public abstract class Timeline {
   public abstract Event at(double t);
 
   /**
+   * Get the instantaneous velocity of this timeline.
+   */
+  public abstract Velocity velocityAt(double t);
+
+  /**
    * @return the event which represents the beginning of this timeline
    * Should return null if the timeline has no start.
    */

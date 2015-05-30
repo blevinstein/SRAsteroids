@@ -30,6 +30,19 @@ public class ArbitraryTimeline extends Timeline {
   }
 
   public Event at(double t) {
+    int i = findSegment(t);
+    return interpolate(events.get(i), events.get(i+1), t);
+  }
+
+  public Velocity velocityAt(double t) {
+    int i = findSegment(t);
+    return events.get(i+1).relativeTo(events.get(i)).toVelocity();
+  }
+
+  /**
+   * @return x such that t is between events[x] and events[x+1]
+   */
+  private int findSegment(double t) {
     if (events.isEmpty()) {
       throw new IllegalArgumentException();
     }
@@ -40,16 +53,13 @@ public class ArbitraryTimeline extends Timeline {
     while (iHigh - iLow > 1) {
       int iMid = (iLow + iHigh) / 2;
       double tMid = events.get(iMid).t();
-      if (tMid < t) {
+      if (tMid <= t) {
         iLow = iMid;
       } else if(tMid > t) {
         iHigh = iMid;
-      } else {
-        // Found exact solution
-        return events.get(iMid);
       }
     }
-    return interpolate(events.get(iLow), events.get(iHigh), t);
+    return iLow;
   }
 
   /**
