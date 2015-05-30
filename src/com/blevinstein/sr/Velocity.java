@@ -106,6 +106,14 @@ public class Velocity {
     return new Velocity(this.vx - other.vx, this.vy - other.vy);
   }
 
+  /**
+   * @return a random Velocity with magnitude of 1
+   */
+  public static Velocity randomUnit() {
+    float angle = (float) (Math.random() * 2 * Math.PI);
+    return new Velocity((float) Math.cos(angle), (float) Math.sin(angle));
+  }
+
   @Override
   public String toString() {
     return "<" + vx + ", " + vy + ">";

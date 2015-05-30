@@ -78,7 +78,7 @@ public class SRAsteroids extends JPanel implements MouseMotionListener, KeyListe
       Event eventOffset = new Event(random(-getWidth()/2, getWidth()/2),
           random(-getHeight()/2, getHeight()/2),
           0);
-      Velocity relativeVelocity = new Velocity(random(-0.7f, 0.7f), random(-0.7f, 0.7f));
+      Velocity relativeVelocity = Velocity.randomUnit().times(random(0, 1) * c);
       timelines.add(
           new ConstantTimeline(myTimeline.end().plus(eventOffset), relativeVelocity));
       // remove old objects to make room
