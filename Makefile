@@ -17,7 +17,9 @@ CLASSES = \
 		$(wildcard test/*/*/*/*.class) \
 		$(wildcard test/*/*/*/*/*.class)
 
-TESTS = com.blevinstein.sr.ArbitraryTimelineTest
+TEST_SRCS = $(wildcard test/*/*/*/*Test.java) \
+						$(wildcard test/*/*/*/*/*Test.java)
+TESTS = $(subst /,.,$(subst test/,,$(subst .java,,${TEST_SRCS})))
 
 default: build
 
