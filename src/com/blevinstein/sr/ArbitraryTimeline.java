@@ -7,6 +7,9 @@ public class ArbitraryTimeline extends Timeline {
   List<Event> events = new ArrayList<>();
 
   public void add(Event e) {
+    if (!events.isEmpty() && e.t() <= end().t()) {
+      throw new IllegalArgumentException();
+    }
     events.add(e);
   }
 
