@@ -5,6 +5,8 @@ import static com.blevinstein.sr.SR.c;
 import com.blevinstein.sr.ConstantTimeline;
 import com.blevinstein.sr.Event;
 import com.blevinstein.sr.SR;
+import com.blevinstein.sr.ArbitraryTimeline;
+import com.blevinstein.sr.StaticTimeline;
 import com.blevinstein.sr.Timeline;
 import com.blevinstein.sr.Velocity;
 import com.blevinstein.util.Throttle;
@@ -30,13 +32,15 @@ import javax.swing.JPanel;
 
 public class SRAsteroids extends JPanel implements MouseMotionListener, KeyListener {
   private List<Timeline> timelines = new CopyOnWriteArrayList<>();
-  private Event now = new Event(0, 0, 0);
+  private ArbitraryTimeline myTimeline = new ArbitraryTimeline();
   private Velocity velocity = new Velocity(0, 0);
 
   public static final float dt = 0.1f;
 
   public SRAsteroids() {
     super(null); // no layout manager
+
+    myTimeline.add(new Event(0, 0, 0));
   }
 
   // Main loop that triggers repainting
@@ -49,6 +53,7 @@ public class SRAsteroids extends JPanel implements MouseMotionListener, KeyListe
     }
   }
 
+  // Core update loop
   public void mainLoop() {
     // Accelerate
     float a = 0.1f;
@@ -75,18 +80,16 @@ public class SRAsteroids extends JPanel implements MouseMotionListener, KeyListe
           0);
       Velocity relativeVelocity = new Velocity(random(-0.7f, 0.7f), random(-0.7f, 0.7f));
       timelines.add(
-          new ConstantTimeline(now.plus(eventOffset), relativeVelocity));
+          new ConstantTimeline(myTimeline.end().plus(eventOffset), relativeVelocity));
       // remove old objects to make room
       if (timelines.size() > 100) {
         timelines.remove(0);
       }
     }
     
-    // TODO: replace (now : Event) with (self : Timeline)
-    now = now.plus(velocity.over(dt));
+    myTimeline.add(myTimeline.end().plus(velocity.over(dt)));
   }
 
-  // Core update loop
   public void paintComponent(Graphics g) {
     super.paintComponent(g);
 
@@ -97,15 +100,27 @@ public class SRAsteroids extends JPanel implements MouseMotionListener, KeyListe
     g2.setColor(Color.BLACK);
     g2.fill(new Rectangle(0, 0, getWidth(), getHeight()));
 
+    Event now = myTimeline.end();
+
     // Show the observer
     g2.setColor(Color.WHITE);
     drawEllipse(g2, getWidth()/2, getHeight()/2, 2.5f, Velocity.ZERO);
     float beta_sq = velocity.beta_sq();
-    g2.draw(new Line2D.Float(
-          getWidth()/2,
-          getHeight()/2,
-          getWidth()/2 - velocity.x() / c * beta_sq * 100f,
-          getHeight()/2 - velocity.y() / c * beta_sq * 100f));
+    List<Event> historyEvents = myTimeline.history(100);
+    for (int i = 0; i < historyEvents.size() - 1; i++) {
+      Event event1 = historyEvents.get(i);
+      Event event2 = historyEvents.get(i + 1);
+      StaticTimeline trail1 = new StaticTimeline(event1.x(), event1.y());
+      StaticTimeline trail2 = new StaticTimeline(event2.x(), event2.y());
+      // TODO: refactor so that (timeline, observer, velocity) -> image isn't so obtuse?
+      Event image1 = SR.lorentz(trail1.concurrentWith(now, velocity).relativeTo(now), velocity);
+      Event image2 = SR.lorentz(trail2.concurrentWith(now, velocity).relativeTo(now), velocity);
+      g2.draw(new Line2D.Float(
+            getWidth()/2 + image1.x(),
+            getHeight()/2 + image1.y(),
+            getWidth()/2 + image2.x(),
+            getHeight()/2 + image2.y()));
+    }
 
     // Show the objects
     for (Timeline timeline : timelines) {

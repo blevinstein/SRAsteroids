@@ -23,11 +23,20 @@ public class ArbitraryTimeline extends Timeline {
     return events.get(events.size() - 1);
   }
 
+  public List<Event> history(int n) {
+    return new ArrayList<>(events.subList(
+        Math.max(0, events.size() - n),
+        events.size()));
+  }
+
   public Event at(float t) {
     if (events.isEmpty()) {
       throw new IllegalArgumentException();
     }
     int iLow = 0, iHigh = events.size() - 1;
+    if (events.get(iLow).t() > t || events.get(iHigh).t() < t) {
+      throw new IllegalArgumentException();
+    }
     while (iHigh - iLow > 1) {
       int iMid = (iLow + iHigh) / 2;
       float tMid = events.get(iMid).t();
