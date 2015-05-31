@@ -28,8 +28,11 @@ build: $(subst .java,.class,${SRCS})
 %.class: %.java
 	javac -cp ${CLASSPATH} $<
 
-run: build
+swing: build
 	java -cp ${CLASSPATH} com.blevinstein.sr.asteroids.SwingDriver
+
+gl: build
+	java -cp ${CLASSPATH} com.blevinstein.sr.asteroids.JOGLDriver
 
 tests: build
 	java -cp ${CLASSPATH} org.junit.runner.JUnitCore ${TESTS}

@@ -44,9 +44,9 @@ public class SRAsteroids {
     }
     if (view.getKeyDown(KeyEvent.VK_LEFT) != view.getKeyDown(KeyEvent.VK_RIGHT)) {
       if (view.getKeyDown(KeyEvent.VK_LEFT)) {
-        velocity = velocity.relativePlus(velocity.norm().perp().times(a));
-      } else {
         velocity = velocity.relativePlus(velocity.norm().perp().times(-a));
+      } else {
+        velocity = velocity.relativePlus(velocity.norm().perp().times(a));
       }
     }
     velocity = velocity.checked(0.95f);
@@ -54,8 +54,8 @@ public class SRAsteroids {
     // TODO: add objects on click, in current reference frame
     // Add random objects
     if (random(0, 1) < 0.05) {
-      Event eventOffset = view.getEvent(random(-view.getWidth()/2, view.getWidth()/2),
-          random(-view.getHeight()/2, view.getHeight()/2), velocity);
+      Event eventOffset = view.getEvent(random(0, view.getWidth()),
+          random(0, view.getHeight()), velocity);
       timelines.add(
           new ConstantTimeline(myTimeline.end().plus(eventOffset), velocity));
       // remove old objects to make room
