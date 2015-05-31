@@ -135,6 +135,24 @@ public class JOGLDriver implements SRAsteroids.View, KeyListener {
         c.getAlpha() / 255.0);
   }
 
+  private void vertex(Event e) {
+    gl.glVertex2d(width/2 + e.x(), height/2 + e.y());
+  }
+
+  private static int SHIP_LEN = 10;
+  public void ship(Color c, Timeline t, Velocity v, double angle) {
+    setColor(c);
+    Event image = SR.lorentz(t.concurrentWith(now, v).relativeTo(now), v);
+    Event iOffset = Velocity.unit(angle).over(1).times(SHIP_LEN);
+    Event jOffset = Velocity.unit(angle).perp().over(1).times(SHIP_LEN/2);
+    gl.glBegin(GL2.GL_TRIANGLE_FAN);
+      vertex(image);
+      vertex(image.plus(jOffset));
+      vertex(image.plus(iOffset));
+      vertex(image.minus(jOffset));
+    gl.glEnd();
+  }
+
   public void line(Color c, double x1, double y1, double x2, double y2, Velocity v) {
     setColor(c);
     StaticTimeline point1 = new StaticTimeline(x1, y1);
@@ -143,8 +161,8 @@ public class JOGLDriver implements SRAsteroids.View, KeyListener {
     Event image2 = SR.lorentz(point2.concurrentWith(now, v).relativeTo(now), v);
     gl.glLineWidth(2);
     gl.glBegin(GL2.GL_LINES);
-      gl.glVertex2d(width/2 + image1.x(), height/2 + image1.y());
-      gl.glVertex2d(width/2 + image2.x(), height/2 + image2.y());
+      vertex(image1);
+      vertex(image2);
     gl.glEnd();
   }
 
@@ -166,8 +184,7 @@ public class JOGLDriver implements SRAsteroids.View, KeyListener {
     int segments = (int) Math.max(6, Math.ceil(2 * Math.PI * r / CIRCLE_SEG_LEN));
     gl.glBegin(GL2.GL_LINE_LOOP);
     for (int i = 0; i < segments; i++) {
-      gl.glVertex2d(width/2 + image.x() + r * Math.cos(2 * Math.PI * i / segments),
-          height/2 + image.y() + r * Math.sin(2 * Math.PI * i / segments));
+      vertex(image.plus(Velocity.unit(2 * Math.PI * i / segments).over(1).times(r)));
     }
     gl.glEnd();
   }

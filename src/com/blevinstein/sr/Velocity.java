@@ -67,6 +67,10 @@ public class Velocity {
     return Math.acos(this.dot(other) / this.mag() / other.mag());
   }
 
+  public double getAngle() {
+    return Math.atan2(vy, vx);
+  }
+
   public double gamma() {
     return (1 / Math.sqrt(1 - beta_sq()));
   }
@@ -103,12 +107,16 @@ public class Velocity {
     return new Velocity(this.vx - other.vx, this.vy - other.vy);
   }
 
+  public static Velocity unit(double angle) {
+    return new Velocity(Math.cos(angle), Math.sin(angle));
+  }
+
   /**
    * @return a random Velocity with magnitude of 1
    */
   public static Velocity randomUnit() {
     double angle = Math.random() * 2 * Math.PI;
-    return new Velocity(Math.cos(angle), Math.sin(angle));
+    return unit(angle);
   }
 
   @Override

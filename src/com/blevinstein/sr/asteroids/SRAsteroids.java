@@ -19,6 +19,7 @@ public class SRAsteroids {
   private List<Timeline> timelines = new CopyOnWriteArrayList<>();
   private ArbitraryTimeline myTimeline = new ArbitraryTimeline();
   private Velocity velocity = new Velocity(0, 0);
+  private double angle = 0;
   private View view;
 
   public static final double dt = 0.1f;
@@ -35,18 +36,19 @@ public class SRAsteroids {
   public void mainLoop() {
     // Accelerate
     double a = 0.1f;
+    double alpha = 0.1f;
     if (view.getKeyDown(KeyEvent.VK_DOWN) != view.getKeyDown(KeyEvent.VK_UP)) {
       if (view.getKeyDown(KeyEvent.VK_DOWN)) {
-        velocity = velocity.relativePlus(velocity.norm().times(-a));
+        velocity = velocity.relativePlus(velocity.unit(angle).times(-a));
       } else {
-        velocity = velocity.relativePlus(velocity.norm().times(a));
+        velocity = velocity.relativePlus(velocity.unit(angle).times(a));
       }
     }
     if (view.getKeyDown(KeyEvent.VK_LEFT) != view.getKeyDown(KeyEvent.VK_RIGHT)) {
       if (view.getKeyDown(KeyEvent.VK_LEFT)) {
-        velocity = velocity.relativePlus(velocity.norm().perp().times(-a));
+        angle += alpha;
       } else {
-        velocity = velocity.relativePlus(velocity.norm().perp().times(a));
+        angle -= alpha;
       }
     }
     velocity = velocity.checked(0.95f);
@@ -70,6 +72,7 @@ public class SRAsteroids {
   public interface View {
     void setNow(Event now);
 
+    void ship(Color c, Timeline t, Velocity v, double angle);
     void line(Color c, double x1, double y1, double x2, double y2, Velocity v);
     void circle(Color c, Timeline t, double r, Velocity v);
 
@@ -84,7 +87,7 @@ public class SRAsteroids {
 
     // Show the observer
     // TODO: Velocity.ZERO -> velocity
-    view.circle(Color.WHITE, myTimeline, 2.5, Velocity.ZERO);
+    view.ship(Color.WHITE, myTimeline, Velocity.ZERO, angle);
     List<Event> historyEvents = myTimeline.history(100);
     for (int i = 0; i < historyEvents.size() - 1; i++) {
       Event event1 = historyEvents.get(i);
