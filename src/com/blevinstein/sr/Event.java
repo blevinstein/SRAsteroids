@@ -3,6 +3,8 @@ package com.blevinstein.sr;
 import static com.blevinstein.sr.SR.c;
 
 public class Event {
+  public static final Event ORIGIN = new Event(0, 0, 0);
+
   private double _x;
   private double _y;
   private double _t;

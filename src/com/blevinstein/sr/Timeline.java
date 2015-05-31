@@ -38,11 +38,10 @@ public abstract class Timeline {
   public Event bisectionMethod(Function<Event, Double> errorFunction,
       double tLow, double tHigh) {
     // bisection method
-    int iterations = 0;
     double tol = 0.001f;
     double tMid = (tLow + tHigh) / 2;
     double eMid = errorFunction.apply(this.at(tMid));
-    while (tHigh - tLow > tol && iterations < 1000) {
+    while (tHigh - tLow > tol) {
       if (eMid < 0) {
         tLow = tMid;
       } else if (eMid > 0) {
@@ -61,19 +60,28 @@ public abstract class Timeline {
    * @param tGuess starting point for solution search
    * @param dError approximation of d(errorFunction)/dt
    */
+  private static final int ITER_MAX = 500;
   public Event solve(Function<Event, Double> errorFunction, double tGuess, double dError) {
     // low and high guesses for time in original reference frame
     double tLow = tGuess, tHigh = tGuess;
 
     double eLow, eHigh;
     eLow = eHigh = errorFunction.apply(at(tGuess));
+    int iterations = 0;
     // adjust high and low bounds until they are valid
     while (eHigh < 0) {
-      tHigh -= eHigh / dError;
+      if (iterations++ > ITER_MAX) {
+        throw new IllegalStateException();
+      }
+      tHigh -= Math.min(eHigh / dError, -0.1) * (1 >> iterations);
       eHigh = errorFunction.apply(at(tHigh));
     }
+    iterations = 0;
     while (eLow > 0) {
-      tLow -= eLow / dError;
+      if (iterations++ > ITER_MAX) {
+        throw new IllegalStateException();
+      }
+      tLow -= Math.max(eLow / dError, 0.1) * (1 >> iterations);
       eLow = errorFunction.apply(at(tLow));
     }
 

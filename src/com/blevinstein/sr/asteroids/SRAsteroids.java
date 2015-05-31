@@ -24,7 +24,7 @@ public class SRAsteroids {
   public static final double dt = 0.1f;
 
   public SRAsteroids() {
-    myTimeline.add(new Event(0, 0, 0));
+    myTimeline.add(Event.ORIGIN);
   }
 
   public SRAsteroids setView(View view) {

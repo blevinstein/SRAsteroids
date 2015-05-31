@@ -33,6 +33,7 @@ public class JOGLDriver implements SRAsteroids.View, KeyListener {
 
   public JOGLDriver() {
     world = new SRAsteroids().setView(this);
+    now = Event.ORIGIN;
 
     GLProfile profile = GLProfile.getDefault();
     profile.initSingleton();
@@ -45,7 +46,6 @@ public class JOGLDriver implements SRAsteroids.View, KeyListener {
     canvas.addGLEventListener(new GLEventListener() {
       @Override
       public void reshape(GLAutoDrawable drawable, int x, int y, int w, int h) {
-        System.out.println("resize " + w + "," + h);
         width = w;
         height = h;
         setup(drawable.getGL().getGL2());
@@ -70,7 +70,6 @@ public class JOGLDriver implements SRAsteroids.View, KeyListener {
   public void run() {
     Throttle t = new Throttle(60); // 60fps max
     while (true) {
-      System.out.println("mainLoop");
       world.mainLoop();
       canvas.display();
       t.sleep();
@@ -121,8 +120,6 @@ public class JOGLDriver implements SRAsteroids.View, KeyListener {
     this.gl = gl;
 
     gl.glClear(GL2.GL_COLOR_BUFFER_BIT);
-
-    //gl.glLoadIdentity();
 
     world.draw();
   }
