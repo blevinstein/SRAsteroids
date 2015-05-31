@@ -82,8 +82,7 @@ public class SwingDriver extends JPanel implements SRAsteroids.View, KeyListener
     this.now = now;
   }
 
-  public void drawLine(Color c, double x1, double y1, double x2, double y2,
-      Velocity v) {
+  public void drawLine(Color c, double x1, double y1, double x2, double y2, Velocity v) {
     StaticTimeline point1 = new StaticTimeline(x1, y1);
     StaticTimeline point2 = new StaticTimeline(x2, y2);
     Event image1 = SR.lorentz(point1.concurrentWith(now, v).relativeTo(now), v);
