@@ -11,9 +11,7 @@ import com.blevinstein.sr.Timeline;
 import com.blevinstein.sr.Velocity;
 
 import java.awt.Color;
-import java.awt.Shape;
 import java.awt.event.KeyEvent;
-import java.awt.geom.Ellipse2D;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -72,8 +70,8 @@ public class SRAsteroids {
   public interface View {
     void setNow(Event now);
 
-    void drawLine(Color c, double x1, double y1, double x2, double y2, Velocity v);
-    void fill(Color c, Timeline t, Shape s, Velocity v);
+    void line(Color c, double x1, double y1, double x2, double y2, Velocity v);
+    void circle(Color c, Timeline t, double r, Velocity v);
 
     boolean getKeyDown(int keyCode);
     Event getEvent(double x, double y, Velocity v);
@@ -86,26 +84,22 @@ public class SRAsteroids {
 
     // Show the observer
     // TODO: Velocity.ZERO -> velocity
-    view.fill(Color.WHITE, myTimeline, circle(2.5), Velocity.ZERO);
+    view.circle(Color.WHITE, myTimeline, 2.5, Velocity.ZERO);
     List<Event> historyEvents = myTimeline.history(100);
     for (int i = 0; i < historyEvents.size() - 1; i++) {
       Event event1 = historyEvents.get(i);
       Event event2 = historyEvents.get(i + 1);
-      view.drawLine(Color.WHITE, event1.x(), event1.y(), event2.x(), event2.y(), velocity);
+      view.line(Color.WHITE, event1.x(), event1.y(), event2.x(), event2.y(), velocity);
     }
 
     // Show the objects
     for (Timeline timeline : timelines) {
-      view.fill(Color.WHITE, timeline, circle(10), velocity);
+      view.circle(Color.WHITE, timeline, 10, velocity);
     }
   }
 
 
   // Convenience methods
-
-  private Ellipse2D.Double circle(double r) {
-    return new Ellipse2D.Double(-r, -r, 2 * r, 2 * r);
-  }
 
   private double random(double min, double max) {
     return (min + Math.random() * (max - min));

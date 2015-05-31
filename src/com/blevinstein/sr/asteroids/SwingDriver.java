@@ -16,6 +16,7 @@ import java.awt.Shape;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
@@ -82,7 +83,7 @@ public class SwingDriver extends JPanel implements SRAsteroids.View, KeyListener
     this.now = now;
   }
 
-  public void drawLine(Color c, double x1, double y1, double x2, double y2, Velocity v) {
+  public void line(Color c, double x1, double y1, double x2, double y2, Velocity v) {
     StaticTimeline point1 = new StaticTimeline(x1, y1);
     StaticTimeline point2 = new StaticTimeline(x2, y2);
     Event image1 = SR.lorentz(point1.concurrentWith(now, v).relativeTo(now), v);
@@ -92,7 +93,7 @@ public class SwingDriver extends JPanel implements SRAsteroids.View, KeyListener
           getWidth()/2 + image2.x(), getHeight()/2 + image2.y()));
   }
 
-  public void fill(Color c, Timeline t, Shape s, Velocity vObserver) {
+  public void circle(Color c, Timeline t, double r, Velocity vObserver) {
     // TODO: use seenBy instead of concurrentWith
     Event event = t.concurrentWith(now, vObserver);
     Velocity vObject = t.velocityAt(event.t());
@@ -110,7 +111,7 @@ public class SwingDriver extends JPanel implements SRAsteroids.View, KeyListener
     graphics.translate(image.x() + getWidth() / 2, image.y() + getHeight() / 2);
     graphics.transform(contraction);
     graphics.setColor(c);
-    graphics.fill(s);
+    graphics.fill(circle(r));
     graphics.setTransform(previousTransform);
   }
 
@@ -120,6 +121,10 @@ public class SwingDriver extends JPanel implements SRAsteroids.View, KeyListener
   }
 
   // Convenience methods
+
+  private Ellipse2D.Double circle(double r) {
+    return new Ellipse2D.Double(-r, -r, 2 * r, 2 * r);
+  }
 
   private boolean offScreen(Event e) {
     double margin = 10;
