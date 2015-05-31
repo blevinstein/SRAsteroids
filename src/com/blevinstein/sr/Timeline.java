@@ -73,7 +73,7 @@ public abstract class Timeline {
       if (iterations++ > ITER_MAX) {
         throw new IllegalStateException();
       }
-      tHigh -= Math.min(eHigh / dError, -0.1) * (1 >> iterations);
+      tHigh += Math.pow(2, iterations);
       eHigh = errorFunction.apply(at(tHigh));
     }
     iterations = 0;
@@ -81,7 +81,7 @@ public abstract class Timeline {
       if (iterations++ > ITER_MAX) {
         throw new IllegalStateException();
       }
-      tLow -= Math.max(eLow / dError, 0.1) * (1 >> iterations);
+      tLow -= Math.pow(2, iterations);
       eLow = errorFunction.apply(at(tLow));
     }
 
