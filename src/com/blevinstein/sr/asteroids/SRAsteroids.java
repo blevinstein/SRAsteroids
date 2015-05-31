@@ -16,6 +16,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.Shape;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseMotionListener;
@@ -43,7 +44,6 @@ public class SRAsteroids extends JPanel implements MouseMotionListener, KeyListe
     myTimeline.add(new Event(0, 0, 0));
   }
 
-  // Main loop that triggers repainting
   public void run() {
     Throttle t = new Throttle(60); // 60fps max
     while (true) {
@@ -53,7 +53,6 @@ public class SRAsteroids extends JPanel implements MouseMotionListener, KeyListe
     }
   }
 
-  // Core update loop
   public void mainLoop() {
     // Accelerate
     double a = 0.1f;
@@ -90,10 +89,48 @@ public class SRAsteroids extends JPanel implements MouseMotionListener, KeyListe
     myTimeline.add(myTimeline.end().plus(velocity.over(dt)));
   }
 
+  // Paint methods
+
+  private void drawLine(Graphics2D g, Color c, double x1, double y1, double x2, double y2,
+      Velocity v) {
+    Event now = myTimeline.end();
+    StaticTimeline point1 = new StaticTimeline(x1, y1);
+    StaticTimeline point2 = new StaticTimeline(x2, y2);
+    Event image1 = SR.lorentz(point1.concurrentWith(now, velocity).relativeTo(now), velocity);
+    Event image2 = SR.lorentz(point2.concurrentWith(now, velocity).relativeTo(now), velocity);
+    g.setColor(c);
+    g.draw(new Line2D.Double(getWidth()/2 + image1.x(), getHeight()/2 + image1.y(),
+          getWidth()/2 + image2.x(), getHeight()/2 + image2.y()));
+  }
+
+  private void fill(Graphics2D g, Color c, Timeline t, Shape s, Velocity vObserver) {
+    Event now = myTimeline.end();
+      // TODO: use seenBy instead of concurrentWith
+    Event event = t.concurrentWith(now, vObserver);
+    Velocity vObject = t.velocityAt(event.t());
+    if (event == null) {
+      // Timeline does not exist at this time.
+      return;
+    }
+    Event image = SR.lorentz(event.relativeTo(now), vObserver);
+    if (offScreen(image)) {
+      return;
+    }
+    AffineTransform contraction = SR.lorentzContraction(vObserver.relativePlus(vObject));
+
+    AffineTransform previousTransform = g.getTransform();
+    g.translate(image.x() + getWidth() / 2, image.y() + getHeight() / 2);
+    g.transform(contraction);
+    g.setColor(c);
+    g.fill(s);
+    g.setTransform(previousTransform);
+  }
+
   public void paintComponent(Graphics g) {
     super.paintComponent(g);
 
-    BufferedImage buffer = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB);
+    BufferedImage buffer =
+      new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB);
     Graphics2D g2 = (Graphics2D) buffer.getGraphics();
     g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
@@ -103,42 +140,18 @@ public class SRAsteroids extends JPanel implements MouseMotionListener, KeyListe
     Event now = myTimeline.end();
 
     // Show the observer
-    g2.setColor(Color.WHITE);
-    fillEllipse(g2, getWidth()/2, getHeight()/2, 2.5f, Velocity.ZERO);
+    fill(g2, Color.WHITE, myTimeline, circle(2.5), Velocity.ZERO);
     double beta_sq = velocity.beta_sq();
     List<Event> historyEvents = myTimeline.history(100);
     for (int i = 0; i < historyEvents.size() - 1; i++) {
       Event event1 = historyEvents.get(i);
       Event event2 = historyEvents.get(i + 1);
-      StaticTimeline trail1 = new StaticTimeline(event1.x(), event1.y());
-      StaticTimeline trail2 = new StaticTimeline(event2.x(), event2.y());
-      // TODO: refactor so that (timeline, observer, velocity) -> image isn't so obtuse?
-      Event image1 = SR.lorentz(trail1.concurrentWith(now, velocity).relativeTo(now), velocity);
-      Event image2 = SR.lorentz(trail2.concurrentWith(now, velocity).relativeTo(now), velocity);
-      g2.draw(new Line2D.Double(
-            getWidth()/2 + image1.x(),
-            getHeight()/2 + image1.y(),
-            getWidth()/2 + image2.x(),
-            getHeight()/2 + image2.y()));
+      drawLine(g2, Color.WHITE, event1.x(), event1.y(), event2.x(), event2.y(), velocity);
     }
 
     // Show the objects
     for (Timeline timeline : timelines) {
-      // TODO: use seenBy instead of concurrentWith
-      Event event = timeline.concurrentWith(now, velocity);
-      if (event == null) {
-        // Timeline is in the past or future
-        continue;
-      }
-      Event image = SR.lorentz(event.relativeTo(now), velocity);
-      Velocity relativeVelocity = timeline.velocityAt(event.t()).relativePlus(velocity);
-      if (offScreen(image)) continue;
-      // NOTE: use red = future, blue = past
-      g2.setColor(new Color((int) constrain(255 + image.t(), 0, 255),
-            (int) constrain(255 - Math.abs(image.t()), 0, 255),
-            (int) constrain(255 - image.t(), 0, 255)));
-      // TODO: make 3D to allow rotation into time
-      fillEllipse(g2, image.x() + getWidth() / 2, image.y() + getHeight() / 2, 10f, relativeVelocity);
+      fill(g2, Color.WHITE, timeline, circle(10), velocity);
     }
 
     g.drawImage(buffer, 0, 0, null /* observer */);
@@ -166,27 +179,14 @@ public class SRAsteroids extends JPanel implements MouseMotionListener, KeyListe
 
   // Convenience methods
 
+  private Ellipse2D.Double circle(double r) {
+    return new Ellipse2D.Double(-r, -r, 2 * r, 2 * r);
+  }
+
   private boolean offScreen(Event e) {
     double margin = 10;
     double w = getWidth() / 2 + margin, h = getHeight() / 2 + margin;
     return e.x() > w || e.x() < -w || e.y() > h || e.y() < -h;
-  }
-
-  private void fillEllipse(Graphics2D g, double x, double y, double r, Velocity v) {
-    AffineTransform contraction = SR.lorentzContraction(v);
-
-    AffineTransform previousTransform = g.getTransform();
-    g.translate(x, y);
-    g.transform(contraction);
-    g.translate(-x, -y);
-    g.fill(new Ellipse2D.Double(x - r, y - r, 2 * r, 2 * r));
-    g.setTransform(previousTransform);
-  }
-
-  private double constrain(double value, double min, double max) {
-    if (value < min) return min;
-    if (value > max) return max;
-    return value;
   }
 
   private double random(double min, double max) {
