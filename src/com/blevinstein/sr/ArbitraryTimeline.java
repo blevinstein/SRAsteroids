@@ -2,9 +2,10 @@ package com.blevinstein.sr;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class ArbitraryTimeline extends Timeline {
-  List<Event> events = new ArrayList<>();
+  List<Event> events = new CopyOnWriteArrayList<>();
 
   public void add(Event e) {
     if (!events.isEmpty() && e.t() <= end().t()) {
