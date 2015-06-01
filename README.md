@@ -17,7 +17,14 @@ TODO
 ----
 - Make timelines with start/end events
 - Implement basic collision, splitting, varied sizes of asteriods
+  - For now, implement ellipse collision
 
-- Refactor into package structure
 - Use apache commons math lib?
+
+- implement TransformedTimeline
+- implement SimulatedTimeline
+
+- add zoom
+
+- add light pulses
 
