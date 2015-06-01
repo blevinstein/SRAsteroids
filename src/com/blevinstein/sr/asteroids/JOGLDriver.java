@@ -176,13 +176,13 @@ public class JOGLDriver implements SRAsteroids.View, KeyListener {
       // Timeline does not exist at this time.
       return;
     }
-    Velocity vObject = t.velocityAt(event.t()).minus(vObserver);
+    Velocity vObject = t.velocityAt(event.t()).relativeMinus(vObserver);
     Event image = SR.lorentz(event.minus(now), vObject);
     // TODO if (offScreen(image)) return;
 
     AffineTransform contraction = SR.lorentzContraction(vObject);
     int segments = (int) Math.max(6, Math.ceil(2 * Math.PI * r / CIRCLE_SEG_LEN));
-    gl.glBegin(GL2.GL_LINE_LOOP);
+    gl.glBegin(GL2.GL_TRIANGLE_FAN);
     for (int i = 0; i < segments; i++) {
       double x = Math.cos(2 * Math.PI * i / segments) * r;
       double y = Math.sin(2 * Math.PI * i / segments) * r;

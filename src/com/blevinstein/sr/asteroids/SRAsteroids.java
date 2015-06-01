@@ -51,7 +51,7 @@ public class SRAsteroids {
         angle -= alpha;
       }
     }
-    velocity = velocity.checked(0.99f);
+    velocity = velocity.checked(0.99);
 
     // TODO: add objects on click, in current reference frame
     // Add random objects

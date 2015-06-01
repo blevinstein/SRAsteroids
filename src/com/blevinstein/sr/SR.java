@@ -13,6 +13,7 @@ public class SR {
   // returns new spacetime coordinates for an event after transformation
   public static Event lorentz(Event e, Velocity v) {
     double beta_sq = v.beta_sq();
+    if (beta_sq >= 1) throw new IllegalArgumentException("beta > 1");
     double gamma = v.gamma();
     double bx = v.x() / c;
     double by = v.y() / c;

@@ -63,6 +63,10 @@ public class Velocity {
       .times(1 / (1 + dotProduct / (c * c)));
   }
 
+  public Velocity relativeMinus(Velocity other) {
+    return this.relativePlus(other.times(-1));
+  }
+
   public double angleTo(Velocity other) {
     return Math.acos(this.dot(other) / this.mag() / other.mag());
   }
