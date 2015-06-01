@@ -20,6 +20,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.geom.AffineTransform;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -139,6 +140,7 @@ public class JOGLDriver implements SRAsteroids.View, KeyListener {
     gl.glVertex2d(width/2 + e.x(), height/2 + e.y());
   }
 
+  // TODO: use seenBy instead of concurrentWith?
   private static int SHIP_LEN = 10;
   public void ship(Color c, Timeline t, Velocity v, double angle) {
     setColor(c);
@@ -168,23 +170,26 @@ public class JOGLDriver implements SRAsteroids.View, KeyListener {
 
   private static int CIRCLE_SEG_LEN = 5;
   public void circle(Color c, Timeline t, double r, Velocity vObserver) {
-    // TODO: use seenBy instead of concurrentWith
+    setColor(c);
     Event event = t.concurrentWith(now, vObserver);
     if (event == null) {
       // Timeline does not exist at this time.
       return;
     }
-    Velocity vObject = t.velocityAt(event.t());
-    Event image = SR.lorentz(event.minus(now), vObserver);
+    Velocity vObject = t.velocityAt(event.t()).minus(vObserver);
+    Event image = SR.lorentz(event.minus(now), vObject);
     // TODO if (offScreen(image)) return;
 
-    // TODO: apply contraction transformation
-    //AffineTransform contraction = SR.lorentzContraction(vObserver.relativePlus(vObject));
-    setColor(c);
+    AffineTransform contraction = SR.lorentzContraction(vObject);
     int segments = (int) Math.max(6, Math.ceil(2 * Math.PI * r / CIRCLE_SEG_LEN));
     gl.glBegin(GL2.GL_LINE_LOOP);
     for (int i = 0; i < segments; i++) {
-      vertex(image.plus(Velocity.unit(2 * Math.PI * i / segments).over(1).times(r)));
+      double x = Math.cos(2 * Math.PI * i / segments) * r;
+      double y = Math.sin(2 * Math.PI * i / segments) * r;
+      // Apply AffineTransform
+      double xx = x * contraction.getScaleX() + y * contraction.getShearX() + contraction.getTranslateX();
+      double yy = y * contraction.getScaleY() + x * contraction.getShearY() + contraction.getTranslateY();
+      vertex(image.advance(xx, yy, 0));
     }
     gl.glEnd();
   }
