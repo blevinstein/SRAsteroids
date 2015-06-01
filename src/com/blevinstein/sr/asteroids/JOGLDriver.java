@@ -144,7 +144,9 @@ public class JOGLDriver implements SRAsteroids.View, KeyListener {
   private static int SHIP_LEN = 10;
   public void ship(Color c, Timeline t, Velocity v, double angle) {
     setColor(c);
-    Event image = SR.lorentz(t.concurrentWith(now, v).minus(now), v);
+    Event event = t.concurrentWith(now, v);
+    if (event == null) { return; } // Timeline does not exist at this time.
+    Event image = SR.lorentz(event.minus(now), v);
     Event iOffset = Velocity.unit(angle).over(1).times(SHIP_LEN);
     Event jOffset = Velocity.unit(angle).perp().over(1).times(SHIP_LEN/2);
     gl.glBegin(GL2.GL_TRIANGLE_FAN);
@@ -172,10 +174,7 @@ public class JOGLDriver implements SRAsteroids.View, KeyListener {
   public void circle(Color c, Timeline t, double r, Velocity vObserver) {
     setColor(c);
     Event event = t.concurrentWith(now, vObserver);
-    if (event == null) {
-      // Timeline does not exist at this time.
-      return;
-    }
+    if (event == null) { return; } // Timeline does not exist at this time.
     Velocity vObject = t.velocityAt(event.t()).relativeMinus(vObserver);
     Event image = SR.lorentz(event.minus(now), vObject);
     // TODO if (offScreen(image)) return;

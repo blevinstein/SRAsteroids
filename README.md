@@ -15,7 +15,6 @@ To run:
 
 TODO
 ----
-- Make timelines with start/end events
 - Implement basic collision, splitting, varied sizes of asteriods
   - For now, implement ellipse collision
 

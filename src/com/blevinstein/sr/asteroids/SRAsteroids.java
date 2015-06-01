@@ -86,7 +86,6 @@ public class SRAsteroids {
     view.setNow(myTimeline.end());
 
     // Show the observer
-    // TODO: Velocity.ZERO -> velocity
     view.ship(Color.WHITE, myTimeline, Velocity.ZERO, angle);
     List<Event> historyEvents = myTimeline.history(255);
     for (int i = 0; i < historyEvents.size() - 1; i++) {
