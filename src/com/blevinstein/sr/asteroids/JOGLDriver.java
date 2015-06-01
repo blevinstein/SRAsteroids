@@ -175,8 +175,8 @@ public class JOGLDriver implements SRAsteroids.View, KeyListener {
     setColor(c);
     Event event = t.concurrentWith(now, vObserver);
     if (event == null) { return; } // Timeline does not exist at this time.
-    Velocity vObject = t.velocityAt(event.t()).relativeMinus(vObserver);
-    Event image = SR.lorentz(event.minus(now), vObject);
+    Velocity vObject = vObserver.relativeMinus(t.velocityAt(event.t())).times(-1);
+    Event image = SR.lorentz(event.minus(now), vObserver);
     // TODO if (offScreen(image)) return;
 
     AffineTransform contraction = SR.lorentzContraction(vObject);
