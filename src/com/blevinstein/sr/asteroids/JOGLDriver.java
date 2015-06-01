@@ -142,7 +142,7 @@ public class JOGLDriver implements SRAsteroids.View, KeyListener {
   private static int SHIP_LEN = 10;
   public void ship(Color c, Timeline t, Velocity v, double angle) {
     setColor(c);
-    Event image = SR.lorentz(t.concurrentWith(now, v).relativeTo(now), v);
+    Event image = SR.lorentz(t.concurrentWith(now, v).minus(now), v);
     Event iOffset = Velocity.unit(angle).over(1).times(SHIP_LEN);
     Event jOffset = Velocity.unit(angle).perp().over(1).times(SHIP_LEN/2);
     gl.glBegin(GL2.GL_TRIANGLE_FAN);
@@ -157,8 +157,8 @@ public class JOGLDriver implements SRAsteroids.View, KeyListener {
     setColor(c);
     StaticTimeline point1 = new StaticTimeline(x1, y1);
     StaticTimeline point2 = new StaticTimeline(x2, y2);
-    Event image1 = SR.lorentz(point1.concurrentWith(now, v).relativeTo(now), v);
-    Event image2 = SR.lorentz(point2.concurrentWith(now, v).relativeTo(now), v);
+    Event image1 = SR.lorentz(point1.concurrentWith(now, v).minus(now), v);
+    Event image2 = SR.lorentz(point2.concurrentWith(now, v).minus(now), v);
     gl.glLineWidth(2);
     gl.glBegin(GL2.GL_LINES);
       vertex(image1);
@@ -170,12 +170,12 @@ public class JOGLDriver implements SRAsteroids.View, KeyListener {
   public void circle(Color c, Timeline t, double r, Velocity vObserver) {
     // TODO: use seenBy instead of concurrentWith
     Event event = t.concurrentWith(now, vObserver);
-    Velocity vObject = t.velocityAt(event.t());
     if (event == null) {
       // Timeline does not exist at this time.
       return;
     }
-    Event image = SR.lorentz(event.relativeTo(now), vObserver);
+    Velocity vObject = t.velocityAt(event.t());
+    Event image = SR.lorentz(event.minus(now), vObserver);
     // TODO if (offScreen(image)) return;
 
     // TODO: apply contraction transformation

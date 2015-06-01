@@ -44,7 +44,7 @@ public class ArbitraryTimeline extends Timeline {
 
   public Velocity velocityAt(double t) {
     int i = findSegment(t);
-    return events.get(i+1).relativeTo(events.get(i)).toVelocity();
+    return events.get(i+1).minus(events.get(i)).toVelocity();
   }
 
   /**
@@ -98,19 +98,19 @@ public class ArbitraryTimeline extends Timeline {
 
     if (iStart == iEnd) {
       // Only one relevant segment
-      return this.at(tEnd).relativeTo(this.at(tStart)).timeElapsed();
+      return this.at(tEnd).minus(this.at(tStart)).timeElapsed();
     }
 
     // segment from tStart to events[iStart+1]
-    totalTimeElapsed += events.get(iStart + 1).relativeTo(this.at(tStart)).timeElapsed();
+    totalTimeElapsed += events.get(iStart + 1).minus(this.at(tStart)).timeElapsed();
 
     // segments from events[iStart+1] to events[iEnd]
     for (int i = iStart + 1; i < iEnd; i++) {
-      totalTimeElapsed += events.get(i + 1).relativeTo(events.get(i)).timeElapsed();
+      totalTimeElapsed += events.get(i + 1).minus(events.get(i)).timeElapsed();
     }
 
     // segment from events[iEnd] to tEnd
-    totalTimeElapsed += this.at(tEnd).relativeTo(events.get(iEnd)).timeElapsed();
+    totalTimeElapsed += this.at(tEnd).minus(events.get(iEnd)).timeElapsed();
 
     return totalTimeElapsed;
   }

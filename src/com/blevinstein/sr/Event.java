@@ -28,6 +28,9 @@ public class Event {
         this._t + other._t);
   }
 
+  /**
+   * @return 'this' as seen by 'other' event in stationary reference frame
+   */
   public Event minus(Event other) {
     return new Event(this._x - other._x,
         this._y - other._y,
@@ -38,13 +41,6 @@ public class Event {
     return new Event(this._x * k,
         this._y * k,
         this._t * k);
-  }
-
-  // @return 'this' as seen by 'other' event in stationary reference frame
-  public Event relativeTo(Event other) {
-    return new Event(this._x - other._x,
-        this._y - other._y,
-        this._t - other._t);
   }
 
   public Event advance(double dt) {

@@ -59,7 +59,7 @@ public class SRAsteroids {
       Event eventOffset = view.getEvent(random(0, view.getWidth()),
           random(0, view.getHeight()), velocity);
       timelines.add(
-          new ConstantTimeline(myTimeline.end().plus(eventOffset), velocity));
+          new ConstantTimeline(eventOffset, velocity));
       // remove old objects to make room
       if (timelines.size() > 100) {
         timelines.remove(0);
@@ -88,11 +88,12 @@ public class SRAsteroids {
     // Show the observer
     // TODO: Velocity.ZERO -> velocity
     view.ship(Color.WHITE, myTimeline, Velocity.ZERO, angle);
-    List<Event> historyEvents = myTimeline.history(100);
+    List<Event> historyEvents = myTimeline.history(255);
     for (int i = 0; i < historyEvents.size() - 1; i++) {
       Event event1 = historyEvents.get(i);
       Event event2 = historyEvents.get(i + 1);
-      view.line(Color.WHITE, event1.x(), event1.y(), event2.x(), event2.y(), velocity);
+      Color c = new Color(i, i, i);
+      view.line(c, event1.x(), event1.y(), event2.x(), event2.y(), velocity);
     }
 
     // Show the objects

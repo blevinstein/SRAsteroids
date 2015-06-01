@@ -89,7 +89,7 @@ public abstract class Timeline {
   }
 
   /**
-   * @return e such that lorentz(e.relativeTo(observer), v).t() = 0
+   * @return e such that lorentz(e.minus(observer), v).t() = 0
    * NOTE: naive implementation finds a solution using bisection method, can be overridden
    */
   public Event concurrentWith(Event observer, Velocity v) {
@@ -98,7 +98,7 @@ public abstract class Timeline {
       return this.at(observer.t());
     }
 
-    Event solution = solve((Event e) -> SR.lorentz(e.relativeTo(observer), v).t(),
+    Event solution = solve((Event e) -> SR.lorentz(e.minus(observer), v).t(),
         observer.t(),
         v.gamma() / 2);
     return this.contains(solution) ? solution : null;
@@ -111,8 +111,8 @@ public abstract class Timeline {
       return this.at(observer.t());
     }
 
-    Event solution = solve((Event e) -> SR.lorentz(e.relativeTo(observer), v).interval_sq(),
-        observer.t() - this.at(observer.t()).relativeTo(observer).dist() / c,
+    Event solution = solve((Event e) -> SR.lorentz(e.minus(observer), v).interval_sq(),
+        observer.t() - this.at(observer.t()).minus(observer).dist() / c,
         v.gamma() / 2);
     if (solution.t() > observer.t()) {
       throw new IllegalStateException("Solution is in future instead of past!");
