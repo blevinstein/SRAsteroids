@@ -56,7 +56,7 @@ public class Event {
    * @return length of the spacetime interval between this event and the observer/origin
    */
   public double interval() {
-    return Math.sqrt(interval_sq());
+    return Math.sqrt(Math.abs(interval_sq()));
   }
   public double interval_sq() {
     return (c * _t) * (c * _t) - dist_sq();
