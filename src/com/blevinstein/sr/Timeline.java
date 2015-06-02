@@ -4,8 +4,6 @@ import static com.blevinstein.sr.SR.c;
 
 import java.util.function.Function;
 
-// TODO: test concurrentWith
-// TODO: test seenBy
 public abstract class Timeline {
   /**
    * Get the position of an object over time in a particular reference frame.
