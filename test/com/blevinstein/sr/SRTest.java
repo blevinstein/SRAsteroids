@@ -12,8 +12,11 @@ public class SRTest {
   public ExpectedException thrown = ExpectedException.none();
 
   public static void assertEquals(Event a, Event b, double tol) {
+    assertEquals("", a, b, tol);
+  }
+  public static void assertEquals(String message, Event a, Event b, double tol) {
     if (!a.equals(b, tol)) {
-      Assert.fail(String.format("%s != %s", a, b));
+      Assert.fail(String.format("%s != %s. %s", a, b, message));
     }
   }
 
