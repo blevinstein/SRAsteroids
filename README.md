@@ -3,9 +3,7 @@ Special Relativity Asteroids
 
 Goal: demonstrate time dilation/length contractions, other SR oddities
 
-Success: visualized length contraction!
-
-Currently uses Java Swing.
+Currently uses JOGL.
 
 To build:
 > make
