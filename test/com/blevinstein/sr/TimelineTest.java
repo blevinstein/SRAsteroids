@@ -44,4 +44,36 @@ public class TimelineTest {
       }
     }
   }
+
+  @Test
+  public void seenBy() {
+    Event observer = new Event(1, 1, 1);
+    Velocity v = new Velocity(5, 0);
+    Event image = new Event(3, -4, -0.5); // NOTE: (c * t)^2 = x^2 + y^2
+    Event concurrent = observer.plusRelative(image, v);
+
+    List<Timeline> timelines = new ArrayList<>();
+    timelines.add(new StaticTimeline(concurrent.x(), concurrent.y()));
+    timelines.add(new ConstantTimeline(concurrent, v));
+    timelines.add(new ConstantTimeline(concurrent, v.times(-1)));
+    timelines.add(new ArbitraryTimeline()
+        .add(new Event(-1, -2, -100))
+        .add(concurrent)
+        .add(new Event(1, 2, 100)));
+
+    for (Timeline t : timelines) {
+      assertEquals(t.toString(),
+          image,
+          t.seenBy(observer, v),
+          0.01);
+
+      if (t.start() != null) {
+        assertEquals(Event.ORIGIN, t.seenBy(t.start(), v), 0.001);
+      }
+
+      if (t.end() != null) {
+        assertEquals(Event.ORIGIN, t.seenBy(t.end(), v), 0.001);
+      }
+    }
+  }
 }

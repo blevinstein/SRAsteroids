@@ -69,7 +69,7 @@ public abstract class Timeline {
    */
   private static final int ITER_MAX = 500;
   public double solve(Function<Event, Double> errorFunction, double tGuess) {
-    return solve(errorFunction, tGuess, 1);
+    return solve(errorFunction, tGuess, 0.5);
   }
   public double solve(Function<Event, Double> errorFunction, double tGuess, double dError) {
     // low and high guesses for time in original reference frame
@@ -81,7 +81,7 @@ public abstract class Timeline {
     // adjust high and low bounds until they are valid
     while (eHigh < 0) {
       if (iterations++ > ITER_MAX) {
-        throw new IllegalStateException();
+        throw new IllegalStateException("eHigh < 0");
       }
       tHigh += Math.pow(2, iterations);
       eHigh = errorFunction.apply(at(tHigh));
@@ -89,7 +89,7 @@ public abstract class Timeline {
     iterations = 0;
     while (eLow > 0) {
       if (iterations++ > ITER_MAX) {
-        throw new IllegalStateException();
+        throw new IllegalStateException("eLow > 0");
       }
       tLow -= Math.pow(2, iterations);
       eLow = errorFunction.apply(at(tLow));
@@ -120,14 +120,15 @@ public abstract class Timeline {
    */
   // NOTE: This method only works when a timeline is timelike
   public Event seenBy(Event observer, Velocity v) {
-    double solution = solve((Event e) -> SR.lorentz(e.minus(observer), v).interval_sq(),
+    double solution = solve((Event e) -> {
+          Event image = SR.lorentz(e.minus(observer), v);
+          // Calculates the time (relative to observer.t()) at which the observer sees an event
+          return image.t() + image.dist() / c;
+        },
         observer.t() - this.at(observer.t()).minus(observer).dist() / c,
         v.gamma() / 2);
 
-    if (solution > observer.t()) {
-      throw new IllegalStateException("Solution is in future instead of past!");
-    }
-    return this.contains(solution) ? this.at(solution) : null;
+    return this.contains(solution) ? SR.lorentz(this.at(solution).minus(observer), v) : null;
   }
 
   public boolean contains(double t) {
