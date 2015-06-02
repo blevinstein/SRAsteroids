@@ -42,15 +42,15 @@ public class TimelineTest {
     Event observer = new Event(1, 1, 1);
     Velocity v = new Velocity(5, 0);
     Event image = new Event(3, -4, -0.5); // NOTE: (c * t)^2 = x^2 + y^2
-    Event concurrent = observer.plusRelative(image, v);
+    Event seen = observer.plusRelative(image, v);
 
     List<Timeline> timelines = new ArrayList<>();
-    timelines.add(new StaticTimeline(concurrent.x(), concurrent.y()));
-    timelines.add(new ConstantTimeline(concurrent, v));
-    timelines.add(new ConstantTimeline(concurrent, v.times(-1)));
+    timelines.add(new StaticTimeline(seen.x(), seen.y()));
+    timelines.add(new ConstantTimeline(seen, v));
+    timelines.add(new ConstantTimeline(seen, v.times(-1)));
     timelines.add(new ArbitraryTimeline()
         .add(new Event(-1, -2, -100))
-        .add(concurrent)
+        .add(seen)
         .add(new Event(1, 2, 100)));
 
     for (Timeline t : timelines) {
