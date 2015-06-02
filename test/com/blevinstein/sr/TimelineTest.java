@@ -34,14 +34,6 @@ public class TimelineTest {
           image,
           t.concurrentWith(observer, v),
           0.01);
-
-      if (t.start() != null) {
-        assertEquals(Event.ORIGIN, t.concurrentWith(t.start(), v), 0.001);
-      }
-
-      if (t.end() != null) {
-        assertEquals(Event.ORIGIN, t.concurrentWith(t.end(), v), 0.001);
-      }
     }
   }
 
@@ -66,14 +58,6 @@ public class TimelineTest {
           image,
           t.seenBy(observer, v),
           0.01);
-
-      if (t.start() != null) {
-        assertEquals(Event.ORIGIN, t.seenBy(t.start(), v), 0.001);
-      }
-
-      if (t.end() != null) {
-        assertEquals(Event.ORIGIN, t.seenBy(t.end(), v), 0.001);
-      }
     }
   }
 }
