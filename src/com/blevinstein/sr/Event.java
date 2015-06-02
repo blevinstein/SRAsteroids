@@ -94,6 +94,12 @@ public class Event {
     return this.toVelocity().gamma() * _t;
   }
 
+  public boolean equals(Event other, double tol) {
+    return Math.abs(this._x - other._x) < tol
+        && Math.abs(this._y - other._y) < tol
+        && Math.abs(this._t - other._t) < tol;
+  }
+
   @Override
   public boolean equals(Object obj) {
     if (obj instanceof Event) {
