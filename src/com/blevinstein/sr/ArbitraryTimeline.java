@@ -7,11 +7,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class ArbitraryTimeline extends Timeline {
   List<Event> events = new CopyOnWriteArrayList<>();
 
-  public void add(Event e) {
+  public ArbitraryTimeline add(Event e) {
     if (!events.isEmpty() && e.t() <= end().t()) {
       throw new IllegalArgumentException("Must move forwards in time.");
     }
     events.add(e);
+    return this;
   }
 
   public Event start() {
