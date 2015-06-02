@@ -73,7 +73,7 @@ public class SRAsteroids {
     void setNow(Event now);
 
     void ship(Color c, Timeline t, Velocity v, double angle);
-    void line(Color c, double x1, double y1, double x2, double y2, Velocity v);
+    void line(Color c, Timeline t1, Timeline t2, Velocity v);
     void circle(Color c, Timeline t, double r, Velocity v);
 
     boolean getKeyDown(int keyCode);
@@ -91,8 +91,11 @@ public class SRAsteroids {
     for (int i = 0; i < historyEvents.size() - 1; i++) {
       Event event1 = historyEvents.get(i);
       Event event2 = historyEvents.get(i + 1);
+      Velocity v = event2.minus(event1).toVelocity();
+      StaticTimeline trail1 = new StaticTimeline(event1.x(), event1.y());
+      StaticTimeline trail2 = new StaticTimeline(event2.x(), event2.y());
       Color c = new Color(i, i, i);
-      view.line(c, event1.x(), event1.y(), event2.x(), event2.y(), velocity);
+      view.line(c, trail1, trail2, velocity);
     }
 
     // Show the objects

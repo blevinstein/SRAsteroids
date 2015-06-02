@@ -2,7 +2,6 @@ package com.blevinstein.sr.asteroids;
 
 import com.blevinstein.sr.Event;
 import com.blevinstein.sr.SR;
-import com.blevinstein.sr.StaticTimeline;
 import com.blevinstein.sr.Timeline;
 import com.blevinstein.sr.Velocity;
 import com.blevinstein.util.Throttle;
@@ -144,9 +143,7 @@ public class JOGLDriver implements SRAsteroids.View, KeyListener {
   private static int SHIP_LEN = 10;
   public void ship(Color c, Timeline t, Velocity v, double angle) {
     setColor(c);
-    Event event = t.concurrentWith(now, v);
-    if (event == null) { return; } // Timeline does not exist at this time.
-    Event image = SR.lorentz(event.minus(now), v);
+    Event image = t.concurrentWith(t.end(), v);
     Event iOffset = Velocity.unit(angle).over(1).times(SHIP_LEN);
     Event jOffset = Velocity.unit(angle).perp().over(1).times(SHIP_LEN/2);
     gl.glBegin(GL2.GL_TRIANGLE_FAN);
@@ -157,12 +154,10 @@ public class JOGLDriver implements SRAsteroids.View, KeyListener {
     gl.glEnd();
   }
 
-  public void line(Color c, double x1, double y1, double x2, double y2, Velocity v) {
+  public void line(Color c, Timeline t1, Timeline t2, Velocity v) {
     setColor(c);
-    StaticTimeline point1 = new StaticTimeline(x1, y1);
-    StaticTimeline point2 = new StaticTimeline(x2, y2);
-    Event image1 = SR.lorentz(point1.concurrentWith(now, v).minus(now), v);
-    Event image2 = SR.lorentz(point2.concurrentWith(now, v).minus(now), v);
+    Event image1 = t1.concurrentWith(now, v);
+    Event image2 = t2.concurrentWith(now, v);
     gl.glLineWidth(2);
     gl.glBegin(GL2.GL_LINES);
       vertex(image1);
@@ -173,10 +168,9 @@ public class JOGLDriver implements SRAsteroids.View, KeyListener {
   private static int CIRCLE_SEG_LEN = 5;
   public void circle(Color c, Timeline t, double r, Velocity vObserver) {
     setColor(c);
-    Event event = t.concurrentWith(now, vObserver);
-    if (event == null) { return; } // Timeline does not exist at this time.
+    Event image = t.concurrentWith(now, vObserver);
+    Event event = SR.lorentz(image, vObserver.times(-1));
     Velocity vObject = vObserver.relativeMinus(t.velocityAt(event.t())).times(-1);
-    Event image = SR.lorentz(event.minus(now), vObserver);
     // TODO if (offScreen(image)) return;
 
     AffineTransform contraction = SR.lorentzContraction(vObject);

@@ -35,7 +35,12 @@ public abstract class Timeline {
    */
   public Event end() { return null; }
 
-  public Event bisectionMethod(Function<Event, Double> errorFunction,
+  /**
+   * Given errorFunction(this.at(tHigh)) > 0 > errorFunction(this.at(tLow))
+   * Where errorFunction is continuous
+   * @return tMid such that errorFunction(this.at(tMid)) ~ 0
+   */
+  public double bisectionMethod(Function<Event, Double> errorFunction,
       double tLow, double tHigh) {
     // bisection method
     double tol = 0.001f;
@@ -47,21 +52,26 @@ public abstract class Timeline {
       } else if (eMid > 0) {
         tHigh = tMid;
       } else {
-        return this.at(tMid);
+        // found exact solution
+        return tMid;
       }
       tMid = (tLow + tHigh) / 2;
       eMid = errorFunction.apply(this.at(tMid));
     }
-    return this.at(tMid);
+    return tMid;
   }
 
   /**
-   * @return the value of t that minimizes errorFunction.apply(at(t))
+   * @return the value of t that minimizes errorFunction(this.at(t))
    * @param tGuess starting point for solution search
-   * @param dError approximation of d(errorFunction)/dt
+   * optional @param dError approximation of d(errorFunction)/dt
+   * NOTE: This function requires that errorFunction(t) is monotonically increasing w.r.t. t
    */
   private static final int ITER_MAX = 500;
-  public Event solve(Function<Event, Double> errorFunction, double tGuess, double dError) {
+  public double solve(Function<Event, Double> errorFunction, double tGuess) {
+    return solve(errorFunction, tGuess, 1);
+  }
+  public double solve(Function<Event, Double> errorFunction, double tGuess, double dError) {
     // low and high guesses for time in original reference frame
     double tLow = tGuess, tHigh = tGuess;
 
@@ -89,47 +99,40 @@ public abstract class Timeline {
   }
 
   /**
-   * @return e such that lorentz(e.minus(observer), v).t() = 0
+   * @return event e such that e = lorentz(this.at(_).minus(observer), v) and e.t() == 0
+   * i.e. the event on this timeline that is simultaneous with the observer in the
+   *     accelerated frame of reference
    * NOTE: naive implementation finds a solution using bisection method, can be overridden
    */
   public Event concurrentWith(Event observer, Velocity v) {
-    // avoid division by zero
-    if (v.beta_sq() == 0f) {
-      return this.at(observer.t());
-    }
+    double solution = solve((Event e) -> SR.lorentz(e.minus(observer), v).t(),
+          observer.t(),
+          v.gamma() / 2);
 
-    Event solution = solve((Event e) -> SR.lorentz(e.minus(observer), v).t(),
-        observer.t(),
-        v.gamma() / 2);
-    return this.contains(solution) ? solution : null;
+    return this.contains(solution) ? SR.lorentz(this.at(solution).minus(observer), v) : null;
   }
 
+  /*
+   * @return event e such that e = lorentz(this.at(_).minus(observer), v)
+   *     and e.interval() == 0 and e.t() < observer.t()
+   * i.e. a lightlike interval between this timeline and the observer, extending from the
+   *     observer into the past
+   */
   // NOTE: This method only works when a timeline is timelike
   public Event seenBy(Event observer, Velocity v) {
-    // avoid division by zero
-    if (v.beta_sq() == 0f) {
-      return this.at(observer.t());
-    }
-
-    Event solution = solve((Event e) -> SR.lorentz(e.minus(observer), v).interval_sq(),
+    double solution = solve((Event e) -> SR.lorentz(e.minus(observer), v).interval_sq(),
         observer.t() - this.at(observer.t()).minus(observer).dist() / c,
         v.gamma() / 2);
-    if (solution.t() > observer.t()) {
+
+    if (solution > observer.t()) {
       throw new IllegalStateException("Solution is in future instead of past!");
     }
-    return this.contains(solution) ? solution : null;
+    return this.contains(solution) ? this.at(solution) : null;
   }
 
-  public boolean contains(Event e) {
-    if (start() != null && start().t() > e.t()) {
-      // e is before start of timeline
-      return false;
-    }
-    if (end() != null && end().t() < e.t()) {
-      // e is after end of timeline
-      return false;
-    }
-    return true;
+  public boolean contains(double t) {
+    return (start() == null || start().t() <= t)
+      && (end() == null || t <= end().t());
   }
 }
 
