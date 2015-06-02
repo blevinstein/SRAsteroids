@@ -17,17 +17,23 @@ public class TimelineTest {
   public void concurrentWith() {
     Event observer = new Event(1, 1, 1);
     Velocity v = new Velocity(5, 0);
+    Event image = new Event(3, -2, 0); // NOTE: t = 0
+    Event concurrent = observer.plusRelative(image, v);
 
     List<Timeline> timelines = new ArrayList<>();
-    timelines.add(new StaticTimeline(11, 1));
-    timelines.add(new ConstantTimeline(new Event(1, 2, 3), v));
-    timelines.add(new ConstantTimeline(new Event(1, 2, 3), v.times(-1)));
-    timelines.add(new ArbitraryTimeline().add(new Event(-1, -2, -4)).add(new Event(1, 2, 4)));
+    timelines.add(new StaticTimeline(concurrent.x(), concurrent.y()));
+    timelines.add(new ConstantTimeline(concurrent, v));
+    timelines.add(new ConstantTimeline(concurrent, v.times(-1)));
+    timelines.add(new ArbitraryTimeline()
+        .add(new Event(-1, -2, -100))
+        .add(concurrent)
+        .add(new Event(1, 2, 100)));
 
     for (Timeline t : timelines) {
-      Assert.assertEquals(0,
-          t.concurrentWith(observer, v).t(),
-          0.001);
+      assertEquals(t.toString(),
+          image,
+          t.concurrentWith(observer, v),
+          0.01);
 
       if (t.start() != null) {
         assertEquals(Event.ORIGIN, t.concurrentWith(t.start(), v), 0.001);
