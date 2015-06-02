@@ -23,4 +23,9 @@ public class ConstantTimeline extends Timeline {
   public double timeElapsed(double tStart, double tEnd) {
     return _v.gamma() * (tEnd - tStart);
   }
+
+  @Override
+  public String toString() {
+    return "ConstantTimeline " + _e + " @ " + _v;
+  }
 }

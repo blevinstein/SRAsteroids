@@ -20,4 +20,9 @@ public class StaticTimeline extends Timeline {
   public double timeElapsed(double tStart, double tEnd) {
     return tEnd - tStart;
   }
+
+  @Override
+  public String toString() {
+    return "StaticTimeline " + x + ", " + y;
+  }
 }

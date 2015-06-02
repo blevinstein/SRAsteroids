@@ -2,6 +2,7 @@ package com.blevinstein.sr;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringJoiner;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class ArbitraryTimeline extends Timeline {
@@ -114,5 +115,14 @@ public class ArbitraryTimeline extends Timeline {
     totalTimeElapsed += this.at(tEnd).minus(events.get(iEnd)).timeElapsed();
 
     return totalTimeElapsed;
+  }
+
+  @Override
+  public String toString() {
+    StringJoiner joiner = new StringJoiner(", ", "ArbitraryTimeline ", "");
+    for (Event e : events) {
+      joiner.add(e.toString());
+    }
+    return joiner.toString();
   }
 }
