@@ -50,7 +50,6 @@ public class Velocity {
     return new Velocity(vx / k, vy / k);
   }
 
-  // BROKEN
   // http://en.wikipedia.org/wiki/Velocity-addition_formula
   // w = v + u =
   // 1 / (1 + v dot u / c^2) * (v + (1 / g) u + (1 / c^2) (g / (1 + g)) (v dot u) v)
