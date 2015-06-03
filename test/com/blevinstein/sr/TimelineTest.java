@@ -1,5 +1,6 @@
 package com.blevinstein.sr;
 
+import static com.blevinstein.sr.SR.c;
 import static com.blevinstein.sr.SRTest.assertEquals;
 
 import java.util.ArrayList;
@@ -41,7 +42,7 @@ public class TimelineTest {
   public void seenBy() {
     Event observer = new Event(1, 1, 1);
     Velocity v = new Velocity(5, 0);
-    Event image = new Event(3, -4, -0.5); // NOTE: (c * t)^2 = x^2 + y^2
+    Event image = new Event(3, -4, -5 / c); // NOTE: (c * t)^2 = x^2 + y^2
     Event seen = observer.plusRelative(image, v);
 
     List<Timeline> timelines = new ArrayList<>();
