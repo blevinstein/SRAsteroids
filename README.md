@@ -32,7 +32,7 @@ TODO
 
 - add light pulses
 
-- replace List<Timeline> with List<Object/Entity/Asteroid/?> in SRAsteroids
+- replace List of Timeline with List of Object/Entity/Asteroid/? in SRAsteroids
 
 - remove objects when timeline is in past; requires adding object abstraction
 
@@ -50,6 +50,7 @@ TODO
   the World, giving its own position and relative velocity, and use that to simulate a timestep.
   Problem: use seenBy or concurrentWith?
 - implement SimulatedTimeline
+
     ctor: SimulatedTimeline(Event initialEvent)
     state: ArbitraryTimeline path
     update(Event observer, Velocity velocity, float tMin):
@@ -58,11 +59,12 @@ TODO
       not sure if buggy or just not intuitive.
 
 - write Force abstraction, then in mainLoop
-      for (Entity e : entities) {
-        for (Force f : e.getForces()) {
-          e.accelerate(f, dt)
-        }
+
+    for (Entity e : entities) {
+      for (Force f : e.getForces()) {
+        e.accelerate(f, dt)
       }
+    }
 - add SpringForce
 - research GR: what would it take to add gravity?
 - research EM: what would it take to add electromagnetic forces? I know electrical forces and magnetic forces can be transformed into each other through lorentz transformations, if implement naive "k q1 q2 / d12^2" without magnetism it will be inconsistent when transformed.
