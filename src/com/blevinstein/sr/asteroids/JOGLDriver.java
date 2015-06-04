@@ -26,14 +26,15 @@ import java.util.Map;
 public class JOGLDriver implements SRAsteroids.View, KeyListener {
   
   private SRAsteroids world;
-  private Event now;
+  private Event observer;
+  private Velocity velocity;
   private GLCanvas canvas;
   private GL2 gl;
   private int width, height;
 
   public JOGLDriver() {
     world = new SRAsteroids().setView(this);
-    now = Event.ORIGIN;
+    observer = Event.ORIGIN;
 
     GLProfile profile = GLProfile.getDefault();
     profile.initSingleton();
@@ -124,8 +125,10 @@ public class JOGLDriver implements SRAsteroids.View, KeyListener {
     world.draw();
   }
 
-  public void setNow(Event now) {
-    this.now = now;
+  // TODO: abstract (Event, Velocity) -> ReferenceFrame? Pair<Event, Velocity>? Observer?
+  public void setObserver(Event observer, Velocity velocity) {
+    this.observer = observer;
+    this.velocity = velocity;
   }
 
   private void setColor(Color c) {
@@ -139,11 +142,11 @@ public class JOGLDriver implements SRAsteroids.View, KeyListener {
     gl.glVertex2d(width/2 + e.x(), height/2 + e.y());
   }
 
-  // TODO: use seenBy instead of concurrentWith?
   private static int SHIP_LEN = 10;
-  public void ship(Color c, Timeline t, Velocity v, double angle) {
+  public void ship(Color c, Timeline t, double angle) {
     setColor(c);
-    Event image = t.concurrentWith(t.end(), v);
+    Event image = getImage(t);
+    // TODO: contract offsets by lorentzContraction(t.velocityAt(..)
     Event iOffset = Velocity.unit(angle).over(1).times(SHIP_LEN);
     Event jOffset = Velocity.unit(angle).perp().over(1).times(SHIP_LEN/2);
     gl.glBegin(GL2.GL_TRIANGLE_FAN);
@@ -154,10 +157,10 @@ public class JOGLDriver implements SRAsteroids.View, KeyListener {
     gl.glEnd();
   }
 
-  public void line(Color c, Timeline t1, Timeline t2, Velocity v) {
+  public void line(Color c, Timeline t1, Timeline t2) {
     setColor(c);
-    Event image1 = t1.concurrentWith(now, v);
-    Event image2 = t2.concurrentWith(now, v);
+    Event image1 = getImage(t1);
+    Event image2 = getImage(t2);
     gl.glLineWidth(2);
     gl.glBegin(GL2.GL_LINES);
       vertex(image1);
@@ -166,11 +169,11 @@ public class JOGLDriver implements SRAsteroids.View, KeyListener {
   }
 
   private static int CIRCLE_SEG_LEN = 5;
-  public void circle(Color c, Timeline t, double r, Velocity vObserver) {
+  public void circle(Color c, Timeline t, double r) {
     setColor(c);
-    Event image = t.concurrentWith(now, vObserver);
-    Event event = SR.lorentz(image, vObserver.times(-1));
-    Velocity vObject = vObserver.relativeMinus(t.velocityAt(event.t())).times(-1);
+    Event image = getImage(t);
+    Event event = SR.lorentz(image, velocity.times(-1));
+    Velocity vObject = t.velocityAt(event.t()).relativeMinus(velocity);
     // TODO if (offScreen(image)) return;
 
     AffineTransform contraction = SR.lorentzContraction(vObject);
@@ -187,9 +190,15 @@ public class JOGLDriver implements SRAsteroids.View, KeyListener {
     gl.glEnd();
   }
 
-  public Event getEvent(double x, double y, Velocity v) {
-    Event image = new Event(x - width/2, y - height/2, now.t());
-    return SR.lorentz(image, v.times(-1)).plus(now);
+  // TODO: use seenBy or concurrentWith??
+  public Event getImage(Timeline t) {
+    return t.concurrentWith(observer, velocity);
+  }
+
+  public Event getEvent(double x, double y) {
+    Event image = new Event(x - width/2, y - height/2, observer.t());
+    // NOTE: lorentz(e - o, v) = i -> lorentz(i, -v) = e - o
+    return SR.lorentz(image, velocity.times(-1)).plus(observer);
   }
   
   // KeyListener
