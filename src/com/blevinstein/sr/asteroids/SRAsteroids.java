@@ -27,6 +27,7 @@ public class SRAsteroids {
   public static final double dt = 0.1f;
 
   public SRAsteroids() {
+    myTimeline.add(Event.ORIGIN.advance(-dt));
     myTimeline.add(Event.ORIGIN);
   }
 

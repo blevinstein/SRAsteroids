@@ -52,8 +52,8 @@ public class ArbitraryTimeline extends Timeline {
    * @return x such that t is between events[x] and events[x+1]
    */
   private synchronized int findSegment(double t) {
-    if (events.isEmpty()) {
-      throw new IllegalArgumentException("Empty.");
+    if (events.size() < 2) {
+      throw new IllegalArgumentException("No segments.");
     }
     int iLow = 0, iHigh = events.size() - 1;
     if (events.get(iLow).t() > t || events.get(iHigh).t() < t) {
