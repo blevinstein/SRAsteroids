@@ -191,9 +191,8 @@ public class JOGLDriver implements SRAsteroids.View, KeyListener {
     gl.glEnd();
   }
 
-  // TODO: use seenBy or concurrentWith??
   public Event getImage(Timeline t) {
-    return t.concurrentWith(observer, velocity);
+    return t.seenBy(observer, velocity);
   }
 
   public Event getEvent(Event image) {
