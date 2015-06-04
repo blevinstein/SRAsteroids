@@ -3,12 +3,11 @@ package com.blevinstein.sr;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringJoiner;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 public class ArbitraryTimeline extends Timeline {
-  List<Event> events = new CopyOnWriteArrayList<>();
+  List<Event> events = new ArrayList<>();
 
-  public ArbitraryTimeline add(Event e) {
+  public synchronized ArbitraryTimeline add(Event e) {
     if (!events.isEmpty() && e.t() <= end().t()) {
       throw new IllegalArgumentException("Must move forwards in time.");
     }
@@ -16,23 +15,23 @@ public class ArbitraryTimeline extends Timeline {
     return this;
   }
 
-  public Event start() {
+  public synchronized Event start() {
     if (events.isEmpty()) { return null; }
     return events.get(0);
   }
 
-  public Event end() {
+  public synchronized Event end() {
     if (events.isEmpty()) { return null; }
     return events.get(events.size() - 1);
   }
 
-  public List<Event> history(int n) {
+  public synchronized List<Event> history(int n) {
     return new ArrayList<>(events.subList(
         Math.max(0, events.size() - n),
         events.size()));
   }
 
-  public Event at(double t) {
+  public synchronized Event at(double t) {
     if (events.size() == 1) {
       if (events.get(0).t() == t) {
         return events.get(0);
@@ -44,7 +43,7 @@ public class ArbitraryTimeline extends Timeline {
     return interpolate(events.get(i), events.get(i+1), t);
   }
 
-  public Velocity velocityAt(double t) {
+  public synchronized Velocity velocityAt(double t) {
     int i = findSegment(t);
     return events.get(i+1).minus(events.get(i)).toVelocity();
   }
@@ -52,7 +51,7 @@ public class ArbitraryTimeline extends Timeline {
   /**
    * @return x such that t is between events[x] and events[x+1]
    */
-  private int findSegment(double t) {
+  private synchronized int findSegment(double t) {
     if (events.isEmpty()) {
       throw new IllegalArgumentException("Empty.");
     }
@@ -89,7 +88,7 @@ public class ArbitraryTimeline extends Timeline {
     return a.plus(b.minus(a).times(x));
   }
 
-  public double timeElapsed(double tStart, double tEnd) {
+  public synchronized double timeElapsed(double tStart, double tEnd) {
     // Handle inverted intervals
     if (tEnd < tStart) {
       return -timeElapsed(tEnd, tStart);
