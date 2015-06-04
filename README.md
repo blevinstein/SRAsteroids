@@ -21,6 +21,8 @@ To run:
 
 TODO
 ----
+- Asteroids in random places with random velocities is overwhelming. Need more understandable pattern.
+
 - Implement basic collision, splitting, varied sizes of asteriods
   - For now, implement ellipse collision
 
