@@ -17,7 +17,7 @@ public class TimelineTest {
   @Test
   public void concurrentWith() {
     Event observer = new Event(1, 1, 1);
-    Velocity v = new Velocity(5, 0);
+    Velocity v = new Velocity(c / 2, 0);
     Event image = new Event(3, -2, 0); // NOTE: t = 0
     Event concurrent = observer.plusRelative(image, v);
 
@@ -34,14 +34,14 @@ public class TimelineTest {
       assertEquals(t.toString(),
           image,
           t.concurrentWith(observer, v),
-          0.01);
+          0.1);
     }
   }
 
   @Test
   public void seenBy() {
     Event observer = new Event(1, 1, 1);
-    Velocity v = new Velocity(5, 0);
+    Velocity v = new Velocity(c / 2, 0);
     Event image = new Event(3, -4, -5 / c); // NOTE: (c * t)^2 = x^2 + y^2
     Event seen = observer.plusRelative(image, v);
 
@@ -58,7 +58,7 @@ public class TimelineTest {
       assertEquals(t.toString(),
           image,
           t.seenBy(observer, v),
-          0.01);
+          0.1);
     }
   }
 }

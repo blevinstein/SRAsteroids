@@ -28,21 +28,21 @@ public class SRTest {
 
   @Test
   public void lorentz_lengthContraction() {
-    Velocity v = new Velocity(5, 0);
+    Velocity v = new Velocity(c / 2, 0);
     Assert.assertEquals(3 * v.gamma(), SR.lorentz(new Event(3, 0, 0), v).x(), 0.001);
     Assert.assertEquals(-3 * v.gamma(), SR.lorentz(new Event(-3, 0, 0), v).x(), 0.001);
   }
 
   @Test
   public void lorentz_timeDilation() {
-    Velocity v = new Velocity(4, 0);
+    Velocity v = new Velocity(c * 0.4, 0);
     Assert.assertEquals(7 * v.gamma(), SR.lorentz(new Event(0, 0, 7), v).t(), 0.001);
     Assert.assertEquals(-7 * v.gamma(), SR.lorentz(new Event(0, 0, -7), v).t(), 0.001);
   }
 
   @Test
   public void lorentz_reversible() {
-    Velocity v = new Velocity(2, 2);
+    Velocity v = new Velocity(0.2 * c, 0.2 * c);
     Event e = new Event(1, 2, 3);
     assertEquals(e, SR.lorentz(SR.lorentz(e, v), v.times(-1)), 0.001);
   }
