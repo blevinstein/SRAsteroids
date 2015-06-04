@@ -6,7 +6,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 
 public class SR {
-  public static final double c = 100;
+  public static final double c = 50;
   public static final double MAX = 0.95;
 
   // given (bx, by) = beta = v / c

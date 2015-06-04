@@ -60,7 +60,7 @@ public class SRAsteroids {
     // TODO Experiment: change speed of light, e.g. asteroids in normal time, then switch into
     //   "fast time" by setting c lower (and scaling down velocity of all objects?)
     // Add random objects
-    if (random(0, 1) < 0.05) {
+    if (random(0, 1) < 0.15) {
       Event image = new Event(random(-view.getWidth()/2, view.getWidth()/2),
           random(-view.getHeight()/2, view.getHeight()/2), 0);
       Event eventOffset = view.getEvent(image);
