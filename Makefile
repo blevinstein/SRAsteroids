@@ -23,10 +23,8 @@ TESTS = $(subst /,.,$(subst test/,,$(subst .java,,${TEST_SRCS})))
 
 default: build
 
-build: $(subst .java,.class,${SRCS})
-
-%.class: %.java
-	javac -cp ${CLASSPATH} $<
+build: ${SRCS}
+	javac -cp ${CLASSPATH} ${SRCS}
 
 run: build
 	java -cp ${CLASSPATH} com.blevinstein.sr.asteroids.JOGLDriver
