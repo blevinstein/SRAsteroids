@@ -38,8 +38,8 @@ public class SRAsteroids {
   // NOTE: synchronized draw() and mainLoop()
   public synchronized void mainLoop() {
     // Accelerate
-    double a = 0.1f;
-    double alpha = 0.1f;
+    double a = 1;
+    double alpha = 0.1;
     if (view.getKeyDown(KeyEvent.VK_DOWN) != view.getKeyDown(KeyEvent.VK_UP)) {
       if (view.getKeyDown(KeyEvent.VK_DOWN)) {
         velocity = velocity.relativePlus(velocity.unit(angle).times(-a));
@@ -128,19 +128,20 @@ public class SRAsteroids {
     int getHeight();
   }
 
+  private static final int TRAIL_LEN = 100;
   public synchronized void draw() {
     view.setObserver(myTimeline.end(), myTimeline.velocityAt(myTimeline.end().t()));
 
     // Show the observer
     view.ship(Color.WHITE, myTimeline, angle);
-    List<Event> historyEvents = myTimeline.history(255);
+    List<Event> historyEvents = myTimeline.history(TRAIL_LEN);
     for (int i = 0; i < historyEvents.size() - 1; i++) {
       Event event1 = historyEvents.get(i);
       Event event2 = historyEvents.get(i + 1);
       Velocity v = event2.minus(event1).toVelocity();
       StaticTimeline trail1 = new StaticTimeline(event1.x(), event1.y());
       StaticTimeline trail2 = new StaticTimeline(event2.x(), event2.y());
-      Color c = new Color(i, i, i);
+      Color c = new Color(i * 1f / TRAIL_LEN, i * 1f / TRAIL_LEN, i * 1f / TRAIL_LEN);
       view.line(c, trail1, trail2);
     }
 
