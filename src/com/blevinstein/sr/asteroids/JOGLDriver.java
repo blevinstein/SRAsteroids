@@ -138,8 +138,10 @@ public class JOGLDriver implements SRAsteroids.View, KeyListener {
         c.getAlpha() / 255.0);
   }
 
-  private void vertex(Event e) {
-    gl.glVertex2d(width/2 + e.x(), height/2 + e.y());
+  private void vertex(Event image) {
+    if (isOnScreen(image)) {
+      gl.glVertex2d(width/2 + image.x(), height/2 + image.y());
+    }
   }
 
   private static int SHIP_LEN = 10;
@@ -174,7 +176,6 @@ public class JOGLDriver implements SRAsteroids.View, KeyListener {
     Event image = getImage(t);
     Event event = SR.lorentz(image, velocity.times(-1));
     Velocity vObject = t.velocityAt(event.t()).relativeMinus(velocity);
-    // TODO if (offScreen(image)) return;
 
     AffineTransform contraction = SR.lorentzContraction(vObject);
     int segments = (int) Math.max(6, Math.ceil(2 * Math.PI * r / CIRCLE_SEG_LEN));
