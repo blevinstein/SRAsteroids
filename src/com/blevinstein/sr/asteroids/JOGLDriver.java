@@ -200,6 +200,11 @@ public class JOGLDriver implements SRAsteroids.View, KeyListener {
     // NOTE: lorentz(e - o, v) = i -> lorentz(i, -v) = e - o
     return SR.lorentz(image, velocity.times(-1)).plus(observer);
   }
+
+  public boolean isOnScreen(Event image) {
+    return image.x() > -width/2 && image.x() < width/2
+        && image.y() > -height/2 && image.y() < height/2;
+  }
   
   // KeyListener
 

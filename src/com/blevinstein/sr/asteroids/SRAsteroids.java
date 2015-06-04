@@ -71,7 +71,7 @@ public class SRAsteroids {
     // Prune objects outside of view
     for (int i = 0; i < timelines.size(); ) {
       Event image = view.getImage(timelines.get(i));
-      if (isOnScreen(image)) {
+      if (view.isOnScreen(image)) {
         i++;
       } else {
         timelines.remove(i);
@@ -79,12 +79,6 @@ public class SRAsteroids {
     }
 
     myTimeline.add(myTimeline.end().plus(velocity.over(dt)));
-  }
-
-  // TODO: refactor into View, take Timeline as arg?
-  private boolean isOnScreen(Event image) {
-    return image.x() > -view.getWidth()/2 && image.x() < view.getWidth()/2
-        && image.y() > -view.getHeight()/2 && image.y() < view.getHeight()/2;
   }
 
   // Estimate the maximum distance of any object visible on the screen
@@ -136,6 +130,11 @@ public class SRAsteroids {
      * @param v velocity of the observer
      */
     Event getEvent(double x, double y);
+
+    /**
+     * @return whether an image is on-screen
+     */
+    boolean isOnScreen(Event image);
 
     boolean getKeyDown(int keyCode);
     int getWidth();
