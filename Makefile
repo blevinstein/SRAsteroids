@@ -1,7 +1,9 @@
 empty :=
 space := $(empty) $(empty)
 
-CLASSPATH = src:test:$(subst $(space),:,$(wildcard lib/*.jar))
+JARS = $(subst $(space),:,$(wildcard lib/*.jar))
+BUILDPATH = src:test:${JARS}
+RUNPATH = build:${JARS}
 
 # TODO: move **/*.class to build/
 
@@ -24,13 +26,13 @@ TESTS = $(subst /,.,$(subst test/,,$(subst .java,,${TEST_SRCS})))
 default: build
 
 build: ${SRCS}
-	javac -cp ${CLASSPATH} ${SRCS}
+	javac -cp ${BUILDPATH} ${SRCS} -d build
 
 run: build
-	java -cp ${CLASSPATH} com.blevinstein.sr.asteroids.JOGLDriver
+	java -cp ${RUNPATH} com.blevinstein.sr.asteroids.JOGLDriver
 
 tests: build
-	java -cp ${CLASSPATH} org.junit.runner.JUnitCore ${TESTS}
+	java -cp ${RUNPATH} org.junit.runner.JUnitCore ${TESTS}
 
 clean:
 	rm -rf ${CLASSES}
