@@ -61,11 +61,12 @@ public class SRAsteroids {
     //   "fast time" by setting c lower (and scaling down velocity of all objects?)
     // Add random objects
     if (random(0, 1) < 0.05) {
-      Event eventOffset = view.getEvent(random(0, view.getWidth()),
-          random(0, view.getHeight()));
-      timelines.add(
-          new ConstantTimeline(eventOffset,
-            Velocity.randomUnit().times(random(0, c))));
+      Event image = new Event(random(-view.getWidth()/2, view.getWidth()/2),
+          random(-view.getHeight()/2, view.getHeight()/2), 0);
+      Event eventOffset = view.getEvent(image);
+      Timeline timeline =
+          new ConstantTimeline(eventOffset, Velocity.randomUnit().times(random(0, c)));
+      timelines.add(timeline);
     }
 
     // Prune objects outside of view
@@ -81,19 +82,6 @@ public class SRAsteroids {
     myTimeline.add(myTimeline.end().plus(velocity.over(dt)));
   }
 
-  // Estimate the maximum distance of any object visible on the screen
-  private double getViewRadius() {
-    double w = view.getWidth(), h = view.getHeight();
-    // Only candidates are the 4 furthest corners of the screen
-    // NOTE: only be necessary to try 2 corners, e.g. quadrants 1 and 2, under concurrentWith
-    //   projection
-    return Math.max(Math.max(Math.max(
-      view.getEvent(w/2, h/2).minus(myTimeline.end()).dist(),
-      view.getEvent(w/2, -h/2).minus(myTimeline.end()).dist()),
-      view.getEvent(-w/2, -h/2).minus(myTimeline.end()).dist()),
-      view.getEvent(-w/2, h/2).minus(myTimeline.end()).dist());
-  }
-
   public interface View {
     /**
      * Set the position and velocity of the reference frame.
@@ -104,6 +92,11 @@ public class SRAsteroids {
      * This is the projection function used to put timelines on-screen.
      */
     Event getImage(Timeline t);
+
+    /**
+     * Reverse of getImage projection.
+     */
+    Event getEvent(Event image);
 
     /**
      * Draw a ship at getImage(t).
@@ -124,12 +117,6 @@ public class SRAsteroids {
      * @param v velocity of observer relative to the circle.
      */
     void circle(Color c, Timeline t, double r);
-
-    /**
-     * @return an Event which would be projected onto the screen at coords (x, y _)
-     * @param v velocity of the observer
-     */
-    Event getEvent(double x, double y);
 
     /**
      * @return whether an image is on-screen

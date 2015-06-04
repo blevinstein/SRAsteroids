@@ -195,11 +195,13 @@ public class JOGLDriver implements SRAsteroids.View, KeyListener {
     return t.concurrentWith(observer, velocity);
   }
 
-  public Event getEvent(double x, double y) {
-    Event image = new Event(x - width/2, y - height/2, observer.t());
+  public Event getEvent(Event image) {
     // NOTE: lorentz(e - o, v) = i -> lorentz(i, -v) = e - o
     return SR.lorentz(image, velocity.times(-1)).plus(observer);
   }
+
+  // TODO: public Event getImageOnScreen(double x, double y) -> Event image, depends on the
+  // getImage() projection used
 
   public boolean isOnScreen(Event image) {
     return image.x() > -width/2 && image.x() < width/2
