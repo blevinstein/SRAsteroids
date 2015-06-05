@@ -21,6 +21,7 @@ public class SRAsteroids {
   private ArbitraryTimeline myTimeline = new ArbitraryTimeline();
   private Velocity velocity = new Velocity(0, 0);
   private double angle = 0;
+  private Velocity lastBoost = null;
 
   private View view;
 
@@ -42,11 +43,13 @@ public class SRAsteroids {
     double a = 1;
     double alpha = 0.1;
     if (view.getKeyDown(KeyEvent.VK_DOWN) != view.getKeyDown(KeyEvent.VK_UP)) {
+      Velocity lastVelocity = velocity;
       if (view.getKeyDown(KeyEvent.VK_DOWN)) {
-        velocity = velocity.relativePlus(velocity.unit(angle).times(-a));
+        velocity = velocity.relativePlus(velocity.unit(angle).times(-a)).checked(0.99);
       } else {
-        velocity = velocity.relativePlus(velocity.unit(angle).times(a));
+        velocity = velocity.relativePlus(velocity.unit(angle).times(a)).checked(0.99);
       }
+      lastBoost = velocity.relativeMinus(lastVelocity); // use as flag to render boost
     }
     if (view.getKeyDown(KeyEvent.VK_LEFT) != view.getKeyDown(KeyEvent.VK_RIGHT)) {
       if (view.getKeyDown(KeyEvent.VK_LEFT)) {
@@ -55,7 +58,6 @@ public class SRAsteroids {
         angle -= alpha;
       }
     }
-    velocity = velocity.checked(0.99);
 
     // TODO Experiment: add objects on click, in current reference frame
     // TODO Experiment: change speed of light, e.g. asteroids in normal time, then switch into
@@ -146,12 +148,28 @@ public class SRAsteroids {
       view.line(c, trail1, trail2);
     }
 
+    if (lastBoost != null) {
+      // Show graphics to indicate acceleration & deformation
+      for (int i = 0; i < 200; i++) {
+        double rx = random(-view.getWidth()/2, view.getWidth()/2),
+            ry = random(-view.getHeight()/2, view.getHeight()/2);
+        Event image1 = new Event(rx, ry, 0);
+        Event image2 = SR.lorentz(image1, lastBoost.times(20));
+        Event event1 = view.getEvent(image1);
+        Event event2 = view.getEvent(image2);
+        ConstantTimeline timeline1 = new ConstantTimeline(event1, velocity);
+        ConstantTimeline timeline2 = new ConstantTimeline(event2, velocity);
+        Color c = new Color(150, 150, 150);
+        view.line(c, timeline1, timeline2);
+      }
+      lastBoost = null;
+    }
+
     // Show the objects
     for (Timeline timeline : timelines) {
       view.circle(Color.WHITE, timeline, 10);
     }
   }
-
 
   // Convenience methods
 
