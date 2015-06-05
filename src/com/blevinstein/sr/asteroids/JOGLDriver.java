@@ -26,11 +26,11 @@ import java.util.Map;
 public class JOGLDriver implements SRAsteroids.View, KeyListener {
   
   private SRAsteroids world;
-  private Event observer;
-  private Velocity velocity;
+  private Event observer = Event.ORIGIN;
+  private Velocity velocity = Velocity.ZERO;
   private GLCanvas canvas;
   private GL2 gl;
-  private int width, height;
+  private int width = 1, height = 1;
 
   public JOGLDriver() {
     world = new SRAsteroids().setView(this);
