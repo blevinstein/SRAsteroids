@@ -23,9 +23,6 @@ TODO
 ----
 - Asteroids in random places with random velocities is overwhelming. Need more understandable pattern.
 
-- Add some kind of visual effect during lorentz transforms, to help user understand
-  transformation visually? e.g. starfield.each((Event) -> line(point at v(t-1), point at v(t)))
-
 - Implement basic collision, splitting, varied sizes of asteriods
   - For now, implement ellipse collision
 
