@@ -168,7 +168,7 @@ public class JOGLDriver implements SRAsteroids.View, KeyListener {
     setColor(c);
     Event image1 = getImage(t1);
     Event image2 = getImage(t2);
-    gl.glLineWidth(1);
+    gl.glLineWidth(2);
     gl.glBegin(GL2.GL_LINES);
       vertex(image1);
       vertex(image2);
@@ -179,15 +179,20 @@ public class JOGLDriver implements SRAsteroids.View, KeyListener {
   public void circle(Color c, Timeline t, double r) {
     setColor(c);
     Event image = getImage(t);
-    Event event = SR.lorentz(image, velocity.times(-1));
+    Event event = getEvent(image);
     Velocity vObject = t.velocityAt(event.t()).relativeMinus(velocity);
 
     AffineTransform contraction = SR.lorentzContraction(vObject);
     int segments = (int) Math.max(6, Math.ceil(2 * Math.PI * r / CIRCLE_SEG_LEN));
-    gl.glBegin(GL2.GL_TRIANGLE_FAN);
-    for (int i = 0; i < segments; i++) {
-      double x = Math.cos(2 * Math.PI * i / segments) * r * zoom;
-      double y = Math.sin(2 * Math.PI * i / segments) * r * zoom;
+
+    double initAngle =  -5 * t.timeElapsed(0, event.t());
+
+    gl.glLineWidth(2);
+    gl.glBegin(GL2.GL_LINE_STRIP);
+    vertex(image);
+    for (int i = 0; i < segments + 1; i++) {
+      double x = Math.cos(2 * Math.PI * i / segments + initAngle) * r * zoom;
+      double y = Math.sin(2 * Math.PI * i / segments + initAngle) * r * zoom;
       // Apply AffineTransform
       double xx = x * contraction.getScaleX() + y * contraction.getShearX() + contraction.getTranslateX();
       double yy = y * contraction.getScaleY() + x * contraction.getShearY() + contraction.getTranslateY();
@@ -197,12 +202,10 @@ public class JOGLDriver implements SRAsteroids.View, KeyListener {
   }
 
   public Event getImage(Timeline t) {
-    // TODO: zoom
     return t.seenBy(observer, velocity).times(zoom);
   }
 
   public Event getEvent(Event image) {
-    // TODO: zoom
     // NOTE: lorentz(e - o, v) = i -> lorentz(i, -v) = e - o
     return SR.lorentz(image.times(1.0 / zoom), velocity.times(-1)).plus(observer);
   }

@@ -41,7 +41,7 @@ public class SRAsteroids {
   // NOTE: synchronized draw() and mainLoop()
   public synchronized void mainLoop() {
     // Accelerate
-    double a = 1;
+    double a = 0.5;
     double alpha = 0.1;
     if (view.getKeyDown(KeyEvent.VK_DOWN) != view.getKeyDown(KeyEvent.VK_UP)) {
       Velocity lastVelocity = velocity;
@@ -80,17 +80,7 @@ public class SRAsteroids {
       timelines.add(timeline);
     }
 
-    // Prune objects outside of view
-    for (int i = 0; i < timelines.size(); ) {
-      Event image = view.getImage(timelines.get(i));
-      if (view.isOnScreen(image)) {
-        i++;
-      } else {
-        timelines.remove(i);
-      }
-    }
-
-    myTimeline.add(myTimeline.end().plus(velocity.over(dt)));
+    myTimeline.add(myTimeline.end().plus(velocity.over(dt * velocity.gamma())));
   }
 
   public interface View {
