@@ -30,6 +30,8 @@ TODO
 
 - implement TransformedTimeline
 
+- implement EllipticalTimeline, add orbits around central point
+
 - add zoom
 
 - add light pulses
