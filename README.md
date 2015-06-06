@@ -19,6 +19,10 @@ To build:
 To run:
 > make run
 
+Controls:
+- Arrow keys to move (turn left/right, accelerate forwards/backwards)
+- E/Q to zoom in/out
+
 TODO
 ----
 - Asteroids in random places with random velocities is overwhelming. Need more understandable pattern.
