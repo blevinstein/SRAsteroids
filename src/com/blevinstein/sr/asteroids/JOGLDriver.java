@@ -31,6 +31,7 @@ public class JOGLDriver implements SRAsteroids.View, KeyListener {
   private GLCanvas canvas;
   private GL2 gl;
   private int width = 1, height = 1;
+  private double zoom = 1.0;
 
   public JOGLDriver() {
     world = new SRAsteroids().setView(this);
@@ -131,6 +132,10 @@ public class JOGLDriver implements SRAsteroids.View, KeyListener {
     this.velocity = velocity;
   }
 
+  public void setZoom(double zoom) {
+    this.zoom = zoom;
+  }
+
   private void setColor(Color c) {
     gl.glColor4d(c.getRed() / 255.0,
         c.getGreen() / 255.0,
@@ -148,9 +153,9 @@ public class JOGLDriver implements SRAsteroids.View, KeyListener {
   public void ship(Color c, Timeline t, double angle) {
     setColor(c);
     Event image = getImage(t);
-    // TODO: contract offsets by lorentzContraction(t.velocityAt(..)
-    Event iOffset = Velocity.unit(angle).over(1).times(SHIP_LEN);
-    Event jOffset = Velocity.unit(angle).perp().over(1).times(SHIP_LEN/2);
+    // TODO: add offsets before transformation to capture lorentz contraction
+    Event iOffset = Velocity.unit(angle).over(1).times(SHIP_LEN).times(zoom);
+    Event jOffset = Velocity.unit(angle).perp().over(1).times(SHIP_LEN/3).times(zoom);
     gl.glBegin(GL2.GL_TRIANGLE_FAN);
       vertex(image);
       vertex(image.plus(jOffset));
@@ -181,8 +186,8 @@ public class JOGLDriver implements SRAsteroids.View, KeyListener {
     int segments = (int) Math.max(6, Math.ceil(2 * Math.PI * r / CIRCLE_SEG_LEN));
     gl.glBegin(GL2.GL_TRIANGLE_FAN);
     for (int i = 0; i < segments; i++) {
-      double x = Math.cos(2 * Math.PI * i / segments) * r;
-      double y = Math.sin(2 * Math.PI * i / segments) * r;
+      double x = Math.cos(2 * Math.PI * i / segments) * r * zoom;
+      double y = Math.sin(2 * Math.PI * i / segments) * r * zoom;
       // Apply AffineTransform
       double xx = x * contraction.getScaleX() + y * contraction.getShearX() + contraction.getTranslateX();
       double yy = y * contraction.getScaleY() + x * contraction.getShearY() + contraction.getTranslateY();
@@ -192,12 +197,14 @@ public class JOGLDriver implements SRAsteroids.View, KeyListener {
   }
 
   public Event getImage(Timeline t) {
-    return t.seenBy(observer, velocity);
+    // TODO: zoom
+    return t.seenBy(observer, velocity).times(zoom);
   }
 
   public Event getEvent(Event image) {
+    // TODO: zoom
     // NOTE: lorentz(e - o, v) = i -> lorentz(i, -v) = e - o
-    return SR.lorentz(image, velocity.times(-1)).plus(observer);
+    return SR.lorentz(image.times(1.0 / zoom), velocity.times(-1)).plus(observer);
   }
 
   // TODO: public Event getImageOnScreen(double x, double y) -> Event image, depends on the

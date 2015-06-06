@@ -21,6 +21,7 @@ public class SRAsteroids {
   private ArbitraryTimeline myTimeline = new ArbitraryTimeline();
   private Velocity velocity = new Velocity(0, 0);
   private double angle = 0;
+  private double zoom = 1.0;
   private Velocity lastBoost = null;
 
   private View view;
@@ -58,6 +59,13 @@ public class SRAsteroids {
         angle -= alpha;
       }
     }
+    if (view.getKeyDown(KeyEvent.VK_E)) {
+      zoom *= 1.1;
+    }
+    if (view.getKeyDown(KeyEvent.VK_Q)) {
+      zoom /= 1.1;
+    }
+    view.setZoom(zoom);
 
     // TODO Experiment: add objects on click, in current reference frame
     // TODO Experiment: change speed of light, e.g. asteroids in normal time, then switch into
@@ -90,6 +98,11 @@ public class SRAsteroids {
      * Set the position and velocity of the reference frame.
      */
     void setObserver(Event now, Velocity v);
+
+    /**
+     * Sets the zoom factor.
+     */
+    void setZoom(double zoom);
 
     /**
      * This is the projection function used to put timelines on-screen.
