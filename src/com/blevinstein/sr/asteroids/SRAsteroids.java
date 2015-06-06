@@ -26,7 +26,7 @@ public class SRAsteroids {
 
   private View view;
 
-  public static final double dt = 0.1f;
+  public static final double dt = 0.1;
 
   public SRAsteroids() {
     myTimeline.add(Event.ORIGIN.advance(-dt));
@@ -41,7 +41,7 @@ public class SRAsteroids {
   // NOTE: synchronized draw() and mainLoop()
   public synchronized void mainLoop() {
     // Accelerate
-    double a = 0.5;
+    double a = 0.25;
     double alpha = 0.1;
     if (view.getKeyDown(KeyEvent.VK_DOWN) != view.getKeyDown(KeyEvent.VK_UP)) {
       Velocity lastVelocity = velocity;
@@ -60,10 +60,10 @@ public class SRAsteroids {
       }
     }
     if (view.getKeyDown(KeyEvent.VK_E)) {
-      zoom *= 1.1;
+      zoom *= 1.05;
     }
     if (view.getKeyDown(KeyEvent.VK_Q)) {
-      zoom /= 1.1;
+      zoom /= 1.05;
     }
     view.setZoom(zoom);
 
@@ -76,7 +76,7 @@ public class SRAsteroids {
           random(-view.getHeight()/2, view.getHeight()/2), 0);
       Event eventOffset = view.getEvent(image);
       Timeline timeline =
-          new ConstantTimeline(eventOffset, Velocity.randomUnit().times(random(0, c)));
+          new ConstantTimeline(eventOffset, Velocity.randomUnit().times(random(0, 0.5 * c)));
       timelines.add(timeline);
     }
 
@@ -147,7 +147,7 @@ public class SRAsteroids {
       Velocity v = event2.minus(event1).toVelocity();
       StaticTimeline trail1 = new StaticTimeline(event1.x(), event1.y());
       StaticTimeline trail2 = new StaticTimeline(event2.x(), event2.y());
-      Color c = new Color(i * 1f / TRAIL_LEN, i * 1f / TRAIL_LEN, i * 1f / TRAIL_LEN);
+      Color c = new Color(i * 1f / TRAIL_LEN, i * 0.3f / TRAIL_LEN, i * 0.3f / TRAIL_LEN);
       view.line(c, trail1, trail2);
     }
 
