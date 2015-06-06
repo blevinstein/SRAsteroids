@@ -36,8 +36,6 @@ TODO
 
 - implement EllipticalTimeline, add orbits around central point
 
-- add zoom
-
 - add light pulses
 
 - replace List of Timeline with List of Object/Entity/Asteroid/? in SRAsteroids
