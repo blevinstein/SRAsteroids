@@ -24,6 +24,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class JOGLDriver implements SRAsteroids.View, KeyListener {
+
+  private static final int FPS = 60; // max fps
   
   private SRAsteroids world;
   private Event observer = Event.ORIGIN;
@@ -70,7 +72,7 @@ public class JOGLDriver implements SRAsteroids.View, KeyListener {
   }
 
   public void run() {
-    Throttle t = new Throttle(60); // 60fps max
+    Throttle t = new Throttle(FPS);
     while (true) {
       world.mainLoop();
       canvas.display();
@@ -185,7 +187,9 @@ public class JOGLDriver implements SRAsteroids.View, KeyListener {
     AffineTransform contraction = SR.lorentzContraction(vObject);
     int segments = (int) Math.max(6, Math.ceil(2 * Math.PI * r / CIRCLE_SEG_LEN));
 
-    double initAngle =  -5 * t.timeElapsed(0, event.t());
+    double second = FPS * SRAsteroids.dt; // TODO: fix this code smell
+    double rotation = -2 * Math.PI / second; // NOTE: negative to make rotation clockwise
+    double initAngle = t.timeElapsed(0, event.t()) * rotation;
 
     gl.glLineWidth(2);
     gl.glBegin(GL2.GL_LINE_STRIP);
@@ -194,8 +198,10 @@ public class JOGLDriver implements SRAsteroids.View, KeyListener {
       double x = Math.cos(2 * Math.PI * i / segments + initAngle) * r * zoom;
       double y = Math.sin(2 * Math.PI * i / segments + initAngle) * r * zoom;
       // Apply AffineTransform
-      double xx = x * contraction.getScaleX() + y * contraction.getShearX() + contraction.getTranslateX();
-      double yy = y * contraction.getScaleY() + x * contraction.getShearY() + contraction.getTranslateY();
+      double xx = x * contraction.getScaleX() + y * contraction.getShearX()
+        + contraction.getTranslateX();
+      double yy = y * contraction.getScaleY() + x * contraction.getShearY()
+        + contraction.getTranslateY();
       vertex(image.advance(xx, yy, 0));
     }
     gl.glEnd();
