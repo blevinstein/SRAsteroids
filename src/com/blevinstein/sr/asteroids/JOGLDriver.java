@@ -166,13 +166,14 @@ public class JOGLDriver implements SRAsteroids.View, KeyListener {
     gl.glEnd();
   }
 
-  public void line(Color c, Timeline t1, Timeline t2) {
-    setColor(c);
+  public void line(Color c1, Color c2, Timeline t1, Timeline t2) {
     Event image1 = getImage(t1);
     Event image2 = getImage(t2);
     gl.glLineWidth(2);
     gl.glBegin(GL2.GL_LINES);
+      setColor(c1);
       vertex(image1);
+      setColor(c2);
       vertex(image2);
     gl.glEnd();
   }

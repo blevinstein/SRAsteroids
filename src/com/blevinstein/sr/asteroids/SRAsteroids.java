@@ -46,9 +46,9 @@ public class SRAsteroids {
     if (view.getKeyDown(KeyEvent.VK_DOWN) != view.getKeyDown(KeyEvent.VK_UP)) {
       Velocity lastVelocity = velocity;
       if (view.getKeyDown(KeyEvent.VK_DOWN)) {
-        velocity = velocity.relativePlus(velocity.unit(angle).times(-a)).checked(0.99);
+        velocity = velocity.relativePlus(velocity.unit(angle).times(-a)).checked(0.999);
       } else {
-        velocity = velocity.relativePlus(velocity.unit(angle).times(a)).checked(0.99);
+        velocity = velocity.relativePlus(velocity.unit(angle).times(a)).checked(0.999);
       }
       lastBoost = velocity.relativeMinus(lastVelocity); // use as flag to render boost
     }
@@ -115,7 +115,7 @@ public class SRAsteroids {
      * Draw a line from getImage(t1) to getImage(t2).
      * @param v velocity of observer relative to the line.
      */
-    void line(Color c, Timeline t1, Timeline t2);
+    void line(Color c1, Color c2, Timeline t1, Timeline t2);
 
     /**
      * Draw a circle around getImage(t).
@@ -140,6 +140,7 @@ public class SRAsteroids {
 
     // Show the observer
     view.ship(Color.WHITE, myTimeline, angle);
+    /*
     List<Event> historyEvents = myTimeline.history(TRAIL_LEN);
     for (int i = 0; i < historyEvents.size() - 1; i++) {
       Event event1 = historyEvents.get(i);
@@ -147,24 +148,39 @@ public class SRAsteroids {
       Velocity v = event2.minus(event1).toVelocity();
       StaticTimeline trail1 = new StaticTimeline(event1.x(), event1.y());
       StaticTimeline trail2 = new StaticTimeline(event2.x(), event2.y());
-      Color c = new Color(i * 1f / TRAIL_LEN, i * 0.3f / TRAIL_LEN, i * 0.3f / TRAIL_LEN);
-      view.line(c, trail1, trail2);
+      Color c = new Color(i * 0.5f / TRAIL_LEN, i * 0.5f / TRAIL_LEN, i * 1f / TRAIL_LEN);
+      view.line(c, c, trail1, trail2);
     }
+    */
 
     if (lastBoost != null) {
+      // Show graphics to indicate ship output
+      // TODO: support a particle system where particles last > 1 frame; space dust?
+      double boostAngle = lastBoost.angle();
+      for (int i = 0; i < 10; i++) {
+        double outputAngle = boostAngle + random(-0.2, 0.2);
+        Event ship = myTimeline.end();
+        Velocity vOutput = Velocity.unit(outputAngle).times(random(0, 1) * -200);
+        Event output = ship.relativePlus(vOutput.over(dt), velocity);
+        ConstantTimeline timeline1 = new ConstantTimeline(ship, velocity);
+        ConstantTimeline timeline2 = new ConstantTimeline(output, velocity);
+        view.line(Color.BLACK, Color.RED, timeline1, timeline2);
+      }
+
       // Show graphics to indicate acceleration & deformation
+      /*
       for (int i = 0; i < 200; i++) {
         double rx = random(-view.getWidth()/2, view.getWidth()/2),
             ry = random(-view.getHeight()/2, view.getHeight()/2);
         Event image1 = new Event(rx, ry, 0);
-        Event image2 = SR.lorentz(image1, lastBoost.times(20));
+        Event image2 = SR.lorentz(image1, lastBoost.times(60));
         Event event1 = view.getEvent(image1);
         Event event2 = view.getEvent(image2);
         ConstantTimeline timeline1 = new ConstantTimeline(event1, velocity);
         ConstantTimeline timeline2 = new ConstantTimeline(event2, velocity);
-        Color c = new Color(150, 150, 150);
-        view.line(c, timeline1, timeline2);
+        view.line(new Color(100, 100, 100), Color.BLACK, timeline1, timeline2);
       }
+      */
       lastBoost = null;
     }
 

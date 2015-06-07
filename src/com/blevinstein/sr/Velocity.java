@@ -70,7 +70,7 @@ public class Velocity {
     return Math.acos(this.dot(other) / this.mag() / other.mag());
   }
 
-  public double getAngle() {
+  public double angle() {
     return Math.atan2(vy, vx);
   }
 
