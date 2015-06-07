@@ -31,7 +31,7 @@ public class Event {
   /**
    * @return an Event offset from 'this' by 'interval' in the frame with 'relativeVelocity'
    */
-  public Event plusRelative(Event interval, Velocity relativeVelocity) {
+  public Event relativePlus(Event interval, Velocity relativeVelocity) {
     return this.plus(SR.lorentz(interval, relativeVelocity.times(-1)));
   }
 

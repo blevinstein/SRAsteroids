@@ -19,7 +19,7 @@ public class TimelineTest {
     Event observer = new Event(1, 1, 1);
     Velocity v = new Velocity(c / 2, 0);
     Event image = new Event(3, -2, 0); // NOTE: t = 0
-    Event concurrent = observer.plusRelative(image, v);
+    Event concurrent = observer.relativePlus(image, v);
 
     List<Timeline> timelines = new ArrayList<>();
     timelines.add(new StaticTimeline(concurrent.x(), concurrent.y()));
@@ -43,7 +43,7 @@ public class TimelineTest {
     Event observer = new Event(1, 1, 1);
     Velocity v = new Velocity(c / 2, 0);
     Event image = new Event(3, -4, -5 / c); // NOTE: (c * t)^2 = x^2 + y^2
-    Event seen = observer.plusRelative(image, v);
+    Event seen = observer.relativePlus(image, v);
 
     List<Timeline> timelines = new ArrayList<>();
     timelines.add(new StaticTimeline(seen.x(), seen.y()));
