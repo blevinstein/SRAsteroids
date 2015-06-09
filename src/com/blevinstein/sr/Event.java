@@ -7,9 +7,9 @@ import java.util.Objects;
 public class Event {
   public static final Event ORIGIN = new Event(0, 0, 0);
 
-  private double _x;
-  private double _y;
-  private double _t;
+  private final double _x;
+  private final double _y;
+  private final double _t;
 
   public double x() { return _x; }
   public double y() { return _y; }

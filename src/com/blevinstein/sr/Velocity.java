@@ -11,8 +11,8 @@ public class Velocity {
   public static final Velocity I = new Velocity(1, 0);
   public static final Velocity J = new Velocity(0, 1);
 
-  private double vx;
-  private double vy;
+  private final double vx;
+  private final double vy;
 
   public double x() { return vx; }
   public double y() { return vy; }
