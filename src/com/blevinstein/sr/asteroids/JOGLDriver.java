@@ -42,7 +42,7 @@ public class JOGLDriver implements SRAsteroids.View, KeyListener {
     observer = Event.ORIGIN;
 
     GLProfile profile = GLProfile.getDefault();
-    profile.initSingleton();
+    GLProfile.initSingleton();
     GLCapabilities capabilities = new GLCapabilities(profile);
     capabilities.setSampleBuffers(true);
     capabilities.setDoubleBuffered(true);

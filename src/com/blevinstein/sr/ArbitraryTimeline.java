@@ -26,6 +26,7 @@ public class ArbitraryTimeline extends Timeline {
   }
 
   public synchronized List<Event> history(int n) {
+    // return defensive copy
     return new ArrayList<>(events.subList(
         Math.max(0, events.size() - n),
         events.size()));

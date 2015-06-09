@@ -46,9 +46,9 @@ public class SRAsteroids {
     if (view.getKeyDown(KeyEvent.VK_DOWN) != view.getKeyDown(KeyEvent.VK_UP)) {
       Velocity lastVelocity = velocity;
       if (view.getKeyDown(KeyEvent.VK_DOWN)) {
-        velocity = velocity.relativePlus(velocity.unit(angle).times(-a)).checked(0.999);
+        velocity = velocity.relativePlus(Velocity.unit(angle).times(-a)).checked(0.999);
       } else {
-        velocity = velocity.relativePlus(velocity.unit(angle).times(a)).checked(0.999);
+        velocity = velocity.relativePlus(Velocity.unit(angle).times(a)).checked(0.999);
       }
       lastBoost = velocity.relativeMinus(lastVelocity); // use as flag to render boost
     }

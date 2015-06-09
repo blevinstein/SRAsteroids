@@ -2,6 +2,8 @@ package com.blevinstein.sr;
 
 import static com.blevinstein.sr.SR.c;
 
+import java.util.Objects;
+
 public class Velocity {
   public static final Velocity ZERO = new Velocity(0, 0);
   public static final Velocity I = new Velocity(1, 0);
@@ -136,5 +138,10 @@ public class Velocity {
   @Override
   public String toString() {
     return "<" + vx + ", " + vy + ">";
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(vx, vy);
   }
 }

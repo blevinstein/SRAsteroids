@@ -2,6 +2,8 @@ package com.blevinstein.sr;
 
 import static com.blevinstein.sr.SR.c;
 
+import java.util.Objects;
+
 public class Event {
   public static final Event ORIGIN = new Event(0, 0, 0);
 
@@ -122,5 +124,10 @@ public class Event {
   @Override
   public String toString() {
     return "(" + this._x + ", " + this._y + ", " + this._t + ")";
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(_x, _y, _t);
   }
 }
