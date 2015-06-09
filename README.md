@@ -25,7 +25,11 @@ Controls:
 
 TODO
 ----
-- Asteroids in random places with random velocities is overwhelming. Need more understandable pattern.
+- Experiment: add ability to switch between projections (seenBy, concurrentWith)
+  - NOTE: Can add light pulses in concurrentWith projection, doesn't make any sense in seenBy
+  projection
+
+- Experiment: ability to change speed of light? e.g. "turn on/turn off" relativity?
 
 - Implement basic collision, splitting, varied sizes of asteriods
   - For now, implement ellipse collision
@@ -38,17 +42,7 @@ TODO
 
 - add light pulses
 
-- replace List of Timeline with List of Object/Entity/Asteroid/? in SRAsteroids
-
 - remove objects when timeline is in past; requires adding object abstraction
-
-- traditional asteroids requires bounded environment; lorentz contractions break naive
-  implementation of wrapping at boundaries. Different game mechanic in infinite space? Different
-  wrapping implementation? Temporal limits (e.g. asteroids are fast but short-lived?)
-
-- IMPORTANT: seenBy exhibits weird behavior, not sure if buggy or just not intuitive. Need to
-  determine whether it can be built on top of, or whether I should use concurrentWith, which is
-  less physically accurate, but more stable.
 
 - implement a lazy physics engine, RK4?
 - implement WorldView : the position of all objects in a simulation, as seen by a particular
