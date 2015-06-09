@@ -10,8 +10,8 @@ import java.awt.Color;
 // TODO: add size
 // TODO: add period? pulsing/flashing of some sort?
 public class Star {
-  private Timeline _timeline;
-  private Color _color;
+  private final Timeline _timeline;
+  private final Color _color;
 
   public Star(Timeline timeline, Color color) {
     _timeline = timeline;
