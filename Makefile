@@ -5,6 +5,8 @@ JARS = $(subst $(space),:,$(wildcard lib/*.jar))
 BUILDPATH = src:test:${JARS}
 RUNPATH = build:${JARS}
 
+BUILDFLAGS = -Xlint:all
+
 # TODO: move **/*.class to build/
 
 SRCS = \
@@ -26,7 +28,7 @@ TESTS = $(subst /,.,$(subst test/,,$(subst .java,,${TEST_SRCS})))
 default: build
 
 build: ${SRCS}
-	javac -cp ${BUILDPATH} ${SRCS} -d build
+	javac -cp ${BUILDPATH} ${BUILDFLAGS} ${SRCS} -d build
 
 run: build
 	java -cp ${RUNPATH} com.blevinstein.sr.asteroids.JOGLDriver
