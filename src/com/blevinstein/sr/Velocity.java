@@ -4,6 +4,8 @@ import static com.blevinstein.sr.SR.c;
 
 import java.util.Objects;
 
+// TODO: calculate Thomas precession, use to correct positions after applying multiple lorentz
+//   boosts
 public class Velocity {
   public static final Velocity ZERO = new Velocity(0, 0);
   public static final Velocity I = new Velocity(1, 0);
