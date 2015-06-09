@@ -143,7 +143,7 @@ public class SRAsteroids {
     view.setObserver(myTimeline.end(), myTimeline.velocityAt(myTimeline.end().t()));
 
     // Show the observer
-    view.ship(Color.WHITE, myTimeline, angle);
+    view.ship(Color.GREEN, myTimeline, angle);
 
     if (lastBoost != null) {
       // Show graphics to indicate ship output
