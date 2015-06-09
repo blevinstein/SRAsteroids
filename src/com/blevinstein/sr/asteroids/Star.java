@@ -7,6 +7,8 @@ import java.awt.Color;
 /**
  * Container object for a Star.
  */
+// TODO: add size
+// TODO: add period? pulsing/flashing of some sort?
 public class Star {
   private Timeline _timeline;
   private Color _color;
