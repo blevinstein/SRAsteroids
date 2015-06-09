@@ -1,5 +1,7 @@
 package com.blevinstein.sr.asteroids;
 
+import static com.blevinstein.sr.SR.c;
+
 import com.blevinstein.sr.Event;
 import com.blevinstein.sr.SR;
 import com.blevinstein.sr.Timeline;
@@ -81,9 +83,6 @@ public class JOGLDriver implements SRAsteroids.View, KeyListener {
   }
 
   public GLCanvas getCanvas() { return canvas; }
-
-  public int getWidth() { return width; }
-  public int getHeight() { return height; }
 
   public static void main(String[] args) {
     Frame frame = new Frame();
@@ -212,8 +211,12 @@ public class JOGLDriver implements SRAsteroids.View, KeyListener {
     return SR.lorentz(image.times(1.0 / zoom), velocity.times(-1)).plus(observer);
   }
 
-  // TODO: public Event getImageOnScreen(double x, double y) -> Event image, depends on the
-  // getImage() projection used
+  public Event getImageOnScreen(double x, double y) {
+    double xx = (x - 0.5) * width;
+    double yy = (y - 0.5) * height;
+    double t = new Event(xx, yy, 0).dist() / c;
+    return new Event(xx, yy, t);
+  }
 
   public boolean isOnScreen(Event image) {
     return image.x() > -width/2 && image.x() < width/2

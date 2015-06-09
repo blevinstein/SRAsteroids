@@ -72,8 +72,7 @@ public class SRAsteroids {
     //   "fast time" by setting c lower (and scaling down velocity of all objects?)
     // Add random objects
     if (random(0, 1) < 0.15) {
-      Event image = new Event(random(-view.getWidth()/2, view.getWidth()/2),
-          random(-view.getHeight()/2, view.getHeight()/2), 0);
+      Event image = view.getImageOnScreen(random(0, 1), random(0, 1));
       Event eventOffset = view.getEvent(image);
       Timeline timeline =
           new ConstantTimeline(eventOffset, Velocity.randomUnit().times(random(0, 0.5 * c)));
@@ -98,6 +97,12 @@ public class SRAsteroids {
      * This is the projection function used to put timelines on-screen.
      */
     Event getImage(Timeline t);
+
+    /**
+    * @param x horizontal screen coordinate from 0 to 1
+    * @param y vertical screen coordinate from 0 to 1
+    */
+    Event getImageOnScreen(double x, double y);
 
     /**
      * Reverse of getImage projection, gives a point on the original timeline.
@@ -130,8 +135,6 @@ public class SRAsteroids {
     boolean isOnScreen(Event image);
 
     boolean getKeyDown(int keyCode);
-    int getWidth();
-    int getHeight();
   }
 
   private static final int TRAIL_LEN = 100;
