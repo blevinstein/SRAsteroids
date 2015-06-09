@@ -145,9 +145,7 @@ public class JOGLDriver implements SRAsteroids.View, KeyListener {
   }
 
   private void vertex(Event image) {
-    if (isOnScreen(image)) {
-      gl.glVertex2d(width/2 + image.x(), height/2 + image.y());
-    }
+    gl.glVertex2d(width/2 + image.x(), height/2 + image.y());
   }
 
   private static int SHIP_LEN = 10;
