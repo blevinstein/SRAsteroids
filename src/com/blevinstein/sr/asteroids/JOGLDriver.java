@@ -188,7 +188,7 @@ public class JOGLDriver implements SRAsteroids.View, KeyListener {
 
     gl.glLineWidth(2);
     gl.glBegin(GL2.GL_TRIANGLE_FAN);
-    double displayRadius = Math.max(r * zoom, 0.5);
+    double displayRadius = Math.max(r * zoom, 1);
     for (int i = 0; i < segments + 1; i++) {
       double x = Math.cos(2 * Math.PI * i / segments) * displayRadius;
       double y = Math.sin(2 * Math.PI * i / segments) * displayRadius;
