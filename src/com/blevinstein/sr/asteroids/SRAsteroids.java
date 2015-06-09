@@ -17,7 +17,7 @@ import java.util.List;
 
 public class SRAsteroids {
   // TODO: abstract out World, separate from engine and driver code
-  private MutableGalaxy galaxy = new MutableGalaxy();
+  private Galaxy galaxy = new UniformBubbleGalaxy(1E4, 1E-5);
   private ArbitraryTimeline myTimeline = new ArbitraryTimeline();
   private Velocity velocity = new Velocity(0, 0);
   private double angle = 0;
@@ -66,19 +66,6 @@ public class SRAsteroids {
       zoom /= 1.05;
     }
     view.setZoom(zoom);
-
-    // TODO Experiment: add objects on click, in current reference frame
-    // TODO Experiment: change speed of light, e.g. asteroids in normal time, then switch into
-    //   "fast time" by setting c lower (and scaling down velocity of all objects?)
-    // Add random objects
-    if (random(0, 1) < 0.15) {
-      Event image = view.getImageOnScreen(random(0, 1), random(0, 1));
-      Event eventOffset = view.getEvent(image);
-      Timeline timeline =
-          new ConstantTimeline(eventOffset, Velocity.randomUnit().times(random(0, 0.5 * c)));
-      Star newStar = new Star(timeline, Color.WHITE);
-      galaxy.add(newStar);
-    }
 
     myTimeline.add(myTimeline.end().plus(velocity.over(dt * velocity.gamma())));
   }
