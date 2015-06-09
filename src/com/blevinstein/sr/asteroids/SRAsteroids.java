@@ -100,7 +100,7 @@ public class SRAsteroids {
     Event getImage(Timeline t);
 
     /**
-     * Reverse of getImage projection.
+     * Reverse of getImage projection, gives a point on the original timeline.
      */
     Event getEvent(Event image);
 
@@ -140,18 +140,6 @@ public class SRAsteroids {
 
     // Show the observer
     view.ship(Color.WHITE, myTimeline, angle);
-    /*
-    List<Event> historyEvents = myTimeline.history(TRAIL_LEN);
-    for (int i = 0; i < historyEvents.size() - 1; i++) {
-      Event event1 = historyEvents.get(i);
-      Event event2 = historyEvents.get(i + 1);
-      Velocity v = event2.minus(event1).toVelocity();
-      StaticTimeline trail1 = new StaticTimeline(event1.x(), event1.y());
-      StaticTimeline trail2 = new StaticTimeline(event2.x(), event2.y());
-      Color c = new Color(i * 0.5f / TRAIL_LEN, i * 0.5f / TRAIL_LEN, i * 1f / TRAIL_LEN);
-      view.line(c, c, trail1, trail2);
-    }
-    */
 
     if (lastBoost != null) {
       // Show graphics to indicate ship output
@@ -166,21 +154,6 @@ public class SRAsteroids {
         ConstantTimeline timeline2 = new ConstantTimeline(output, velocity);
         view.line(Color.BLACK, Color.RED, timeline1, timeline2);
       }
-
-      // Show graphics to indicate acceleration & deformation
-      /*
-      for (int i = 0; i < 200; i++) {
-        double rx = random(-view.getWidth()/2, view.getWidth()/2),
-            ry = random(-view.getHeight()/2, view.getHeight()/2);
-        Event image1 = new Event(rx, ry, 0);
-        Event image2 = SR.lorentz(image1, lastBoost.times(60));
-        Event event1 = view.getEvent(image1);
-        Event event2 = view.getEvent(image2);
-        ConstantTimeline timeline1 = new ConstantTimeline(event1, velocity);
-        ConstantTimeline timeline2 = new ConstantTimeline(event2, velocity);
-        view.line(new Color(100, 100, 100), Color.BLACK, timeline1, timeline2);
-      }
-      */
       lastBoost = null;
     }
 

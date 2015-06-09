@@ -188,16 +188,11 @@ public class JOGLDriver implements SRAsteroids.View, KeyListener {
     AffineTransform contraction = SR.lorentzContraction(vObject);
     int segments = (int) Math.max(6, Math.ceil(2 * Math.PI * r / CIRCLE_SEG_LEN));
 
-    double second = FPS * SRAsteroids.dt; // TODO: fix this code smell
-    double rotation = -2 * Math.PI / second; // NOTE: negative to make rotation clockwise
-    double initAngle = t.timeElapsed(0, event.t()) * rotation;
-
     gl.glLineWidth(2);
-    gl.glBegin(GL2.GL_LINE_STRIP);
-    vertex(image);
+    gl.glBegin(GL2.GL_TRIANGLE_FAN);
     for (int i = 0; i < segments + 1; i++) {
-      double x = Math.cos(2 * Math.PI * i / segments + initAngle) * r * zoom;
-      double y = Math.sin(2 * Math.PI * i / segments + initAngle) * r * zoom;
+      double x = Math.cos(2 * Math.PI * i / segments) * r * zoom;
+      double y = Math.sin(2 * Math.PI * i / segments) * r * zoom;
       // Apply AffineTransform
       double xx = x * contraction.getScaleX() + y * contraction.getShearX()
         + contraction.getTranslateX();
