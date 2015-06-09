@@ -17,7 +17,7 @@ import java.util.List;
 
 public class SRAsteroids {
   // TODO: abstract out World, separate from engine and driver code
-  private List<Timeline> timelines = new ArrayList<>();
+  private MutableGalaxy galaxy = new MutableGalaxy();
   private ArbitraryTimeline myTimeline = new ArbitraryTimeline();
   private Velocity velocity = new Velocity(0, 0);
   private double angle = 0;
@@ -76,7 +76,8 @@ public class SRAsteroids {
       Event eventOffset = view.getEvent(image);
       Timeline timeline =
           new ConstantTimeline(eventOffset, Velocity.randomUnit().times(random(0, 0.5 * c)));
-      timelines.add(timeline);
+      Star newStar = new Star(timeline, Color.WHITE);
+      galaxy.add(newStar);
     }
 
     myTimeline.add(myTimeline.end().plus(velocity.over(dt * velocity.gamma())));
@@ -160,9 +161,9 @@ public class SRAsteroids {
       lastBoost = null;
     }
 
-    // Show the objects
-    for (Timeline timeline : timelines) {
-      view.circle(Color.WHITE, timeline, 10);
+    // Show the stars
+    for (Star star : galaxy.stars()) {
+      view.circle(star.color(), star.timeline(), 10);
     }
   }
 
