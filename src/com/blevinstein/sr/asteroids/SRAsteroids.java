@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SRAsteroids {
-  // TODO: abstract out World, separate from engine and driver code? is Galaxy enough?
   private Galaxy galaxy = new UniformBubbleGalaxy(1E4, 1E-5, true);
   private ArbitraryTimeline myTimeline = new ArbitraryTimeline();
   private Event observer = Event.ORIGIN;

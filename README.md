@@ -49,7 +49,18 @@ Basic Features
 
 - implement TransformedTimeline, shifted version of another Timeline
 
+- implement CircularTimeline, orbits in a circle
 - implement EllipticalTimeline, add orbits around central point, fake gravity
+
+Procedural Generation
+---------------------
+
+- Create a Galaxy that has clusters of stars that are interesting to navigate.
+
+- Use e.g. Perlin noise to create a Galaxy
+  - smoothly varying star velocities for stability.
+  - smoothly vary density, include large and small stars
+  - add randomly chosen colors? smoothly vary hue/saturation of colors?
 
 Physics Engine
 --------------
