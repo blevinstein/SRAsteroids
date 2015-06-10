@@ -17,7 +17,7 @@ import java.util.List;
 
 public class SRAsteroids {
   // TODO: abstract out World, separate from engine and driver code? is Galaxy enough?
-  private Galaxy galaxy = new UniformBubbleGalaxy(1E4, 1E-5);
+  private Galaxy galaxy = new UniformBubbleGalaxy(1E4, 1E-5, false);
   private ArbitraryTimeline myTimeline = new ArbitraryTimeline();
   private Event observer = Event.ORIGIN;
   private Velocity velocity = new Velocity(0, 0);
@@ -136,7 +136,18 @@ public class SRAsteroids {
       Event image = getImage(star.timeline());
       Event event = getEvent(image);
       Velocity vObject = star.timeline().velocityAt(event.t()).relativeMinus(velocity);
-      view.circle(star.color(), image, vObject, star.radius());
+      boolean twinkle = false;
+      if (star.twinklePeriod() != 0) {
+        double timeElapsed = star.timeline().timeElapsed(0, event.t());
+        double phase = (Math.abs(timeElapsed) / star.twinklePeriod()) % 1.0;
+        if (phase < 0.05) { // 5% duty cycle
+          twinkle = true;
+        }
+      }
+      view.circle(twinkle ? Color.WHITE : star.color(),
+          image,
+          vObject,
+          star.radius());
     }
   }
 
