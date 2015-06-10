@@ -47,7 +47,7 @@ Basic Features
 - Implement basic collision, splitting, varied sizes of asteriods
   - For now, implement ellipse collision
 
-- implement TransformedTimeline, shifted version of another Timeline
+- implement OffsetTimeline, shifted version of another Timeline
 
 - implement CircularTimeline, orbits in a circle
 - implement EllipticalTimeline, add orbits around central point, fake gravity

@@ -208,6 +208,7 @@ public class JOGLDriver implements SRAsteroids.View, KeyListener {
     return new Event(xx, yy, t);
   }
 
+  // TODO: add radius to isOnScreen()
   public boolean isOnScreen(Event image) {
     return image.x() * zoom > -width/2 && image.x() * zoom < width/2
         && image.y() * zoom > -height/2 && image.y() * zoom < height/2;
