@@ -26,9 +26,13 @@ public class UniformBubbleGalaxy implements Galaxy {
       double angle = Math.random() * 2 * Math.PI;
       double dist = Math.sqrt(Math.random()) * radius;
       Event starPosition = new Event(dist * Math.cos(angle), dist * Math.sin(angle), 0);
-      Velocity starVelocity = Velocity.randomUnit().times(Math.random() * 0.9 * c);
+      Velocity starVelocity = Velocity.randomUnit().times(Math.random() * 0.999 * c);
       ConstantTimeline starTimeline = new ConstantTimeline(starPosition, starVelocity);
-      _stars.add(new Star(starTimeline, Color.BLUE, 10, twinkle ? 10 : 0));
+      _stars.add(new Star(
+            starTimeline,
+            twinkle ? Color.GRAY : Color.WHITE,
+            10 /* radius */,
+            twinkle ? 10 : 0 /* twinklePeriod */));
     }
   }
 
