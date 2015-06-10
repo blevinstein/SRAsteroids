@@ -31,6 +31,10 @@ TODO
 
 Experiments
 -----------
+
+- add 'twinkling' to stars, use to visualize time dilation
+- add patterns of colors in the stars, see what happens under transformation
+
 - add ability to switch between projections (seenBy, concurrentWith)
   - NOTE: Can add light pulses in concurrentWith projection, doesn't make any sense in seenBy
   projection
