@@ -133,6 +133,9 @@ public class SRAsteroids {
     for (Star star : galaxy.stars()) {
       // NOTE: decided not to refactor -> View#circle(Star star)
       Event image = getImage(star.timeline());
+      if (!view.isOnScreen(image)) {
+        continue;
+      }
       Event event = getEvent(image);
       Velocity vObject = star.timeline().velocityAt(event.t()).relativeMinus(velocity);
       boolean twinkle = false;
