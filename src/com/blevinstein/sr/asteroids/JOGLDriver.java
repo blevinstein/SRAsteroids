@@ -33,8 +33,6 @@ public class JOGLDriver implements SRAsteroids.View, KeyListener {
   private static final int FPS = 60; // max fps
   
   private SRAsteroids world;
-  private Event observer = Event.ORIGIN;
-  private Velocity velocity = Velocity.ZERO;
   private GLCanvas canvas;
   private GL2 gl;
   private TextRenderer textRenderer;
@@ -44,7 +42,6 @@ public class JOGLDriver implements SRAsteroids.View, KeyListener {
 
   public JOGLDriver() {
     world = new SRAsteroids().setView(this);
-    observer = Event.ORIGIN;
 
     GLProfile profile = GLProfile.getDefault();
     GLProfile.initSingleton();
@@ -141,12 +138,6 @@ public class JOGLDriver implements SRAsteroids.View, KeyListener {
     textRenderer.endRendering();
   }
 
-  // TODO: abstract (Event, Velocity) -> ReferenceFrame? Pair<Event, Velocity>? Observer?
-  public void setObserver(Event observer, Velocity velocity) {
-    this.observer = observer;
-    this.velocity = velocity;
-  }
-
   public void setZoom(double zoom) {
     this.zoom = zoom;
   }
@@ -159,14 +150,13 @@ public class JOGLDriver implements SRAsteroids.View, KeyListener {
   }
 
   private void vertex(Event image) {
-    gl.glVertex2d(width/2 + image.x(), height/2 + image.y());
+    gl.glVertex2d(width/2 + image.x() * zoom, height/2 + image.y() * zoom);
   }
 
   private static int SHIP_LEN = 10;
-  public void ship(Color c, Timeline t, double angle) {
+  public void ship(Color c, Event image, double angle) {
     setColor(c);
-    Event image = getImage(t);
-    // TODO: add offsets before transformation to capture lorentz contraction
+    // TODO: take optional velocity as argument, show lorentz contraction
     Event iOffset = Velocity.unit(angle).over(1).times(SHIP_LEN).times(zoom);
     Event jOffset = Velocity.unit(angle).perp().over(1).times(SHIP_LEN/3).times(zoom);
     gl.glBegin(GL2.GL_TRIANGLE_FAN);
@@ -177,9 +167,7 @@ public class JOGLDriver implements SRAsteroids.View, KeyListener {
     gl.glEnd();
   }
 
-  public void line(Color c1, Color c2, Timeline t1, Timeline t2) {
-    Event image1 = getImage(t1);
-    Event image2 = getImage(t2);
+  public void line(Color c1, Color c2, Event image1, Event image2) {
     gl.glLineWidth(2);
     gl.glBegin(GL2.GL_LINES);
       setColor(c1);
@@ -190,19 +178,16 @@ public class JOGLDriver implements SRAsteroids.View, KeyListener {
   }
 
   private static int CIRCLE_SEG_LEN = 5;
-  public void circle(Color c, Timeline t, double r) {
+  public void circle(Color c, Event image, Velocity vObject, double r) {
     setColor(c);
-    Event image = getImage(t);
     if (!isOnScreen(image)) { return; }
-    Event event = getEvent(image);
-    Velocity vObject = t.velocityAt(event.t()).relativeMinus(velocity);
 
     AffineTransform contraction = SR.lorentzContraction(vObject);
     int segments = (int) Math.max(4, Math.ceil(2 * Math.PI * r / CIRCLE_SEG_LEN));
 
     gl.glLineWidth(2);
     gl.glBegin(GL2.GL_TRIANGLE_FAN);
-    double displayRadius = Math.max(r * zoom, 1);
+    double displayRadius = Math.max(r, 1 / zoom);
     for (int i = 0; i < segments + 1; i++) {
       double x = Math.cos(2 * Math.PI * i / segments) * displayRadius;
       double y = Math.sin(2 * Math.PI * i / segments) * displayRadius;
@@ -216,25 +201,16 @@ public class JOGLDriver implements SRAsteroids.View, KeyListener {
     gl.glEnd();
   }
 
-  public Event getImage(Timeline t) {
-    return t.seenBy(observer, velocity).times(zoom);
-  }
-
-  public Event getEvent(Event image) {
-    // NOTE: lorentz(e - o, v) = i -> lorentz(i, -v) = e - o
-    return SR.lorentz(image.times(1.0 / zoom), velocity.times(-1)).plus(observer);
-  }
-
   public Event getImageOnScreen(double x, double y) {
-    double xx = (x - 0.5) * width;
-    double yy = (y - 0.5) * height;
+    double xx = (x - 0.5) * width / zoom;
+    double yy = (y - 0.5) * height / zoom;
     double t = new Event(xx, yy, 0).dist() / c;
     return new Event(xx, yy, t);
   }
 
   public boolean isOnScreen(Event image) {
-    return image.x() > -width/2 && image.x() < width/2
-        && image.y() > -height/2 && image.y() < height/2;
+    return image.x() * zoom > -width/2 && image.x() * zoom < width/2
+        && image.y() * zoom > -height/2 && image.y() * zoom < height/2;
   }
   
   // KeyListener

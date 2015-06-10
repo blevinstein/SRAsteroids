@@ -19,6 +19,7 @@ public class SRAsteroids {
   // TODO: abstract out World, separate from engine and driver code? is Galaxy enough?
   private Galaxy galaxy = new UniformBubbleGalaxy(1E4, 1E-5);
   private ArbitraryTimeline myTimeline = new ArbitraryTimeline();
+  private Event observer = Event.ORIGIN;
   private Velocity velocity = new Velocity(0, 0);
   private double angle = 0;
   private double zoom = 1.0;
@@ -72,50 +73,33 @@ public class SRAsteroids {
 
   public interface View {
     /**
-     * Set the position and velocity of the reference frame.
-     */
-    void setObserver(Event now, Velocity v);
-
-    /**
      * Sets the zoom factor.
      */
     void setZoom(double zoom);
 
     /**
-     * This is the projection function used to put timelines on-screen.
+     * @param x horizontal screen coordinate from 0 to 1
+     * @param y vertical screen coordinate from 0 to 1
      */
-    Event getImage(Timeline t);
-
-    /**
-    * @param x horizontal screen coordinate from 0 to 1
-    * @param y vertical screen coordinate from 0 to 1
-    */
     Event getImageOnScreen(double x, double y);
 
     /**
-     * Reverse of getImage projection, gives a point on the original timeline.
-     */
-    Event getEvent(Event image);
-
-    /**
-     * Draw a ship at getImage(t).
-     * @param v velocity of observer relative to the ship.
+     * Draw a ship around an image on screen.
      * @param angle of the ship
      */
-    void ship(Color c, Timeline t, double angle);
+    void ship(Color c, Event image, double angle);
 
     /**
-     * Draw a line from getImage(t1) to getImage(t2).
-     * @param v velocity of observer relative to the line.
+     * Draw a line from image1 to image2.
      */
-    void line(Color c1, Color c2, Timeline t1, Timeline t2);
+    void line(Color c1, Color c2, Event image1, Event image2);
 
     /**
-     * Draw a circle around getImage(t).
+     * Draw a circle around an image on screen.
      * @param r radius of the circle
-     * @param v velocity of observer relative to the circle.
+     * @param vObject velocity of object relative to the observer.
      */
-    void circle(Color c, Timeline t, double r);
+    void circle(Color c, Event image, Velocity vObject, double r);
 
     /**
      * @return whether an image is on-screen
@@ -127,10 +111,10 @@ public class SRAsteroids {
 
   private static final int TRAIL_LEN = 100;
   public synchronized void draw() {
-    view.setObserver(myTimeline.end(), myTimeline.velocityAt(myTimeline.end().t()));
+    observer = myTimeline.end();
 
     // Show the observer
-    view.ship(Color.GREEN, myTimeline, angle);
+    view.ship(Color.GREEN, getImage(myTimeline), angle);
 
     if (lastBoost != null) {
       // Show graphics to indicate ship output
@@ -141,9 +125,7 @@ public class SRAsteroids {
         Event ship = myTimeline.end();
         Velocity vOutput = Velocity.unit(outputAngle).times(random(0, 1) * -200);
         Event output = ship.relativePlus(vOutput.over(dt), velocity);
-        ConstantTimeline timeline1 = new ConstantTimeline(ship, velocity);
-        ConstantTimeline timeline2 = new ConstantTimeline(output, velocity);
-        view.line(Color.BLACK, Color.RED, timeline1, timeline2);
+        view.line(Color.BLACK, Color.RED, getImage(ship), getImage(output));
       }
       lastBoost = null;
     }
@@ -151,8 +133,35 @@ public class SRAsteroids {
     // Show the stars
     for (Star star : galaxy.stars()) {
       // NOTE: decided not to refactor -> View#circle(Star star)
-      view.circle(star.color(), star.timeline(), star.radius());
+      Event image = getImage(star.timeline());
+      Event event = getEvent(image);
+      Velocity vObject = star.timeline().velocityAt(event.t()).relativeMinus(velocity);
+      view.circle(star.color(), image, vObject, star.radius());
     }
+  }
+
+  // Projections
+
+  /**
+   * Given a Timeline, projects onto the view screen.
+   */
+  public Event getImage(Timeline t) {
+    return t.seenBy(observer, velocity);
+  }
+
+  /**
+   * Given an Event, projects onto the view screen.
+   */
+  private Event getImage(Event event) {
+    return SR.lorentz(event.minus(observer), velocity);
+  }
+
+  /**
+   * Given an Event on the view screen, project back into the world.
+   */
+  public Event getEvent(Event image) {
+    // NOTE: lorentz(e - o, v) = i -> lorentz(i, -v) = e - o
+    return SR.lorentz(image, velocity.times(-1)).plus(observer);
   }
 
   // Convenience methods
