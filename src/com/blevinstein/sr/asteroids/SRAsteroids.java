@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SRAsteroids {
-  // TODO: abstract out World, separate from engine and driver code
+  // TODO: abstract out World, separate from engine and driver code? is Galaxy enough?
   private Galaxy galaxy = new UniformBubbleGalaxy(1E4, 1E-5);
   private ArbitraryTimeline myTimeline = new ArbitraryTimeline();
   private Velocity velocity = new Velocity(0, 0);
@@ -150,7 +150,8 @@ public class SRAsteroids {
 
     // Show the stars
     for (Star star : galaxy.stars()) {
-      view.circle(star.color(), star.timeline(), 10);
+      // NOTE: decided not to refactor -> View#circle(Star star)
+      view.circle(star.color(), star.timeline(), star.radius());
     }
   }
 

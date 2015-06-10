@@ -29,7 +29,7 @@ public class UniformBubbleGalaxy implements Galaxy {
       Event starPosition = new Event(dist * Math.cos(angle), dist * Math.sin(angle), 0);
       Velocity starVelocity = Velocity.randomUnit().times(Math.random() * 0.9 * c);
       ConstantTimeline starTimeline = new ConstantTimeline(starPosition, starVelocity);
-      _stars.add(new Star(starTimeline, Color.WHITE));
+      _stars.add(new Star(starTimeline, Color.WHITE, 10));
     }
   }
 
