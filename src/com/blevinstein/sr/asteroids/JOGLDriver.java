@@ -7,6 +7,7 @@ import com.blevinstein.sr.SR;
 import com.blevinstein.sr.Timeline;
 import com.blevinstein.sr.Velocity;
 import com.blevinstein.util.Throttle;
+import com.blevinstein.util.Ticker;
 
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
@@ -15,7 +16,9 @@ import com.jogamp.opengl.GLEventListener;
 import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.glu.GLU;
+import com.jogamp.opengl.util.awt.TextRenderer;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Frame;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -34,8 +37,10 @@ public class JOGLDriver implements SRAsteroids.View, KeyListener {
   private Velocity velocity = Velocity.ZERO;
   private GLCanvas canvas;
   private GL2 gl;
+  private TextRenderer textRenderer;
   private int width = 1, height = 1;
   private double zoom = 1.0;
+  private long framerate = 0;
 
   public JOGLDriver() {
     world = new SRAsteroids().setView(this);
@@ -68,17 +73,20 @@ public class JOGLDriver implements SRAsteroids.View, KeyListener {
 
       @Override
       public void display(GLAutoDrawable drawable) {
-        render(drawable.getGL().getGL2());
+        TextRenderer textRenderer = new TextRenderer(new Font("SanSerif", Font.BOLD, 18));
+        render(drawable.getGL().getGL2(), textRenderer);
       }
     });
   }
 
   public void run() {
-    Throttle t = new Throttle(FPS);
+    Throttle throttle = new Throttle(FPS);
+    Ticker ticker = new Ticker();
     while (true) {
       world.mainLoop();
       canvas.display();
-      t.sleep();
+      framerate = ticker.tick();
+      throttle.sleep();
     }
   }
 
@@ -119,12 +127,18 @@ public class JOGLDriver implements SRAsteroids.View, KeyListener {
     gl.glViewport(0, 0, width, height);
   }
 
-  public void render(GL2 gl) {
+  public void render(GL2 gl, TextRenderer textRenderer) {
     this.gl = gl;
+    this.textRenderer = textRenderer;
 
     gl.glClear(GL2.GL_COLOR_BUFFER_BIT);
 
     world.draw();
+
+    textRenderer.beginRendering(width, height);
+    textRenderer.setColor(Color.WHITE);
+    textRenderer.draw("" + framerate, width - 100, height - 100);
+    textRenderer.endRendering();
   }
 
   // TODO: abstract (Event, Velocity) -> ReferenceFrame? Pair<Event, Velocity>? Observer?
