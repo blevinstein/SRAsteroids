@@ -33,6 +33,7 @@ Experiments
 -----------
 
 - add patterns of colors in the stars, see what happens under transformation
+- show redshift/blueshift for stars?
 
 - add ability to switch between projections (seenBy, concurrentWith)
   - NOTE: Can add light pulses in concurrentWith projection, doesn't make any sense in seenBy
