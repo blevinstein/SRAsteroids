@@ -38,7 +38,11 @@ public class JOGLDriver implements SRAsteroids.View {
 
   public JOGLDriver() {
     KeyInput keyInput = new KeyInput();
-    world = new SRAsteroids().setView(this).setKeyInput(keyInput);
+    MouseInput mouseInput = new MouseInput();
+    world = new SRAsteroids()
+        .setView(this)
+        .setKeyInput(keyInput)
+        .setMouseInput(mouseInput);
 
     GLProfile profile = GLProfile.getDefault();
     GLProfile.initSingleton();
@@ -47,6 +51,9 @@ public class JOGLDriver implements SRAsteroids.View {
     capabilities.setDoubleBuffered(true);
     canvas = new GLCanvas(capabilities);
     canvas.addKeyListener(keyInput);
+    canvas.addMouseListener(mouseInput);
+    canvas.addMouseMotionListener(mouseInput);
+    canvas.addMouseWheelListener(mouseInput);
 
     canvas.addGLEventListener(new GLEventListener() {
       @Override
@@ -175,7 +182,7 @@ public class JOGLDriver implements SRAsteroids.View {
   }
 
   private static int CIRCLE_SEG_LEN = 5;
-  public void circle(Color c, Event image, Velocity vObject, double r) {
+  public void circle(Color c, Event image, Velocity vObject, double r, boolean fill) {
     setColor(c);
     if (!isOnScreen(image)) { return; }
 
@@ -183,7 +190,7 @@ public class JOGLDriver implements SRAsteroids.View {
     int segments = (int) Math.max(4, Math.ceil(2 * Math.PI * r / CIRCLE_SEG_LEN));
 
     gl.glLineWidth(2);
-    gl.glBegin(GL2.GL_TRIANGLE_FAN);
+    gl.glBegin(fill ? GL2.GL_TRIANGLE_FAN : GL2.GL_LINE_STRIP);
     double displayRadius = Math.max(r, 1 / zoom);
     for (int i = 0; i < segments + 1; i++) {
       double x = Math.cos(2 * Math.PI * i / segments) * displayRadius;

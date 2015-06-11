@@ -28,7 +28,7 @@ public class SRAsteroids {
 
   private View view;
   private KeyInput keyInput;
-  // TODO: add mouse input
+  private MouseInput mouseInput;
 
   public static final double dt = 0.1;
 
@@ -45,6 +45,11 @@ public class SRAsteroids {
   public SRAsteroids setKeyInput(KeyInput keyInput) {
     this.keyInput = keyInput;
     this.pilot = new ManualPilot(keyInput);
+    return this;
+  }
+
+  public SRAsteroids setMouseInput(MouseInput mouseInput) {
+    this.mouseInput = mouseInput;
     return this;
   }
 
@@ -106,7 +111,7 @@ public class SRAsteroids {
      * @param r radius of the circle
      * @param vObject velocity of object relative to the observer.
      */
-    void circle(Color c, Event image, Velocity vObject, double r);
+    void circle(Color c, Event image, Velocity vObject, double r, boolean fill);
 
     /**
      * @return whether an image is on-screen
@@ -114,6 +119,7 @@ public class SRAsteroids {
     boolean isOnScreen(Event image);
   }
 
+  // TODO: getImage is expensive, think about caching? GalaxyImage abstraction?
   private static final int TRAIL_LEN = 100;
   public synchronized void draw() {
     observer = myTimeline.end();
@@ -156,8 +162,13 @@ public class SRAsteroids {
       view.circle(twinkle ? Color.WHITE : star.color(),
           image,
           vObject,
-          star.radius());
+          star.radius(),
+          true);
     }
+
+    // Show a cursor
+    Event cursorImage = view.getImageOnScreen(mouseInput.x(), mouseInput.y());
+    view.circle(Color.RED, cursorImage, Velocity.ZERO, 50, false);
   }
 
   // Projections
