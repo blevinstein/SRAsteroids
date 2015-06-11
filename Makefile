@@ -15,12 +15,6 @@ SRCS = \
 		$(wildcard test/*/*/*/*.java) \
 		$(wildcard test/*/*/*/*/*.java)
 
-CLASSES = \
-		$(wildcard src/*/*/*/*.class) \
-		$(wildcard src/*/*/*/*/*.class) \
-		$(wildcard test/*/*/*/*.class) \
-		$(wildcard test/*/*/*/*/*.class)
-
 TEST_SRCS = $(wildcard test/*/*/*/*Test.java) \
 						$(wildcard test/*/*/*/*/*Test.java)
 TESTS = $(subst /,.,$(subst test/,,$(subst .java,,${TEST_SRCS})))
@@ -37,4 +31,4 @@ tests: build
 	java -cp ${RUNPATH} org.junit.runner.JUnitCore ${TESTS}
 
 clean:
-	rm -rf ${CLASSES}
+	rm -rf build/*
