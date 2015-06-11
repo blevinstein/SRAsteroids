@@ -28,7 +28,7 @@ import java.awt.geom.AffineTransform;
 import java.util.HashMap;
 import java.util.Map;
 
-public class JOGLDriver implements SRAsteroids.View, KeyListener {
+public class JOGLDriver implements SRAsteroids.View, SRAsteroids.KeyInput, KeyListener {
 
   private static final int FPS = 60; // max fps
   
@@ -41,7 +41,7 @@ public class JOGLDriver implements SRAsteroids.View, KeyListener {
   private long framerate = 0;
 
   public JOGLDriver() {
-    world = new SRAsteroids().setView(this);
+    world = new SRAsteroids().setView(this).setKeyInput(this);
 
     GLProfile profile = GLProfile.getDefault();
     GLProfile.initSingleton();

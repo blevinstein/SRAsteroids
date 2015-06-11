@@ -25,6 +25,7 @@ public class SRAsteroids {
   private Velocity lastBoost = null;
 
   private View view;
+  private KeyInput keyInput;
 
   public static final double dt = 0.1;
 
@@ -38,31 +39,36 @@ public class SRAsteroids {
     return this;
   }
 
+  public SRAsteroids setKeyInput(KeyInput keyInput) {
+    this.keyInput = keyInput;
+    return this;
+  }
+
   // NOTE: synchronized draw() and mainLoop()
   public synchronized void mainLoop() {
     // Accelerate
     double a = 0.25;
     double alpha = 0.1;
-    if (view.getKeyDown(KeyEvent.VK_DOWN) != view.getKeyDown(KeyEvent.VK_UP)) {
+    if (keyInput.getKeyDown(KeyEvent.VK_DOWN) != keyInput.getKeyDown(KeyEvent.VK_UP)) {
       Velocity lastVelocity = velocity;
-      if (view.getKeyDown(KeyEvent.VK_DOWN)) {
+      if (keyInput.getKeyDown(KeyEvent.VK_DOWN)) {
         velocity = velocity.relativePlus(Velocity.unit(angle).times(-a)).checked(0.999);
       } else {
         velocity = velocity.relativePlus(Velocity.unit(angle).times(a)).checked(0.999);
       }
       lastBoost = velocity.relativeMinus(lastVelocity); // use as flag to render boost
     }
-    if (view.getKeyDown(KeyEvent.VK_LEFT) != view.getKeyDown(KeyEvent.VK_RIGHT)) {
-      if (view.getKeyDown(KeyEvent.VK_LEFT)) {
+    if (keyInput.getKeyDown(KeyEvent.VK_LEFT) != keyInput.getKeyDown(KeyEvent.VK_RIGHT)) {
+      if (keyInput.getKeyDown(KeyEvent.VK_LEFT)) {
         angle += alpha;
       } else {
         angle -= alpha;
       }
     }
-    if (view.getKeyDown(KeyEvent.VK_E)) {
+    if (keyInput.getKeyDown(KeyEvent.VK_E)) {
       zoom *= 1.05;
     }
-    if (view.getKeyDown(KeyEvent.VK_Q)) {
+    if (keyInput.getKeyDown(KeyEvent.VK_Q)) {
       zoom /= 1.05;
     }
     view.setZoom(zoom);
@@ -104,7 +110,10 @@ public class SRAsteroids {
      * @return whether an image is on-screen
      */
     boolean isOnScreen(Event image);
+  }
 
+  public interface KeyInput {
+    // TODO: add mouse input
     boolean getKeyDown(int keyCode);
   }
 
