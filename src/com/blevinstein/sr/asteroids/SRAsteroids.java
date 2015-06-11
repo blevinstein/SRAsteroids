@@ -14,9 +14,11 @@ import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.lang3.tuple.Pair;
 
 public class SRAsteroids {
   private Galaxy galaxy = new UniformBubbleGalaxy(1E4, 1E-5, true);
+  private Pilot pilot;
   private ArbitraryTimeline myTimeline = new ArbitraryTimeline();
   private Event observer = Event.ORIGIN;
   private Velocity velocity = new Velocity(0, 0);
@@ -41,30 +43,18 @@ public class SRAsteroids {
 
   public SRAsteroids setKeyInput(KeyInput keyInput) {
     this.keyInput = keyInput;
+    this.pilot = new ManualPilot(keyInput);
     return this;
   }
 
   // NOTE: synchronized draw() and mainLoop()
   public synchronized void mainLoop() {
-    // Accelerate
-    double a = 0.25;
-    double alpha = 0.1;
-    if (keyInput.getKeyDown(KeyEvent.VK_DOWN) != keyInput.getKeyDown(KeyEvent.VK_UP)) {
-      Velocity lastVelocity = velocity;
-      if (keyInput.getKeyDown(KeyEvent.VK_DOWN)) {
-        velocity = velocity.relativePlus(Velocity.unit(angle).times(-a)).checked(0.999);
-      } else {
-        velocity = velocity.relativePlus(Velocity.unit(angle).times(a)).checked(0.999);
-      }
-      lastBoost = velocity.relativeMinus(lastVelocity); // use as flag to render boost
-    }
-    if (keyInput.getKeyDown(KeyEvent.VK_LEFT) != keyInput.getKeyDown(KeyEvent.VK_RIGHT)) {
-      if (keyInput.getKeyDown(KeyEvent.VK_LEFT)) {
-        angle += alpha;
-      } else {
-        angle -= alpha;
-      }
-    }
+    Velocity lastVelocity = velocity;
+    Pair<Velocity, Double> newVelocityAngle = pilot.steer(myTimeline.end(), velocity, angle);
+    velocity = newVelocityAngle.getLeft();
+    angle = newVelocityAngle.getRight();
+    lastBoost = velocity.relativeMinus(lastVelocity); // use as flag to render boost
+
     if (keyInput.getKeyDown(KeyEvent.VK_E)) {
       zoom *= 1.05;
     }
@@ -74,6 +64,14 @@ public class SRAsteroids {
     view.setZoom(zoom);
 
     myTimeline.add(myTimeline.end().plus(velocity.over(dt * velocity.gamma())));
+  }
+
+  public interface Pilot {
+    /**
+     * Given the current position/velocity/angle of the ship, accelerates and rotates.
+     * @return new velocity and new angle
+     */
+    Pair<Velocity, Double> steer(Event myPosition, Velocity myVelocity, double myAngle);
   }
 
   public interface View {
@@ -131,7 +129,8 @@ public class SRAsteroids {
       for (int i = 0; i < 10; i++) {
         double outputAngle = boostAngle + random(-0.2, 0.2);
         Event ship = myTimeline.end();
-        Velocity vOutput = Velocity.unit(outputAngle).times(random(0, 1) * -200);
+        Velocity vOutput = Velocity.unit(outputAngle)
+            .times(random(0, 1) * lastBoost.mag() * -1000);
         Event output = ship.relativePlus(vOutput.over(dt), velocity);
         view.line(Color.BLACK, Color.RED, getImage(ship), getImage(output));
       }
@@ -196,3 +195,4 @@ public class SRAsteroids {
 
   private static final long serialVersionUID = 1;
 }
+

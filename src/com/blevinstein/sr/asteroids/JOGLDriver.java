@@ -228,3 +228,4 @@ public class JOGLDriver implements SRAsteroids.View, SRAsteroids.KeyInput, KeyLi
     return keys.containsKey(keyCode) && keys.get(keyCode);
   }
 }
+
