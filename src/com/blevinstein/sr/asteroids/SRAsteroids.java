@@ -177,7 +177,7 @@ public class SRAsteroids {
    * Given a Timeline, projects onto the view screen.
    */
   public Event getImage(Timeline t) {
-    return t.seenBy(observer, velocity);
+    return t.seenByImage(observer, velocity);
   }
 
   /**

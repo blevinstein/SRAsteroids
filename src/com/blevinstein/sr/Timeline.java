@@ -103,12 +103,15 @@ public abstract class Timeline {
    *     accelerated frame of reference
    * NOTE: naive implementation finds a solution using bisection method, can be overridden
    */
+  public Event concurrentWithImage(Event observer, Velocity v) {
+    return SR.lorentz(concurrentWith(observer, v).minus(observer), v);
+  }
   public Event concurrentWith(Event observer, Velocity v) {
     double solution = solve((Event e) -> SR.lorentz(e.minus(observer), v).t(),
           observer.t(),
           v.gamma() / 2);
 
-    return this.contains(solution) ? SR.lorentz(this.at(solution).minus(observer), v) : null;
+    return this.contains(solution) ? this.at(solution) : null;
   }
 
   /*
@@ -118,6 +121,9 @@ public abstract class Timeline {
    *     observer into the past
    */
   // NOTE: This method only works when a timeline is timelike
+  public Event seenByImage(Event observer, Velocity v) {
+    return SR.lorentz(seenBy(observer, v).minus(observer), v);
+  }
   public Event seenBy(Event observer, Velocity v) {
     double solution = solve((Event e) -> {
           Event image = SR.lorentz(e.minus(observer), v);
@@ -127,7 +133,7 @@ public abstract class Timeline {
         observer.t() - this.at(observer.t()).minus(observer).dist() / c,
         v.gamma() / 2);
 
-    return this.contains(solution) ? SR.lorentz(this.at(solution).minus(observer), v) : null;
+    return this.contains(solution) ? this.at(solution) : null;
   }
 
   public boolean contains(double t) {
