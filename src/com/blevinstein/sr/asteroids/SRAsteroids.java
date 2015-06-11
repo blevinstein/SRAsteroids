@@ -116,7 +116,7 @@ public class SRAsteroids {
     /**
      * @return whether an image is on-screen
      */
-    boolean isOnScreen(Event image);
+    boolean isOnScreen(Event image, double radius);
   }
 
   // TODO: getImage is expensive, think about caching? GalaxyImage abstraction?
@@ -146,7 +146,7 @@ public class SRAsteroids {
     for (Star star : galaxy.stars()) {
       // NOTE: decided not to refactor -> View#circle(Star star)
       Event image = getImage(star.timeline());
-      if (!view.isOnScreen(image)) {
+      if (!view.isOnScreen(image, star.radius())) {
         continue;
       }
       Event event = getEvent(image);

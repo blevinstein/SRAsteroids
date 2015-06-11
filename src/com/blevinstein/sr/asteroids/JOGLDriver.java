@@ -184,7 +184,7 @@ public class JOGLDriver implements SRAsteroids.View {
   private static int CIRCLE_SEG_LEN = 5;
   public void circle(Color c, Event image, Velocity vObject, double r, boolean fill) {
     setColor(c);
-    if (!isOnScreen(image)) { return; }
+    if (!isOnScreen(image, r)) { return; }
 
     AffineTransform contraction = SR.lorentzContraction(vObject);
     int segments = (int) Math.max(4, Math.ceil(2 * Math.PI * r / CIRCLE_SEG_LEN));
@@ -212,10 +212,9 @@ public class JOGLDriver implements SRAsteroids.View {
     return new Event(xx, yy, t);
   }
 
-  // TODO: add radius to isOnScreen()
-  public boolean isOnScreen(Event image) {
-    return image.x() * zoom > -width/2 && image.x() * zoom < width/2
-        && image.y() * zoom > -height/2 && image.y() * zoom < height/2;
+  public boolean isOnScreen(Event image, double radius) {
+    return image.x() * zoom > -width/2-radius && image.x() * zoom < width/2+radius
+        && image.y() * zoom > -height/2-radius && image.y() * zoom < height/2+radius;
   }
 }
 
