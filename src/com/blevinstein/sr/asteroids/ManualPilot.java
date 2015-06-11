@@ -10,9 +10,9 @@ public class ManualPilot implements SRAsteroids.Pilot {
   private static final double a = 0.25;
   private static final double alpha = 0.1;
 
-  private SRAsteroids.KeyInput keyInput;
+  private KeyInput keyInput;
 
-  public ManualPilot(SRAsteroids.KeyInput keyInput) {
+  public ManualPilot(KeyInput keyInput) {
     this.keyInput = keyInput;
   }
 

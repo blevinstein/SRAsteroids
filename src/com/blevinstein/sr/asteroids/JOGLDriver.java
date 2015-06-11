@@ -20,15 +20,11 @@ import com.jogamp.opengl.util.awt.TextRenderer;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Frame;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.geom.AffineTransform;
-import java.util.HashMap;
-import java.util.Map;
 
-public class JOGLDriver implements SRAsteroids.View, SRAsteroids.KeyInput, KeyListener {
+public class JOGLDriver implements SRAsteroids.View {
 
   private static final int FPS = 60; // max fps
   
@@ -41,7 +37,8 @@ public class JOGLDriver implements SRAsteroids.View, SRAsteroids.KeyInput, KeyLi
   private long framerate = 0;
 
   public JOGLDriver() {
-    world = new SRAsteroids().setView(this).setKeyInput(this);
+    KeyInput keyInput = new KeyInput();
+    world = new SRAsteroids().setView(this).setKeyInput(keyInput);
 
     GLProfile profile = GLProfile.getDefault();
     GLProfile.initSingleton();
@@ -49,7 +46,7 @@ public class JOGLDriver implements SRAsteroids.View, SRAsteroids.KeyInput, KeyLi
     capabilities.setSampleBuffers(true);
     capabilities.setDoubleBuffered(true);
     canvas = new GLCanvas(capabilities);
-    canvas.addKeyListener(this);
+    canvas.addKeyListener(keyInput);
 
     canvas.addGLEventListener(new GLEventListener() {
       @Override
@@ -212,20 +209,6 @@ public class JOGLDriver implements SRAsteroids.View, SRAsteroids.KeyInput, KeyLi
   public boolean isOnScreen(Event image) {
     return image.x() * zoom > -width/2 && image.x() * zoom < width/2
         && image.y() * zoom > -height/2 && image.y() * zoom < height/2;
-  }
-  
-  // KeyListener
-
-  private Map<Integer, Boolean> keys = new HashMap<>();
-  public void keyPressed(KeyEvent e) {
-    keys.put(e.getKeyCode(), true);
-  }
-  public void keyReleased(KeyEvent e) {
-    keys.put(e.getKeyCode(), false);
-  }
-  public void keyTyped(KeyEvent e) {}
-  public boolean getKeyDown(int keyCode) {
-    return keys.containsKey(keyCode) && keys.get(keyCode);
   }
 }
 

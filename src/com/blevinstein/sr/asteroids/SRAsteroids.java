@@ -28,6 +28,7 @@ public class SRAsteroids {
 
   private View view;
   private KeyInput keyInput;
+  // TODO: add mouse input
 
   public static final double dt = 0.1;
 
@@ -111,11 +112,6 @@ public class SRAsteroids {
      * @return whether an image is on-screen
      */
     boolean isOnScreen(Event image);
-  }
-
-  public interface KeyInput {
-    // TODO: add mouse input
-    boolean getKeyDown(int keyCode);
   }
 
   private static final int TRAIL_LEN = 100;
