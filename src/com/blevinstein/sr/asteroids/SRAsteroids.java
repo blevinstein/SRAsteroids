@@ -49,12 +49,14 @@ public class SRAsteroids {
 
   // NOTE: synchronized draw() and mainLoop()
   public synchronized void mainLoop() {
+    // Acceleration and rotation
     Velocity lastVelocity = velocity;
     Pair<Velocity, Double> newVelocityAngle = pilot.steer(myTimeline.end(), velocity, angle);
     velocity = newVelocityAngle.getLeft().checked(0.999);
     angle = newVelocityAngle.getRight();
     lastBoost = velocity.relativeMinus(lastVelocity); // use as flag to render boost
 
+    // Zoom
     if (keyInput.getKeyDown(KeyEvent.VK_E)) {
       zoom *= 1.05;
     }
@@ -63,6 +65,7 @@ public class SRAsteroids {
     }
     view.setZoom(zoom);
 
+    // Update timeline
     myTimeline.add(myTimeline.end().plus(velocity.over(dt * velocity.gamma())));
   }
 
