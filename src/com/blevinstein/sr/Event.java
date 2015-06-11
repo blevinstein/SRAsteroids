@@ -23,6 +23,13 @@ public class Event {
     this._y = y;
     this._t = t;
   }
+
+  /**
+   * Returns a new Event with its t coordinate changed.
+   */
+  public Event withT(double t) {
+    return new Event(_x, _y, t);
+  }
   
   public Event plus(Event other) {
     return new Event(this._x + other._x,

@@ -12,13 +12,18 @@ import com.blevinstein.sr.Velocity;
 
 import java.awt.Color;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.tuple.Pair;
 
 public class SRAsteroids {
   private Galaxy galaxy = new UniformBubbleGalaxy(1E4, 1E-5, true);
-  private Pilot pilot;
+
+  private ManualPilot manualPilot;
+  private AutoPilot autoPilot;
+  private boolean autoPilotEngaged = false;
+
   private ArbitraryTimeline myTimeline = new ArbitraryTimeline();
   private Event observer = Event.ORIGIN;
   private Velocity velocity = new Velocity(0, 0);
@@ -44,7 +49,7 @@ public class SRAsteroids {
 
   public SRAsteroids setKeyInput(KeyInput keyInput) {
     this.keyInput = keyInput;
-    this.pilot = new ManualPilot(keyInput);
+    this.manualPilot = new ManualPilot(keyInput);
     return this;
   }
 
@@ -55,14 +60,21 @@ public class SRAsteroids {
 
   // NOTE: synchronized draw() and mainLoop()
   public synchronized void mainLoop() {
-    // Acceleration and rotation
     Velocity lastVelocity = velocity;
-    Pair<Velocity, Double> newVelocityAngle = pilot.steer(myTimeline.end(), velocity, angle);
+
+    // Accelerate and rotate ship
+    Pilot activePilot = autoPilotEngaged ? autoPilot : manualPilot;
+    Pair<Velocity, Double> newVelocityAngle = activePilot.steer(myTimeline.end(), velocity, angle);
     velocity = newVelocityAngle.getLeft().checked(0.999);
     angle = newVelocityAngle.getRight();
+
+    // TODO: calculate accelerate from boost, destroy ship if too high?
     lastBoost = velocity.relativeMinus(lastVelocity); // use as flag to render boost
 
-    // Zoom
+    // Move ship
+    myTimeline.add(myTimeline.end().plus(velocity.over(dt * velocity.gamma())));
+
+    // Zoom view
     if (keyInput.getKeyDown(KeyEvent.VK_E)) {
       zoom *= 1.05;
     }
@@ -71,8 +83,23 @@ public class SRAsteroids {
     }
     view.setZoom(zoom);
 
-    // Update timeline
-    myTimeline.add(myTimeline.end().plus(velocity.over(dt * velocity.gamma())));
+    // Handle autopilot
+    Event cursorEvent = getEvent(view.getImageOnScreen(mouseInput.x(), mouseInput.y()));
+    ConstantTimeline target = new ConstantTimeline(cursorEvent, velocity);
+    for (MouseEvent e : mouseInput.events()) {
+      switch (e.getID()) {
+        case MouseEvent.MOUSE_RELEASED:
+          if (e.getButton() == MouseEvent.BUTTON3) {
+            autoPilot = new AutoPilot(target);
+            autoPilotEngaged = true;
+            System.out.println("engage");
+          } else if (autoPilotEngaged) {
+            autoPilotEngaged = false;
+            System.out.println("disengage");
+          }
+          break;
+      }
+    }
   }
 
   public interface Pilot {
@@ -169,6 +196,11 @@ public class SRAsteroids {
     // Show a cursor
     Event cursorImage = view.getImageOnScreen(mouseInput.x(), mouseInput.y());
     view.circle(Color.RED, cursorImage, Velocity.ZERO, 50, false);
+    // Show autopilot target
+    if (autoPilot != null) {
+      Event targetImage = autoPilot.target().seenByImage(myTimeline.end(), velocity);
+      view.circle(Color.BLUE, targetImage, Velocity.ZERO, 10, false);
+    }
   }
 
   // Projections

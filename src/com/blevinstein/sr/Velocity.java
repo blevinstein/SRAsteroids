@@ -33,6 +33,9 @@ public class Velocity {
     return checked(1);
   }
 
+  /**
+   * @return this velocity, but limited to magnitude {@param max} * c, scaled down if necessary
+   */
   public Velocity checked(double max) {
     double b = beta();
     return b > max ? this.times(max / b) : this;
@@ -79,7 +82,9 @@ public class Velocity {
   }
 
   public double gamma() {
-    return (1 / Math.sqrt(1 - beta_sq()));
+    double bs = beta_sq();
+    if (bs > 1) { throw new IllegalArgumentException("beta > 1"); }
+    return (1 / Math.sqrt(1 - bs));
   }
 
   public double beta() {
