@@ -84,6 +84,9 @@ public class SRAsteroids {
     view.setZoom(zoom);
 
     // Handle autopilot
+    if (autoPilot != null && autoPilot.done()) {
+      autoPilotEngaged = false;
+    }
     Event cursorEvent = getEvent(view.getImageOnScreen(mouseInput.x(), mouseInput.y()));
     ConstantTimeline target = new ConstantTimeline(cursorEvent, velocity);
     for (MouseEvent e : mouseInput.events()) {
