@@ -38,3 +38,4 @@ public class ManualPilot implements SRAsteroids.Pilot {
     return Pair.of(newVelocity, newAngle);
   }
 }
+
