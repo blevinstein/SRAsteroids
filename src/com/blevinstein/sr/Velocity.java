@@ -1,6 +1,7 @@
 package com.blevinstein.sr;
 
 import static com.blevinstein.sr.SR.c;
+import static com.blevinstein.util.Trig.atanh;
 
 import java.util.Objects;
 
@@ -208,10 +209,6 @@ public class Velocity {
    */
   public double rapidity() {
     return atanh(beta()) * c;
-  }
-
-  private double atanh(double x) {
-    return 0.5 * Math.log((1 + x) / (1 - x));
   }
 
   @Override
