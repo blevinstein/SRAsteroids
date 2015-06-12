@@ -34,6 +34,8 @@ Not much 'gameplay' yet, currently exploring visualizations and game mechanics.
 TODO
 ====
 
+- add AcceleratingTimeline, replace ArbitraryTimeline in SRAsteroids for ship
+
 Experiments
 -----------
 
