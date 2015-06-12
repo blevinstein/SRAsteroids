@@ -204,10 +204,14 @@ public class Velocity {
 
   /**
    * @return the rapidity corresponding to the magnitude of this velocity
-   * r / c = tanh(|v| / c)
+   * r / c = arctanh(|v| / c)
    */
   public double rapidity() {
-    return Math.tanh(mag() / c) * c;
+    return atanh(beta()) * c;
+  }
+
+  private double atanh(double x) {
+    return 0.5 * Math.log((1 + x) / (1 - x));
   }
 
   @Override
