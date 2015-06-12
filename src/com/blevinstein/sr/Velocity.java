@@ -202,6 +202,14 @@ public class Velocity {
     return unit(angle);
   }
 
+  /**
+   * @return the rapidity corresponding to the magnitude of this velocity
+   * r / c = tanh(|v| / c)
+   */
+  public double rapidity() {
+    return Math.tanh(mag() / c) * c;
+  }
+
   @Override
   public boolean equals(Object obj) {
     if (obj instanceof Velocity) {
