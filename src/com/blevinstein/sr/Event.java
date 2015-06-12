@@ -4,6 +4,11 @@ import static com.blevinstein.sr.SR.c;
 
 import java.util.Objects;
 
+/**
+ * Represents a spacetime interval, represented as a vector in 3-space (x, y, t)
+ *
+ * Can be used to represent a point in a particular reference frame.
+ */
 public class Event {
   public static final Event ORIGIN = new Event(0, 0, 0);
 
@@ -30,7 +35,10 @@ public class Event {
   public Event withT(double t) {
     return new Event(_x, _y, t);
   }
-  
+
+  /**
+   * Adds together two spacetime intervals.
+   */
   public Event plus(Event other) {
     return new Event(this._x + other._x,
         this._y + other._y,
@@ -53,15 +61,24 @@ public class Event {
         this._t - other._t);
   }
 
+  /**
+   * @return this spacetime interval multiplied by k.
+   */
   public Event times(double k) {
     return new Event(this._x * k,
         this._y * k,
         this._t * k);
   }
 
+  /**
+   * @return this spacetime interval with dt added to its t coordinate
+   */
   public Event advance(double dt) {
     return advance(0, 0, dt);
   }
+  /**
+   * @return this spacetime interval with (dx, dy, dt) added
+   */
   public Event advance(double dx, double dy, double dt) {
     return new Event(_x + dx,
         _y + dy,
@@ -69,7 +86,7 @@ public class Event {
   }
 
   /**
-   * @return length of the spacetime interval between this event and the observer/origin
+   * @return length of this spacetime interval
    */
   public double interval() {
     return Math.sqrt(Math.abs(interval_sq()));
@@ -79,41 +96,60 @@ public class Event {
   }
 
   /**
-   * @return the length of the distance between this event and the observer
+   * @return the length of the distance in space covered by this spacetime interval
    */
   public double dist() {
     return Math.sqrt(dist_sq());
   }
+  /**
+   * @return the square of the distance in space covered by this spacetime interval
+   */
   public double dist_sq() {
     return _x * _x + _y * _y;
   }
 
   /**
-   * @return whether the spacetime interval is spacelike, x^2 + y^2 > (ct)^2
+   * @return whether this spacetime interval is spacelike, x^2 + y^2 > (ct)^2
    */
   public boolean isSpaceLike() {
     return interval_sq() < 0;
   }
 
   /**
-   * @return whether the spacetime interval is timelike, (ct)^2 > x^2 + y^2
+   * @return whether this spacetime interval is lightlike, (ct)^2 ~ x^2 + y^2
+   */
+  public boolean isLightlike(double tolerance) {
+    return Math.abs(interval_sq()) < tolerance;
+  }
+
+  /**
+   * @return whether this spacetime interval is timelike, (ct)^2 > x^2 + y^2
    */
   public boolean isTimeLike() {
     return interval_sq() > 0;
   }
 
+  /**
+   * Calculates the Velocity of a direct path along this spacetime interval.
+   */
   public Velocity toVelocity() {
     return new Velocity(_x / _t, _y / _t);
   }
 
+  /**
+   * Calculates the time elapsed for an object moving along this spacetime interval.
+   */
   public double timeElapsed() {
     return this.toVelocity().gamma() * _t;
   }
 
-  public boolean equals(Event other, double tol) {
-    return Math.abs(this._x - other._x) < tol
-        && Math.abs(this._y - other._y) < tol
-        && Math.abs(this._t - other._t) < tol;
+  /**
+   * Implementation of equals() with additional tolerance argument
+   */
+  public boolean equals(Event other, double tolerance) {
+    return Math.abs(this._x - other._x) < tolerance
+        && Math.abs(this._y - other._y) < tolerance
+        && Math.abs(this._t - other._t) < tolerance;
   }
 
   @Override
