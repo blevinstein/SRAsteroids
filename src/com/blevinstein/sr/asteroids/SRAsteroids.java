@@ -63,7 +63,7 @@ public class SRAsteroids {
     Velocity lastVelocity = velocity;
 
     // Accelerate and rotate ship
-    Pilot activePilot = autoPilotEngaged ? autoPilot : manualPilot;
+    Pilot activePilot = autoPilot != null && !autoPilot.done() ? autoPilot : manualPilot;
     Pair<Velocity, Double> newVelocityAngle = activePilot.steer(myTimeline.end(), velocity, angle);
     velocity = newVelocityAngle.getLeft().checked(0.999);
     angle = newVelocityAngle.getRight();
@@ -83,22 +83,15 @@ public class SRAsteroids {
     }
     view.setZoom(zoom);
 
-    // Handle autopilot
-    if (autoPilot != null && autoPilot.done()) {
-      autoPilotEngaged = false;
-    }
+    // Handle mouse input
     Event cursorEvent = getEvent(view.getImageOnScreen(mouseInput.x(), mouseInput.y()));
     ConstantTimeline target = new ConstantTimeline(cursorEvent, velocity);
     for (MouseEvent e : mouseInput.events()) {
       switch (e.getID()) {
         case MouseEvent.MOUSE_RELEASED:
           if (e.getButton() == MouseEvent.BUTTON3) {
+            // Mouse button 3 => autopilot to location
             autoPilot = new AutoPilot(target);
-            autoPilotEngaged = true;
-            System.out.println("engage");
-          } else if (autoPilotEngaged) {
-            autoPilotEngaged = false;
-            System.out.println("disengage");
           }
           break;
       }
