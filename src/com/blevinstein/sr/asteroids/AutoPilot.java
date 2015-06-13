@@ -30,6 +30,7 @@ public class AutoPilot implements SRAsteroids.Pilot {
   // TODO: refactor steer() into Task/Behavior? allow AutoPilot to perform different behaviors?
   // Naive straight-line at constant velocity, no anticipation, decel to zero at target
   // NOTE: Unlimited rotation
+  // TODO: refactor into separate states, accel and decel
   // TODO: refactor to return accel? is arbitrary acceleration reasonable? arbitrary acceleration
   //   might be interesting for simulating "jump to lightspeed"
   public Pair<Velocity, Double> steer(Event myPosition, Velocity myVelocity, double myAngle) {
@@ -43,17 +44,22 @@ public class AutoPilot implements SRAsteroids.Pilot {
     // TODO: refactor code smell. projection should be handled outside the Pilot
     Event targetOffset = targetEvent.minus(myPosition);
 
-    // Detect success
-    if (targetOffset.dist() < 100 && myVelocity.mag() < 1) {
+    if (targetOffset.dist() < 100 && myVelocity.rapidity() < 1) {
+      // Detect success
       _done = true;
       return Pair.of(myVelocity, myAngle);
-    }
-
-    // Detect almost success
-    if (targetOffset.dist() < 100) {
+    } else if (targetOffset.dist() < 100) {
+      // Detect almost success
       Velocity accel = myVelocity.norm().times(-a);
       return Pair.of(myVelocity.relativePlus(accel), accel.angle());
     }
+
+    // Experiment: reset initPos/Vel when stopping
+    if (myVelocity.rapidity() < 15) {
+      _initPosition = myPosition;
+      _initVelocity = myVelocity;
+    }
+
 
     double initDist = _initPosition.minus(targetEvent).dist();
     double nowDist = targetOffset.dist();
