@@ -44,13 +44,13 @@ public class AutoPilot implements SRAsteroids.Pilot {
     Event targetOffset = targetEvent.minus(myPosition);
 
     // Detect success
-    if (targetOffset.dist() < 10 && myVelocity.mag() < 1) {
+    if (targetOffset.dist() < 100 && myVelocity.mag() < 1) {
       _done = true;
       return Pair.of(myVelocity, myAngle);
     }
 
     // Detect almost success
-    if (targetOffset.dist() < 10) {
+    if (targetOffset.dist() < 100) {
       Velocity accel = myVelocity.norm().times(-a);
       return Pair.of(myVelocity.relativePlus(accel), accel.angle());
     }
@@ -62,12 +62,14 @@ public class AutoPilot implements SRAsteroids.Pilot {
     double dr = myVelocity.rapidity() - _initVelocity.rapidity();
 
     // Expect dt/dx < 0, x = distance to target, x is decreasing
-    // Set dt/dx = 1 to avoid NPE
-    double dtdx = dx != 0 ? -dt / dx : 1;
+    double dtdx = -dt / dx;
+    // Set dt/dx = 1 to avoid NPE, NaN, or bad behavior
+    if (Double.isNaN(dtdx) || dtdx <= 0) dtdx = 1;
 
     // Expect dt/dr > 0, r = rapidity
-    // Set dt/dr = 1 to avoid NPE
-    double dtdr = dr != 0 ? dt / dr : 1;
+    double dtdr = dt / dr;
+    // Set dt/dr = 1 to avoid NPE, NaN, or bad behavior
+    if (Double.isNaN(dtdr) || dtdr <= 0) dtdr = 1;
 
     // Calculate leanIn/leanOut boosts for accelerating and decelerating
     // NOTE: Must do withT(1) before toVelocity() because targetEvent is perceived as being in
@@ -79,9 +81,6 @@ public class AutoPilot implements SRAsteroids.Pilot {
     // Calculate time to reach target and time to decel to zero
     double timeToDecel = myVelocity.rapidity() * dtdr;
     double timeToTarget = targetOffset.dist() * dtdx;
-    if (Double.isNaN(timeToDecel) || Double.isNaN(timeToTarget)) {
-      throw new IllegalStateException();
-    }
 
     Velocity accel = timeToDecel < timeToTarget ? leanIn : leanOut;
     return Pair.of(myVelocity.relativePlus(accel), accel.angle());
