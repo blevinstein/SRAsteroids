@@ -57,32 +57,33 @@ public class AutoPilot implements SRAsteroids.Pilot {
 
     double initDist = _initPosition.minus(targetEvent).dist();
     double nowDist = targetOffset.dist();
+    // TODO: calculate average dt/dx/dr separately on each call to steer()
     double dt = myPosition.t() - _initPosition.t();
     double dx = nowDist - initDist;
-    double dr = myVelocity.rapidity() - _initVelocity.rapidity();
+    double dr = myVelocity.rapidity();
 
     // Expect dt/dx < 0, x = distance to target, x is decreasing
     double dtdx = -dt / dx;
-    // Set dt/dx = 1 to avoid NPE, NaN, or bad behavior
-    if (Double.isNaN(dtdx) || dtdx <= 0) dtdx = 1;
+    // Set dt/dx > 0 to avoid NaN or bad behavior
+    if (Double.isNaN(dtdx) || dtdx <= 0) dtdx = 0.1;
 
     // Expect dt/dr > 0, r = rapidity
     double dtdr = dt / dr;
-    // Set dt/dr = 1 to avoid NPE, NaN, or bad behavior
-    if (Double.isNaN(dtdr) || dtdr <= 0) dtdr = 1;
+    // Set dt/dr > 0 to avoid NaN or bad behavior
+    if (Double.isNaN(dtdr) || dtdr <= 0) dtdr = 0.01;
 
     // Calculate leanIn/leanOut boosts for accelerating and decelerating
     // NOTE: Must do withT(1) before toVelocity() because targetEvent is perceived as being in
     //   the past, so targetOffset.toVelocity() points in the wrong direction
     Velocity towardsTarget = targetOffset.withT(1).toVelocity().checked(0.99);
     Velocity leanIn = towardsTarget.relativeMinus(myVelocity).norm().times(a);
-    Velocity leanOut = towardsTarget.times(-1).relativeMinus(myVelocity).norm().times(a);
+    Velocity leanOut = myVelocity.norm().times(-a);
 
     // Calculate time to reach target and time to decel to zero
     double timeToDecel = myVelocity.rapidity() * dtdr;
     double timeToTarget = targetOffset.dist() * dtdx;
 
-    Velocity accel = timeToDecel < timeToTarget ? leanIn : leanOut;
+    Velocity accel = myVelocity.rapidity() < 10 || timeToDecel <= timeToTarget ? leanIn : leanOut;
     return Pair.of(myVelocity.relativePlus(accel), accel.angle());
   }
 }
