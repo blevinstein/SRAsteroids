@@ -161,8 +161,8 @@ public class JOGLDriver implements SRAsteroids.View {
   public void ship(Color c, Event image, double angle) {
     setColor(c);
     // TODO: take optional velocity as argument, show lorentz contraction
-    Event iOffset = Velocity.unit(angle).over(1).times(SHIP_LEN);
-    Event jOffset = Velocity.unit(angle).perp().over(1).times(SHIP_LEN/3);
+    Event iOffset = Velocity.unit(angle).over(1).times(SHIP_LEN / zoom);
+    Event jOffset = Velocity.unit(angle).perp().over(1).times(SHIP_LEN/3 / zoom);
     gl.glBegin(GL2.GL_TRIANGLE_FAN);
       vertex(image);
       vertex(image.plus(jOffset));
