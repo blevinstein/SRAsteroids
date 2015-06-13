@@ -16,23 +16,23 @@ public class ManualPilot implements SRAsteroids.Pilot {
     this.keyInput = keyInput;
   }
 
-  public Pair<Velocity, Double> steer(Event myPosition, Velocity myVelocity, double myAngle) {
+  public Pair<Velocity, Double> steer(ShipState my) {
     Velocity newVelocity;
     if (keyInput.getKeyDown(KeyEvent.VK_DOWN)) {
-      newVelocity = myVelocity.relativePlus(Velocity.unit(myAngle).times(-a));
+      newVelocity = my.velocity().relativePlus(Velocity.unit(my.angle()).times(-a));
     } else if (keyInput.getKeyDown(KeyEvent.VK_UP)) {
-      newVelocity = myVelocity.relativePlus(Velocity.unit(myAngle).times(a));
+      newVelocity = my.velocity().relativePlus(Velocity.unit(my.angle()).times(a));
     } else {
-      newVelocity = myVelocity;
+      newVelocity = my.velocity();
     }
 
     double newAngle;
     if (keyInput.getKeyDown(KeyEvent.VK_LEFT)) {
-      newAngle = myAngle + alpha;
+      newAngle = my.angle() + alpha;
     } else if(keyInput.getKeyDown(KeyEvent.VK_RIGHT)) {
-      newAngle = myAngle - alpha;
+      newAngle = my.angle() - alpha;
     } else {
-      newAngle = myAngle;
+      newAngle = my.angle();
     }
     
     return Pair.of(newVelocity, newAngle);

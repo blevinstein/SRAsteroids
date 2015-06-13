@@ -64,7 +64,7 @@ public class SRAsteroids {
 
     // Accelerate and rotate ship
     Pilot activePilot = autoPilot != null && !autoPilot.done() ? autoPilot : manualPilot;
-    Pair<Velocity, Double> newVelocityAngle = activePilot.steer(myTimeline.end(), velocity, angle);
+    Pair<Velocity, Double> newVelocityAngle = activePilot.steer(new ShipState(myTimeline.end(), velocity, angle));
     velocity = newVelocityAngle.getLeft().checked(0.999);
     angle = newVelocityAngle.getRight();
 
@@ -105,7 +105,7 @@ public class SRAsteroids {
      * Given the current position/velocity/angle of the ship, accelerates and rotates.
      * @return new velocity and new angle
      */
-    Pair<Velocity, Double> steer(Event myPosition, Velocity myVelocity, double myAngle);
+    Pair<Velocity, Double> steer(ShipState ss);
   }
 
   public interface View {

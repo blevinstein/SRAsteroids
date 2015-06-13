@@ -33,40 +33,40 @@ public class AutoPilot implements SRAsteroids.Pilot {
   // TODO: refactor into separate states, accel and decel
   // TODO: refactor to return accel? is arbitrary acceleration reasonable? arbitrary acceleration
   //   might be interesting for simulating "jump to lightspeed"
-  public Pair<Velocity, Double> steer(Event myPosition, Velocity myVelocity, double myAngle) {
+  public Pair<Velocity, Double> steer(ShipState my) {
     // One-time assignment
-    if (_initPosition == null) { _initPosition = myPosition; }
-    if (_initVelocity == null) { _initVelocity = myVelocity; }
+    if (_initPosition == null) { _initPosition = my.position(); }
+    if (_initVelocity == null) { _initVelocity = my.velocity(); }
 
     // NOTE: Chase target as seen, no anticipation
     // TODO: Anticipate target movement, move to intercept
-    Event targetEvent = _target.seenBy(myPosition, myVelocity);
+    Event targetEvent = _target.seenBy(my.position(), my.velocity());
     // TODO: refactor code smell. projection should be handled outside the Pilot
-    Event targetOffset = targetEvent.minus(myPosition);
+    Event targetOffset = targetEvent.minus(my.position());
 
-    if (targetOffset.dist() < 100 && myVelocity.rapidity() < 1) {
+    if (targetOffset.dist() < 100 && my.velocity().rapidity() < 1) {
       // Detect success
       _done = true;
-      return Pair.of(myVelocity, myAngle);
+      return Pair.of(my.velocity(), my.angle());
     } else if (targetOffset.dist() < 100) {
       // Detect almost success
-      Velocity accel = myVelocity.norm().times(-a);
-      return Pair.of(myVelocity.relativePlus(accel), accel.angle());
+      Velocity accel = my.velocity().norm().times(-a);
+      return Pair.of(my.velocity().relativePlus(accel), accel.angle());
     }
 
     // Experiment: reset initPos/Vel when stopping
-    if (myVelocity.rapidity() < 15) {
-      _initPosition = myPosition;
-      _initVelocity = myVelocity;
+    if (my.velocity().rapidity() < 15) {
+      _initPosition = my.position();
+      _initVelocity = my.velocity();
     }
 
 
     double initDist = _initPosition.minus(targetEvent).dist();
     double nowDist = targetOffset.dist();
     // TODO: calculate average dt/dx/dr separately on each call to steer()
-    double dt = myPosition.t() - _initPosition.t();
+    double dt = my.position().t() - _initPosition.t();
     double dx = nowDist - initDist;
-    double dr = myVelocity.rapidity();
+    double dr = my.velocity().rapidity();
 
     // Expect dt/dx < 0, x = distance to target, x is decreasing
     double dtdx = -dt / dx;
@@ -82,14 +82,14 @@ public class AutoPilot implements SRAsteroids.Pilot {
     // NOTE: Must do withT(1) before toVelocity() because targetEvent is perceived as being in
     //   the past, so targetOffset.toVelocity() points in the wrong direction
     Velocity towardsTarget = targetOffset.withT(1).toVelocity().checked(0.99);
-    Velocity leanIn = towardsTarget.relativeMinus(myVelocity).norm().times(a);
-    Velocity leanOut = myVelocity.norm().times(-a);
+    Velocity leanIn = towardsTarget.relativeMinus(my.velocity()).norm().times(a);
+    Velocity leanOut = my.velocity().norm().times(-a);
 
     // Calculate time to reach target and time to decel to zero
-    double timeToDecel = myVelocity.rapidity() * dtdr;
+    double timeToDecel = my.velocity().rapidity() * dtdr;
     double timeToTarget = targetOffset.dist() * dtdx;
 
-    Velocity accel = myVelocity.rapidity() < 10 || timeToDecel <= timeToTarget ? leanIn : leanOut;
-    return Pair.of(myVelocity.relativePlus(accel), accel.angle());
+    Velocity accel = my.velocity().rapidity() < 10 || timeToDecel <= timeToTarget ? leanIn : leanOut;
+    return Pair.of(my.velocity().relativePlus(accel), accel.angle());
   }
 }
