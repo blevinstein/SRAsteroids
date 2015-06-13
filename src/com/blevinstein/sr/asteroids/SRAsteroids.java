@@ -150,6 +150,7 @@ public class SRAsteroids {
     // Show the observer
     view.ship(Color.GREEN, getImage(myTimeline), angle);
 
+    // TODO: refactor into View#ship?
     if (lastBoost != null) {
       // Show graphics to indicate ship output
       // TODO: support a particle system where particles last > 1 frame; space dust?
@@ -158,7 +159,7 @@ public class SRAsteroids {
         double outputAngle = boostAngle + random(-0.2, 0.2);
         Event ship = myTimeline.end();
         Velocity vOutput = Velocity.unit(outputAngle)
-            .times(random(0, 1) * lastBoost.mag() * -1000);
+            .times(random(0, 1 / zoom) * lastBoost.mag() * -1000);
         Event output = ship.relativePlus(vOutput.over(dt), velocity);
         view.line(Color.BLACK, Color.RED, getImage(ship), getImage(output));
       }
