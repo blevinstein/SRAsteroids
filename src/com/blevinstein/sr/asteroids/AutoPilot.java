@@ -1,5 +1,7 @@
 package com.blevinstein.sr.asteroids;
 
+import static com.blevinstein.sr.SR.c;
+
 import com.blevinstein.sr.Event;
 import com.blevinstein.sr.Timeline;
 import com.blevinstein.sr.Velocity;
@@ -7,13 +9,14 @@ import com.blevinstein.sr.Velocity;
 import org.apache.commons.lang3.tuple.Pair;
 
 // TODO: implement projection and course planning
-// TODO: add way for autopilot to disengage itself
 // NOTE: accelerates recklessly
 public class AutoPilot implements SRAsteroids.Pilot {
   private static final double a = 0.25;
 
   // TODO: take optional Velocity as a ctor argument
   private Timeline _target;
+  private Event _initPosition;
+  private Velocity _initVelocity;
   private boolean _done = false;
 
   public AutoPilot(Timeline target) {
@@ -24,20 +27,60 @@ public class AutoPilot implements SRAsteroids.Pilot {
 
   public boolean done() { return _done; }
 
+  // Naive straight-line at constant velocity, no anticipation, decel to zero at target
+  // NOTE: Unlimited rotation
+  // TODO: refactor to return accel?
   public Pair<Velocity, Double> steer(Event myPosition, Velocity myVelocity, double myAngle) {
-    // Naive straight-line at constant velocity, no smoothing, no anticipation
-    Event event = _target.seenBy(myPosition, myVelocity); // Chase target as seen, like a dog
-    if (event.minus(myPosition).dist() < 10) {
+    // One-time assignment
+    if (_initPosition == null) { _initPosition = myPosition; }
+    if (_initVelocity == null) { _initVelocity = myVelocity; }
+
+    // TODO: refactor code smell. projection should be handled outside the Pilot
+    // Chase target as seen, like a dog
+    Event targetEvent = _target.seenBy(myPosition, myVelocity);
+    Event targetOffset = targetEvent.minus(myPosition);
+
+    // Detect success
+    if (targetOffset.dist() < 10 && myVelocity.mag() < 1) {
       _done = true;
       return Pair.of(myVelocity, myAngle);
     }
-    Velocity desiredVelocity = event.minus(myPosition).withT(1).toVelocity().checked(0.99);
-    
-    // Limited acceleration
-    Velocity accel = desiredVelocity.relativeMinus(myVelocity);
-    if (accel.mag() > a) { accel = accel.norm().times(a); }
 
-    // NOTE: Unlimited rotation
+    // Detect almost success
+    if (targetOffset.dist() < 10) {
+      Velocity accel = myVelocity.norm().times(-a);
+      return Pair.of(myVelocity.relativePlus(accel), accel.angle());
+    }
+
+    double initDist = _initPosition.minus(targetEvent).dist();
+    double nowDist = targetOffset.dist();
+    double dt = myPosition.t() - _initPosition.t();
+    double dx = nowDist - initDist;
+    double dr = myVelocity.rapidity() - _initVelocity.rapidity();
+
+    // Expect dt/dx < 0, x = distance to target, so negate
+    // Set dt/dx = 1 to avoid NPE
+    double dtdx = dx != 0 ? -dt / dx : 1;
+
+    // Expect dt/dr > 0, r = rapidity
+    // Set dt/dr = 1 to avoid NPE
+    double dtdr = dr != 0 ? dt / dr : 1;
+
+    // Calculate leanIn/leanOut boosts for accelerating and decelerating
+    // NOTE: Must do withT(1) before toVelocity() because targetEvent is perceived as being in
+    //   the past, so targetOffset.toVelocity() points in the wrong direction
+    Velocity towardsTarget = targetOffset.withT(1).toVelocity().checked(0.99);
+    Velocity leanIn = towardsTarget.relativeMinus(myVelocity).norm().times(a);
+    Velocity leanOut = towardsTarget.times(-1).relativeMinus(myVelocity).norm().times(a);
+
+    // Calculate time to reach target and time to decel to zero
+    double timeToDecel = myVelocity.rapidity() * dtdr;
+    double timeToTarget = targetOffset.dist() * dtdx;
+    if (Double.isNaN(timeToDecel) || Double.isNaN(timeToTarget)) {
+      throw new IllegalStateException();
+    }
+
+    Velocity accel = timeToDecel < timeToTarget ? leanIn : leanOut;
     return Pair.of(myVelocity.relativePlus(accel), accel.angle());
   }
 }
