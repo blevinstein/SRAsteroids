@@ -92,6 +92,8 @@ public class SRAsteroids {
           if (e.getButton() == MouseEvent.BUTTON3) {
             // Mouse button 3 => autopilot to location
             autoPilot = new AutoPilot(target);
+          } else {
+            autoPilot = null;
           }
           break;
       }
