@@ -192,7 +192,7 @@ public class SRAsteroids {
     view.circle(Color.RED, cursorImage, Velocity.ZERO, 50, false);
     // Show autopilot target
     if (autoPilot != null) {
-      Event targetImage = autoPilot.target().seenByImage(myTimeline.end(), velocity);
+      Event targetImage = getImage(autoPilot.target());
       view.circle(Color.BLUE, targetImage, Velocity.ZERO, 10, false);
     }
   }
