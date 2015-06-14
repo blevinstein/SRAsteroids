@@ -48,16 +48,17 @@ Experiments
 
 - ability to change speed of light? e.g. "turn on/turn off" relativity?
 
+- ellipses split on collision
+  - NOTE: circle-circle collision = point-line collision, r' = r1 + r2
+
 Basic Features
 --------------
 
-- Implement basic collision, splitting, varied sizes of asteriods
-  - For now, implement ellipse collision
-
-- implement OffsetTimeline, shifted version of another Timeline
-
 - implement CircularTimeline, orbits in a circle
 - implement EllipticalTimeline, add orbits around central point, fake gravity
+- create dynamic galaxies that are stable over time
+
+- implement OffsetTimeline, shifted version of another Timeline
 
 Procedural Generation
 ---------------------
@@ -68,6 +69,10 @@ Procedural Generation
   - smoothly varying star velocities for stability.
   - smoothly vary density, include large and small stars
   - add randomly chosen colors? smoothly vary hue/saturation of colors?
+
+- OR use fractal generation
+  - galaxy has clusters, clusters have systems, systems have stars?
+  - more effective with circular/elliptical movement
 
 Physics Engine
 --------------
