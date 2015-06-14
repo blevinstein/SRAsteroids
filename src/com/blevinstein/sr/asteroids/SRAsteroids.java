@@ -177,15 +177,10 @@ public class SRAsteroids {
       }
       Event event = getEvent(image);
       Velocity vObject = star.timeline().velocityAt(event.t()).relativeMinus(velocity);
-      boolean twinkle = false;
-      if (star.twinklePeriod() != 0) {
-        double timeElapsed = star.timeline().timeElapsed(0, event.t());
-        double phase = (Math.abs(timeElapsed) / star.twinklePeriod()) % 1.0;
-        if (phase < 0.05) { // 5% duty cycle
-          twinkle = true;
-        }
-      }
-      view.circle(twinkle ? Color.WHITE : star.color(),
+      double twinklePhase = star.twinklePeriod() != 0 ?
+        (star.timeline().timeElapsed(0, event.t()) / star.twinklePeriod()) % 1
+        : 0;
+      view.circle(adjust(star.color(), (float) (0.2 * Math.sin(2 * Math.PI * twinklePhase))),
           image,
           vObject,
           star.radius(),
@@ -200,6 +195,20 @@ public class SRAsteroids {
       Event targetImage = autoPilot.target().seenByImage(myTimeline.end(), velocity);
       view.circle(Color.BLUE, targetImage, Velocity.ZERO, 10, false);
     }
+  }
+
+  /**
+   * Makes a color lighter or darker.
+   */
+  private Color adjust(Color orig, float deltaB) {
+    float[] hsb = Color.RGBtoHSB(orig.getRed(), orig.getGreen(), orig.getBlue(), new float[3]);
+
+    // Change value, constrain to [0, 1]
+    float newB = hsb[2] + deltaB;
+    if (newB < 0) newB = 0;
+    if (newB > 1) newB = 1;
+
+    return Color.getHSBColor(hsb[0], hsb[1], newB);
   }
 
   // Projections
