@@ -18,28 +18,41 @@ import java.util.List;
 import org.apache.commons.lang3.tuple.Pair;
 
 public class SRAsteroids {
-  private Galaxy galaxy = new UniformBubbleGalaxy(1E4, 1E-5, true);
+  public static final double dt = 0.1;
 
   private ManualPilot manualPilot;
   private AutoPilot autoPilot;
-  private boolean autoPilotEngaged = false;
 
-  private ArbitraryTimeline myTimeline = new ArbitraryTimeline();
-  private Event observer = Event.ORIGIN;
-  private Velocity velocity = new Velocity(0, 0);
-  private double angle = 0;
-  private double zoom = 1.0;
-  private Velocity lastBoost = null;
+  private Galaxy galaxy;
+  private ArbitraryTimeline myTimeline;
+  private Event observer;
+  private Velocity velocity;
+  private double angle;
+  private double zoom;
+  private Velocity lastBoost;
 
   private View view;
   private KeyInput keyInput;
   private MouseInput mouseInput;
 
-  public static final double dt = 0.1;
-
   public SRAsteroids() {
+    reset();
+  }
+
+  public void reset() {
+    galaxy = new UniformBubbleGalaxy(1E4, 1E-5, true);
+
+    myTimeline = new ArbitraryTimeline();
     myTimeline.add(Event.ORIGIN.advance(-dt));
     myTimeline.add(Event.ORIGIN);
+
+    observer = Event.ORIGIN;
+    velocity = Velocity.ZERO;
+    angle = 0;
+    zoom = 1;
+    lastBoost = null;
+
+    autoPilot = null;
   }
 
   public SRAsteroids setView(View view) {
@@ -98,6 +111,33 @@ public class SRAsteroids {
           break;
       }
     }
+
+    // Handle collision
+    boolean death = false;
+    for (Star star : galaxy.stars()) {
+      Event image = getImage(star.timeline());
+      if (!view.isOnScreen(image, star.radius())) {
+        continue;
+      }
+      Event event = getEvent(image);
+      Velocity vObject = star.timeline().velocityAt(event.t()).relativeMinus(velocity);
+      if (collide(observer, event, star.radius(), vObject)) {
+        death = true;
+      }
+    }
+    if (death) {
+      reset();
+    }
+  }
+
+  /**
+   * Point-circle collision.
+   */
+  private boolean collide(Event point, Event cCenter, double cRadius, Velocity cVelocity) {
+    // vProj = mag of velocity in direction of ship
+    double vProj = cVelocity.dot(point.minus(cCenter).toVelocity().norm());
+    double gamma = new Velocity(vProj, 0).gamma();
+    return point.minus(cCenter).dist() < cRadius / gamma;
   }
 
   public interface Pilot {
