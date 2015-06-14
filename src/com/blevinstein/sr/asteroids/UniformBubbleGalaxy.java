@@ -18,7 +18,7 @@ import java.util.List;
 public class UniformBubbleGalaxy implements Galaxy {
   public List<Star> _stars;
 
-  public UniformBubbleGalaxy(double radius, double density, boolean twinkle) {
+  public UniformBubbleGalaxy(double radius, double density) {
     _stars = new ArrayList<>();
     int numStars = (int) (Math.PI * radius * radius * density);
     for (int i = 0; i < numStars; i++) {
@@ -30,9 +30,9 @@ public class UniformBubbleGalaxy implements Galaxy {
       ConstantTimeline starTimeline = new ConstantTimeline(starPosition, starVelocity);
       _stars.add(new Star(
             starTimeline,
-            twinkle ? Color.GRAY : Color.WHITE,
+            Color.GRAY,
             10 /* radius */,
-            twinkle ? 10 : 0 /* twinklePeriod */));
+            10 /* twinklePeriod */));
     }
   }
 
