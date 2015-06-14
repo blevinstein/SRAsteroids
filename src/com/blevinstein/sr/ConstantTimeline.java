@@ -1,5 +1,8 @@
 package com.blevinstein.sr;
 
+/**
+ * Represents a position in another inertial frame, i.e. moving with constant velocity.
+ */
 public class ConstantTimeline extends Timeline {
   private Event _e;
   private Velocity _v;

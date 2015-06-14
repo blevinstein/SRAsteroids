@@ -1,5 +1,8 @@
 package com.blevinstein.sr;
 
+/**
+ * Represents a stationary position.
+ */
 public class StaticTimeline extends Timeline {
   double x;
   double y;
