@@ -21,8 +21,8 @@ public class VelocityTest {
 
   @Test
   public void relativePlus() {
-    assertEquals(new Velocity(40, 0),
-        new Velocity(25, 0).relativePlus(new Velocity(25, 0)));
+    assertEquals(new Velocity(0.8 * c, 0),
+        new Velocity(0.5 * c, 0).relativePlus(new Velocity(0.5 * c, 0)));
   }
 
   @Test

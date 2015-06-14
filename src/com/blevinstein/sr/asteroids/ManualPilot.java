@@ -7,7 +7,7 @@ import java.awt.event.KeyEvent;
 import org.apache.commons.lang3.tuple.Pair;
 
 public class ManualPilot implements SRAsteroids.Pilot {
-  private static final double a = 0.25;
+  private static final double a = 0.5;
   private static final double alpha = 0.1;
 
   private KeyInput keyInput;

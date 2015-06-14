@@ -11,7 +11,7 @@ import org.apache.commons.lang3.tuple.Pair;
 // TODO: implement projection and course planning
 // NOTE: accelerates recklessly
 public class AutoPilot implements SRAsteroids.Pilot {
-  private static final double a = 0.25;
+  private static final double a = 0.5;
 
   // TODO: take optional Velocity as a ctor argument
   private Timeline _target;
