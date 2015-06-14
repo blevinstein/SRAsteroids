@@ -41,7 +41,8 @@ public class SRAsteroids {
 
   public void reset() {
     //galaxy = new UniformBubbleGalaxy(1E4, 1E-5);
-    galaxy = new CircleGalaxy(1E4, 5E-6, 1E7);
+    //galaxy = new CircleGalaxy(1E4, 5E-6, 1E7);
+    galaxy = new SolarSystemGalaxy(1E4, 15 /* planets */, 3 /* moons */, 1E6);
 
     myTimeline = new ArbitraryTimeline();
     myTimeline.add(Event.ORIGIN.advance(-dt));
