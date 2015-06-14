@@ -17,7 +17,7 @@ public class Prob {
       cumProb += Math.pow(lambda, k) * Math.exp(-lambda) / factorial(k);
       k++;
     }
-    return k;
+    return k - 1;
   }
 
   /**
