@@ -2,9 +2,9 @@ package com.blevinstein.sr.asteroids;
 
 import static com.blevinstein.sr.SR.c;
 
+import com.blevinstein.sr.ConstantTimeline;
 import com.blevinstein.sr.Event;
 import com.blevinstein.sr.Velocity;
-import com.blevinstein.sr.ConstantTimeline;
 
 import java.awt.Color;
 import java.util.ArrayList;
