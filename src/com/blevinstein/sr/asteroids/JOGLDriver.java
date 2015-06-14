@@ -158,9 +158,10 @@ public class JOGLDriver implements SRAsteroids.View {
   }
 
   private static int SHIP_LEN = 10;
+  // NOTE: ship exists at a point, is shown large for convenience, scales with zoom and is not
+  //   subject to lorentz contraction
   public void ship(Color c, Event image, double angle) {
     setColor(c);
-    // TODO: take optional velocity as argument, show lorentz contraction
     Event iOffset = Velocity.unit(angle).over(1).times(SHIP_LEN / zoom);
     Event jOffset = Velocity.unit(angle).perp().over(1).times(SHIP_LEN/3 / zoom);
     gl.glBegin(GL2.GL_TRIANGLE_FAN);
