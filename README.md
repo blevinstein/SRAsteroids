@@ -12,22 +12,23 @@ How To Run
   on MacOSX. Get the right jars for your system.
   Some of the files listed may not be necessary. YMMV
 
-Libs:
-- [JOGL](http://jogamp.org/)
-- [junit](https://github.com/junit-team/junit/wiki/Download-and-Install)
-- [Apache Commons Lang3](https://commons.apache.org/proper/commons-lang/download_lang.cgi)
+  Libs:
+  - [JOGL](http://jogamp.org/)
+  - [junit](https://github.com/junit-team/junit/wiki/Download-and-Install)
+  - [Apache Commons Lang3](https://commons.apache.org/proper/commons-lang/download_lang.cgi)
 
 2. Put libs in the lib/ directory.
 
-To build:
-> make
+3. To build:
+    make
 
-To run:
-> make run
+4. To run:
+    make run
 
-Controls:
-- Arrow keys to move (turn left/right, accelerate forwards/backwards)
-- E/Q to zoom in/out
+5. Controls:
+  - Arrow keys to move (turn left/right, accelerate forwards/backwards)
+  - E/Q to zoom in/out
+  - Right click to autopilot to a destination, left click to cancel
 
 Not much 'gameplay' yet, currently exploring visualizations and game mechanics.
 
