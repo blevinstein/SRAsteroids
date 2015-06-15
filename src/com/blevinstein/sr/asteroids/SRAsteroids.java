@@ -42,7 +42,7 @@ public class SRAsteroids {
   public void reset() {
     //galaxy = new UniformBubbleGalaxy(1E4, 1E-5);
     //galaxy = new CircleGalaxy(1E4, 5E-6, 1E7);
-    galaxy = new SolarSystemGalaxy(1E4, 15 /* planets */, 3 /* moons */, 1E6);
+    galaxy = new SolarSystemGalaxy(1E4, 10 /* planets */, 5 /* moons */, 1E7);
 
     myTimeline = new ArbitraryTimeline();
     myTimeline.add(Event.ORIGIN.advance(-dt));
@@ -83,7 +83,6 @@ public class SRAsteroids {
     velocity = newVelocityAngle.getLeft().checked(0.999);
     angle = newVelocityAngle.getRight();
 
-    // TODO: calculate accelerate from boost, destroy ship if too high?
     lastBoost = velocity.relativeMinus(lastVelocity); // use as flag to render boost
 
     // Move ship
