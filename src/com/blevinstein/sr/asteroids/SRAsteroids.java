@@ -45,10 +45,10 @@ public class SRAsteroids {
     galaxy = new SolarSystemGalaxy(1E4, 10 /* planets */, 5 /* moons */, 1E7);
 
     myTimeline = new ArbitraryTimeline();
-    myTimeline.add(Event.ORIGIN.advance(-dt));
-    myTimeline.add(Event.ORIGIN);
 
-    observer = Event.ORIGIN;
+    observer = new Event(1E3 * (Math.random() - 0.5), 1E3 * (Math.random() - 0.5), 0);
+    myTimeline.add(observer.advance(-dt));
+    myTimeline.add(observer);
     velocity = Velocity.ZERO;
     angle = 0;
     zoom = 1;
@@ -138,6 +138,7 @@ public class SRAsteroids {
    * Point-circle collision.
    */
   private boolean collide(Event point, Event cCenter, double cRadius, Velocity cVelocity) {
+    if (point.equals(cCenter)) { return true; } // avoid division by zero
     // vProj = mag of velocity in direction of ship
     double vProj = cVelocity.dot(point.minus(cCenter).toVelocity().norm());
     double gamma = new Velocity(vProj, 0).gamma();
@@ -197,7 +198,7 @@ public class SRAsteroids {
     view.ship(Color.GREEN, getImage(myTimeline), angle);
 
     // TODO: refactor into View#ship?
-    if (lastBoost != null) {
+    if (lastBoost != null && lastBoost.mag() > 0) {
       // Show graphics to indicate ship output
       // TODO: support a particle system where particles last > 1 frame; space dust?
       double boostAngle = lastBoost.angle();
