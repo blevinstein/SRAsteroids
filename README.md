@@ -32,15 +32,22 @@ How To Run
 
 Not much 'gameplay' yet, currently exploring visualizations and game mechanics.
 
+Effects demonstrated
+--------------------
+- Length contraction
+- Time dilation
+- Redshift/blueshift (frequency of 'twinkling' changes, not actual color)
+
 TODO
 ====
 
-- add AcceleratingTimeline, replace ArbitraryTimeline in SRAsteroids for ship
+- add AcceleratingTimeline, replace ArbitraryTimeline in SRAsteroids for ship?
 
 Experiments
 -----------
 
-- add patterns of colors in the stars, see what happens under transformation
+- implement position cache and distance cache?
+
 - show redshift/blueshift for stars?
 
 - add ability to switch between projections (seenBy, concurrentWith)

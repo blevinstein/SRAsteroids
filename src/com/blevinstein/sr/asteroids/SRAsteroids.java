@@ -24,7 +24,6 @@ public class SRAsteroids {
   private AutoPilot autoPilot;
 
   private Galaxy galaxy;
-  private ArbitraryTimeline myTimeline;
   private Event observer;
   private Velocity velocity;
   private double angle;
@@ -45,11 +44,7 @@ public class SRAsteroids {
     //galaxy = new SolarSystemGalaxy(1E4, 10 /* planets */, 5 /* moons */, 1E7);
     galaxy = new GridGalaxy(1E4, 1E4, 100, 100, 10);
 
-    myTimeline = new ArbitraryTimeline();
-
     observer = new Event(1E3 * (Math.random() - 0.5), 1E3 * (Math.random() - 0.5), 0);
-    myTimeline.add(observer.advance(-dt));
-    myTimeline.add(observer);
     velocity = Velocity.ZERO;
     angle = 0;
     zoom = 1;
@@ -80,14 +75,14 @@ public class SRAsteroids {
 
     // Accelerate and rotate ship
     Pilot activePilot = autoPilot != null && !autoPilot.done() ? autoPilot : manualPilot;
-    Pair<Velocity, Double> newVelocityAngle = activePilot.steer(new ShipState(myTimeline.end(), velocity, angle));
+    Pair<Velocity, Double> newVelocityAngle = activePilot.steer(new ShipState(observer, velocity, angle));
     velocity = newVelocityAngle.getLeft().checked(0.999);
     angle = newVelocityAngle.getRight();
 
     lastBoost = velocity.relativeMinus(lastVelocity); // use as flag to render boost
 
     // Move ship
-    myTimeline.add(myTimeline.end().plus(velocity.over(dt * velocity.gamma())));
+    observer = observer.plus(velocity.over(dt * velocity.gamma()));
 
     // Zoom view
     if (keyInput.getKeyDown(KeyEvent.VK_E)) {
@@ -190,13 +185,10 @@ public class SRAsteroids {
     boolean isOnScreen(Event image, double radius);
   }
 
-  // TODO: getImage is expensive, think about caching? GalaxyImage abstraction?
   private static final int TRAIL_LEN = 100;
   public synchronized void draw() {
-    observer = myTimeline.end();
-
     // Show the observer
-    view.ship(Color.GREEN, getImage(myTimeline), angle);
+    view.ship(Color.GREEN, getImage(observer), angle);
 
     // TODO: refactor into View#ship?
     if (lastBoost != null && lastBoost.mag() > 0) {
@@ -205,11 +197,10 @@ public class SRAsteroids {
       double boostAngle = lastBoost.angle();
       for (int i = 0; i < 10; i++) {
         double outputAngle = boostAngle + random(-0.2, 0.2);
-        Event ship = myTimeline.end();
         Velocity vOutput = Velocity.unit(outputAngle)
             .times(random(0, 1 / zoom) * lastBoost.mag() * -1000);
-        Event output = ship.relativePlus(vOutput.over(dt), velocity);
-        view.line(Color.BLACK, Color.RED, getImage(ship), getImage(output));
+        Event output = observer.relativePlus(vOutput.over(dt), velocity);
+        view.line(Color.BLACK, Color.RED, getImage(observer), getImage(output));
       }
       lastBoost = null;
     }
@@ -261,6 +252,7 @@ public class SRAsteroids {
 
   /**
    * Given a Timeline, projects onto the view screen.
+   * TODO: expensive - add cache, flush on each update
    */
   public Event getImage(Timeline t) {
     return t.seenByImage(observer, velocity);
