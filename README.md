@@ -41,6 +41,8 @@ Effects demonstrated
 TODO
 ====
 
+- dump autopilot tracking data to csv, analyze to find better planning algorithm
+
 - add AcceleratingTimeline, replace ArbitraryTimeline in SRAsteroids for ship?
 
 Experiments
