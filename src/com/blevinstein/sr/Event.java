@@ -21,9 +21,6 @@ public class Event {
   public double t() { return _t; }
   
   public Event(double x, double y, double t) {
-    if (Double.isNaN(x) || Double.isNaN(y) || Double.isNaN(t)) {
-      throw new IllegalArgumentException("Component isNaN.");
-    }
     this._x = x;
     this._y = y;
     this._t = t;
