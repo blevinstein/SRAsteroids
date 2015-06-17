@@ -3,13 +3,9 @@ package com.blevinstein.sr;
 import static com.blevinstein.sr.SR.c;
 
 import org.junit.Assert;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 public class SRTest {
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
 
   public static void assertEquals(Event a, Event b, double tol) {
     assertEquals("", a, b, tol);
