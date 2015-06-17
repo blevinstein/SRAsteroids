@@ -114,6 +114,8 @@ public class SRAsteroids {
     }
 
     // Handle collision
+    /*
+    // TODO: optimize?
     boolean death = false;
     for (Star star : galaxy.stars()) {
       Event image = getImage(star.timeline());
@@ -129,6 +131,7 @@ public class SRAsteroids {
     if (death) {
       reset();
     }
+    */
   }
 
   /**
