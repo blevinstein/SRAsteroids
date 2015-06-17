@@ -30,8 +30,7 @@ public class SR {
             - e.x() * gamma * bx / c
             - e.y() * gamma * by / c;
 
-    Event r = new Event(x, y, t);
-    return r;
+    return new Event(x, y, t);
   }
 
   // returns an AffineTransformation for deforming a shape
