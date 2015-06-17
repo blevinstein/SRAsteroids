@@ -140,6 +140,8 @@ public class JOGLDriver implements SRAsteroids.View {
     textRenderer.setColor(Color.WHITE);
     textRenderer.draw("" + framerate, width - 100, height - 100);
     textRenderer.endRendering();
+
+    gl.glFlush();
   }
 
   public void setZoom(double zoom) {
