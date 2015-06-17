@@ -12,12 +12,14 @@ import java.util.List;
 
 /**
  * Represents a galaxy limited to a 'bubble' in a sphere around origin and uniform density.
- * @param radius of the bubble
- * @param density in stars per area
  */
 public class UniformBubbleGalaxy implements Galaxy {
   public List<Star> _stars;
 
+  /**
+   * @param radius of the bubble
+   * @param density in stars per area
+   */
   public UniformBubbleGalaxy(double radius, double density) {
     _stars = new ArrayList<>();
     int numStars = (int) (Math.PI * radius * radius * density);
