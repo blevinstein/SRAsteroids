@@ -23,7 +23,7 @@ public class SolarSystemGalaxy implements Galaxy {
       double gravity) {
     _stars = new ArrayList<>();
     
-    StaticTimeline sun = new StaticTimeline(100, 0);
+    StaticTimeline sun = new StaticTimeline(0, 0);
     _stars.add(new Star(sun, Color.YELLOW, 50 /* radius */, 100 /* twinklePeriod */));
 
     int numPlanets = poisson(expPlanets);
