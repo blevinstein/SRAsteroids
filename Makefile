@@ -19,15 +19,15 @@ TEST_SRCS = $(wildcard test/*/*/*/*Test.java) \
 						$(wildcard test/*/*/*/*/*Test.java)
 TESTS = $(subst /,.,$(subst test/,,$(subst .java,,${TEST_SRCS})))
 
-default: build
+default: compile
 
-build: ${SRCS}
+compile: ${SRCS}
 	javac -cp ${BUILDPATH} ${BUILDFLAGS} ${SRCS} -d build
 
-run: build
+run: compile
 	java -cp ${RUNPATH} com.blevinstein.sr.asteroids.JOGLDriver
 
-tests: build
+tests: compile
 	java -cp ${RUNPATH} org.junit.runner.JUnitCore ${TESTS}
 
 clean:
