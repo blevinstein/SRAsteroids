@@ -5,7 +5,10 @@ import static com.blevinstein.sr.SR.c;
 import com.blevinstein.sr.Event;
 import com.blevinstein.sr.Timeline;
 import com.blevinstein.sr.Velocity;
+import com.blevinstein.util.CsvDump;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import org.apache.commons.lang3.tuple.Pair;
 
 // TODO: implement projection and course planning
@@ -18,22 +21,37 @@ public class AutoPilot implements SRAsteroids.Pilot {
   private Event _initPosition;
   private Velocity _initVelocity;
   private boolean _done = false;
+  private CsvDump dump;
 
   public AutoPilot(Timeline target) {
     _target = target;
+
+    int i = 0;
+    File dumpFile;
+    do {
+      dumpFile = new File(String.format("log.%d.txt", i++));
+    } while (dumpFile.exists());
+    try {
+      dump = new CsvDump(dumpFile.getPath(), "x", "y", "t", "vx", "vy");
+    } catch (FileNotFoundException e) {
+      throw new RuntimeException("Failed to create dump file.");
+    }
   }
 
   public Timeline target() { return _target; }
 
   public boolean done() { return _done; }
 
-  // TODO: refactor steer() into Task/Behavior? allow AutoPilot to perform different behaviors?
-  // Naive straight-line at constant velocity, no anticipation, decel to zero at target
-  // NOTE: Unlimited rotation
-  // TODO: refactor into separate states, accel and decel
-  // TODO: refactor to return accel? is arbitrary acceleration reasonable? arbitrary acceleration
-  //   might be interesting for simulating "jump to lightspeed"
+  /**
+   * TODO: refactor steer() into Task/Behavior? allow AutoPilot to perform different behaviors?
+   * Naive straight-line at constant velocity, no anticipation, decel to zero at target
+   * NOTE: Unlimited rotation
+   * TODO: refactor to return accel? is arbitrary acceleration reasonable? arbitrary acceleration
+   *   might be interesting for simulating "jump to lightspeed"
+   */
   public Pair<Velocity, Double> steer(ShipState my) {
+    dump.addRow(my.position().x(), my.position().y(), my.position().t(),
+        my.velocity().x(), my.velocity().y());
     // One-time assignment
     if (_initPosition == null) { _initPosition = my.position(); }
     if (_initVelocity == null) { _initVelocity = my.velocity(); }
