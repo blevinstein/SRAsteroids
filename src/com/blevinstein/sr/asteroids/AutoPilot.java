@@ -29,7 +29,7 @@ public class AutoPilot implements SRAsteroids.Pilot {
     int i = 0;
     File dumpFile;
     do {
-      dumpFile = new File(String.format("log.%d.txt", i++));
+      dumpFile = new File(String.format("log.%d.csv", i++));
     } while (dumpFile.exists());
     try {
       dump = new CsvDump(dumpFile.getPath(), "x", "y", "t", "vx", "vy");
