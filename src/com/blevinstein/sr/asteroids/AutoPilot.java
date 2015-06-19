@@ -58,7 +58,7 @@ public class AutoPilot implements SRAsteroids.Pilot {
 
     // NOTE: Chase target as seen, no anticipation
     // TODO: Anticipate target movement, move to intercept
-    Event targetEvent = _target.seenBy(my.position(), my.velocity());
+    Event targetEvent = _target.seenBy(my.position(), my.velocity()).source();
     // TODO: refactor code smell. projection should be handled outside the Pilot
     Event targetOffset = targetEvent.minus(my.position());
 

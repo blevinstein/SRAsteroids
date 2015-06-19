@@ -5,6 +5,7 @@ import static com.blevinstein.sr.SR.c;
 import com.blevinstein.sr.ArbitraryTimeline;
 import com.blevinstein.sr.ConstantTimeline;
 import com.blevinstein.sr.Event;
+import com.blevinstein.sr.EventImage;
 import com.blevinstein.sr.SR;
 import com.blevinstein.sr.StaticTimeline;
 import com.blevinstein.sr.Timeline;
@@ -94,8 +95,8 @@ public class SRAsteroids {
     view.setZoom(zoom);
 
     // Handle mouse input
-    Event cursorEvent = getEvent(view.getImageOnScreen(mouseInput.x(), mouseInput.y()));
-    ConstantTimeline target = new ConstantTimeline(cursorEvent, velocity);
+    EventImage cursorImage = getEvent(view.getImageOnScreen(mouseInput.x(), mouseInput.y()));
+    ConstantTimeline target = new ConstantTimeline(cursorImage.source(), velocity);
     for (MouseEvent e : mouseInput.events()) {
       switch (e.getID()) {
         case MouseEvent.MOUSE_RELEASED:
@@ -165,24 +166,22 @@ public class SRAsteroids {
      * Draw a ship around an image on screen.
      * @param angle of the ship
      */
-    void ship(Color c, Event image, double angle);
+    void ship(Color color, EventImage position, double angle);
 
     /**
-     * Draw a line from image1 to image2.
+     * Draw a line from p1 to p2.
      */
-    void line(Color c1, Color c2, Event image1, Event image2);
+    void line(Color c1, Color c2, EventImage p1, EventImage p2);
 
     /**
      * Draw a circle around an image on screen.
-     * @param r radius of the circle
-     * @param vObject velocity of object relative to the observer.
      */
-    void circle(Color c, Event image, Velocity vObject, double r, boolean fill);
+    void circle(Color color, EventImage center, double radius, boolean fill);
 
     /**
      * @return whether an image is on-screen
      */
-    boolean isOnScreen(Event image, double radius);
+    boolean isOnScreen(EventImage image, double radius);
   }
 
   private static final int TRAIL_LEN = 100;
@@ -207,30 +206,26 @@ public class SRAsteroids {
 
     // Show the stars
     for (Star star : galaxy.stars()) {
-      // NOTE: decided not to refactor -> View#circle(Star star)
-      Event image = getImage(star.timeline());
-      if (!view.isOnScreen(image, star.radius())) {
+      EventImage starImage = getImage(star.timeline());
+      if (!view.isOnScreen(starImage, star.radius())) {
         continue;
       }
-      Event event = getEvent(image);
-      Velocity vObject = star.timeline().velocityAt(event.t()).relativeMinus(velocity);
       double twinklePhase = star.twinklePeriod() != 0 ?
-        (star.timeline().timeElapsed(0, event.t()) / star.twinklePeriod()) % 1
+        (star.timeline().timeElapsed(0, starImage.source().t()) / star.twinklePeriod()) % 1
         : 0;
       view.circle(adjust(star.color(), (float) (0.2 * Math.sin(2 * Math.PI * twinklePhase))),
-          image,
-          vObject,
+          starImage,
           star.radius(),
           true);
     }
 
     // Show a cursor
-    Event cursorImage = view.getImageOnScreen(mouseInput.x(), mouseInput.y());
-    view.circle(Color.RED, cursorImage, Velocity.ZERO, 50, false);
+    EventImage cursorImage = EventImage.fromImage(view.getImageOnScreen(mouseInput.x(), mouseInput.y()), observer, velocity);
+    view.circle(Color.RED, cursorImage, 50, false);
     // Show autopilot target
     if (autoPilot != null) {
-      Event targetImage = getImage(autoPilot.target());
-      view.circle(Color.BLUE, targetImage, Velocity.ZERO, 10, false);
+      EventImage targetImage = getImage(autoPilot.target());
+      view.circle(Color.BLUE, targetImage, 10, false);
     }
   }
 
@@ -254,23 +249,22 @@ public class SRAsteroids {
    * Given a Timeline, projects onto the view screen.
    * TODO: expensive - add cache, flush on each update
    */
-  public Event getImage(Timeline t) {
-    return t.seenByImage(observer, velocity);
+  public EventImage getImage(Timeline t) {
+    return t.seenBy(observer, velocity);
   }
 
   /**
    * Given an Event, projects onto the view screen.
    */
-  private Event getImage(Event event) {
-    return SR.lorentz(event.minus(observer), velocity);
+  private EventImage getImage(Event event) {
+    return new EventImage(event, Velocity.ZERO, observer, velocity);
   }
 
   /**
    * Given an Event on the view screen, project back into the world.
    */
-  public Event getEvent(Event image) {
-    // NOTE: lorentz(e - o, v) = i -> lorentz(i, -v) = e - o
-    return SR.lorentz(image, velocity.times(-1)).plus(observer);
+  public EventImage getEvent(Event image) {
+    return EventImage.fromImage(image, observer, velocity);
   }
 
   // Convenience methods

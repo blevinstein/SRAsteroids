@@ -3,6 +3,7 @@ package com.blevinstein.sr.asteroids;
 import static com.blevinstein.sr.SR.c;
 
 import com.blevinstein.sr.Event;
+import com.blevinstein.sr.EventImage;
 import com.blevinstein.sr.SR;
 import com.blevinstein.sr.Timeline;
 import com.blevinstein.sr.Velocity;
@@ -162,39 +163,39 @@ public class JOGLDriver implements SRAsteroids.View {
   private static int SHIP_LEN = 10;
   // NOTE: ship exists at a point, is shown large for convenience, scales with zoom and is not
   //   subject to lorentz contraction
-  public void ship(Color c, Event image, double angle) {
-    setColor(c);
+  public void ship(Color color, EventImage position, double angle) {
+    setColor(color);
     Event iOffset = Velocity.unit(angle).over(1).times(SHIP_LEN / zoom);
     Event jOffset = Velocity.unit(angle).perp().over(1).times(SHIP_LEN/3 / zoom);
     gl.glBegin(GL2.GL_TRIANGLE_FAN);
-      vertex(image);
-      vertex(image.plus(jOffset));
-      vertex(image.plus(iOffset));
-      vertex(image.minus(jOffset));
+      vertex(position.image());
+      vertex(position.image().plus(jOffset));
+      vertex(position.image().plus(iOffset));
+      vertex(position.image().minus(jOffset));
     gl.glEnd();
   }
 
-  public void line(Color c1, Color c2, Event image1, Event image2) {
+  public void line(Color c1, Color c2, EventImage p1, EventImage p2) {
     gl.glLineWidth(2);
     gl.glBegin(GL2.GL_LINES);
       setColor(c1);
-      vertex(image1);
+      vertex(p1.image());
       setColor(c2);
-      vertex(image2);
+      vertex(p2.image());
     gl.glEnd();
   }
 
   private static int CIRCLE_SEG_LEN = 5;
-  public void circle(Color c, Event image, Velocity vObject, double r, boolean fill) {
-    setColor(c);
-    if (!isOnScreen(image, r)) { return; }
+  public void circle(Color color, EventImage center, double radius, boolean fill) {
+    setColor(color);
+    if (!isOnScreen(center, radius)) { return; }
 
-    AffineTransform contraction = SR.lorentzContraction(vObject);
-    int segments = (int) Math.max(4, Math.ceil(2 * Math.PI * r / CIRCLE_SEG_LEN));
+    AffineTransform contraction = center.localTransform();
+    int segments = (int) Math.max(4, Math.ceil(2 * Math.PI * radius / CIRCLE_SEG_LEN));
 
     gl.glLineWidth(2);
     gl.glBegin(fill ? GL2.GL_TRIANGLE_FAN : GL2.GL_LINE_STRIP);
-    double displayRadius = Math.max(r, 1 / zoom);
+    double displayRadius = Math.max(radius, 1 / zoom);
     for (int i = 0; i < segments + 1; i++) {
       double x = Math.cos(2 * Math.PI * i / segments) * displayRadius;
       double y = Math.sin(2 * Math.PI * i / segments) * displayRadius;
@@ -203,7 +204,7 @@ public class JOGLDriver implements SRAsteroids.View {
         + contraction.getTranslateX();
       double yy = y * contraction.getScaleY() + x * contraction.getShearY()
         + contraction.getTranslateY();
-      vertex(image.advance(xx, yy, 0));
+      vertex(center.image().advance(xx, yy, 0));
     }
     gl.glEnd();
   }
@@ -215,9 +216,11 @@ public class JOGLDriver implements SRAsteroids.View {
     return new Event(xx, yy, t);
   }
 
-  public boolean isOnScreen(Event image, double radius) {
-    return image.x() * zoom > -width/2-radius && image.x() * zoom < width/2+radius
-        && image.y() * zoom > -height/2-radius && image.y() * zoom < height/2+radius;
+  public boolean isOnScreen(EventImage point, double radius) {
+    return point.image().x() * zoom > -width/2-radius
+        && point.image().x() * zoom < width/2+radius
+        && point.image().y() * zoom > -height/2-radius
+        && point.image().y() * zoom < height/2+radius;
   }
 }
 

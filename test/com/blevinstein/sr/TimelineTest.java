@@ -33,7 +33,7 @@ public class TimelineTest {
     for (Timeline t : timelines) {
       assertEquals(t.toString(),
           image,
-          t.concurrentWithImage(observer, v),
+          t.concurrentWith(observer, v).image(),
           0.1);
     }
   }
@@ -57,7 +57,7 @@ public class TimelineTest {
     for (Timeline t : timelines) {
       assertEquals(t.toString(),
           image,
-          t.seenByImage(observer, v),
+          t.seenBy(observer, v).image(),
           0.1);
     }
   }
