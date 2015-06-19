@@ -9,6 +9,7 @@ import java.awt.geom.AffineTransform;
  */
 public class EventImage {
   private Event _source;
+  private Event _offset;
   private Event _image;
   private Velocity _velocity;
 
@@ -20,7 +21,8 @@ public class EventImage {
    */
   public EventImage(Event source, Velocity vSource, Event observer, Velocity vObserver) {
     _source = source;
-    _image = SR.lorentz(source.minus(observer), vObserver);
+    _offset = source.minus(observer);
+    _image = SR.lorentz(_offset, vObserver);
     _velocity = vSource.relativeMinus(vObserver);
   }
 
@@ -30,6 +32,7 @@ public class EventImage {
   }
 
   public Event source() { return _source; }
+  public Event offset() { return _offset; }
   public Event image() { return _image; }
   public Velocity velocity() { return _velocity; }
 
