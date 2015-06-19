@@ -5,11 +5,17 @@ import static com.blevinstein.sr.SR.c;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 
+/**
+ * Contains basic algorithms of Special Relativity.
+ */
 public class SR {
   public static final double c = 100;
 
-  // given (bx, by) = beta = v / c
-  // returns new spacetime coordinates for an event after transformation
+  /**
+   * @param e the position of an Event relative to a moving observer
+   * @param v the relative velocity of the observer
+   * @return new spacetime coordinates for an event after transformation
+   */
   public static Event lorentz(Event e, Velocity v) {
     double beta_sq = v.beta_sq();
     if (beta_sq >= 1) throw new IllegalArgumentException("beta > 1");
@@ -33,7 +39,9 @@ public class SR {
     return new Event(x, y, t);
   }
 
-  // returns an AffineTransformation for deforming a shape
+  /**
+   * @return an AffineTransformation for deforming a shape
+   */
   public static AffineTransform lorentzContraction(Velocity v) {
     double beta_sq = v.beta_sq();
     double gamma = v.gamma();
