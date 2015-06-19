@@ -64,7 +64,8 @@ public abstract class Timeline {
    * @return the value of t that minimizes errorFunction(this.at(t))
    * @param tGuess starting point for solution search
    * optional @param dError approximation of d(errorFunction)/dt
-   * NOTE: This function requires that errorFunction(t) is monotonically increasing w.r.t. t
+   * NOTE: This function requires that errorFunction(t) is monotonically increasing w.r.t. t,
+   *   i.e. timelike
    */
   private static final int ITER_MAX = 500;
   public double solve(Function<Event, Double> errorFunction, double tGuess) {
@@ -113,13 +114,12 @@ public abstract class Timeline {
         : null;
   }
 
-  /*
-   * @return event e such that e = lorentz(this.at(_).minus(observer), v)
-   *     and e.interval() == 0 and e.t() < observer.t()
-   * i.e. a lightlike interval between this timeline and the observer, extending from the
-   *     observer into the past
+  /**
+   * @return EventImage ei such that
+   *   {@code ei.offset().interval() == 0 && ei.offset().t() < observer.t()}
+   *   i.e. a lightlike interval between this timeline and the observer, extending from the
+   *   observer into the past
    */
-  // NOTE: This method only works when a timeline is timelike
   public EventImage seenBy(Event observer, Velocity v) {
     double solution = solve((Event e) -> {
           Event image = SR.lorentz(e.minus(observer), v);
@@ -127,6 +127,26 @@ public abstract class Timeline {
           return image.t() + image.dist() / c;
         },
         observer.t() - this.at(observer.t()).minus(observer).dist() / c,
+        v.gamma() / 2);
+
+    return this.contains(solution)
+        ? new EventImage(this.at(solution), this.velocityAt(solution), observer, v)
+        : null;
+  }
+
+  /**
+   * @return EventImage ei such that
+   *   {@code ei.offset().interval() == 0 && ei.offset().t() > observer.t()}
+   *   i.e. a lightlike interval between this timeline and the observer, extending from the
+   *   observer into the future
+   */
+  public EventImage willSee(Event observer, Velocity v) {
+    double solution = solve((Event e) -> {
+          Event image = SR.lorentz(e.minus(observer), v);
+          // Calculates the time (relative to observer.t()) at which the event sees the observer
+          return image.t() - image.dist() / c;
+        },
+        observer.t() + this.at(observer.t()).minus(observer).dist() / c,
         v.gamma() / 2);
 
     return this.contains(solution)

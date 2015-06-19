@@ -19,6 +19,13 @@ import java.util.List;
 import org.apache.commons.lang3.tuple.Pair;
 
 public class SRAsteroids {
+  public enum ProjectionMode {
+    NO_TRANSFORM,
+    CONCURRENT_WITH,
+    SEEN_BY,
+    WILL_SEE
+  }
+
   public static final double dt = 0.1;
 
   private ManualPilot manualPilot;
@@ -30,6 +37,7 @@ public class SRAsteroids {
   private double angle;
   private double zoom;
   private Velocity lastBoost;
+  private ProjectionMode mode = ProjectionMode.SEEN_BY;
 
   private View view;
   private KeyInput keyInput;
@@ -91,6 +99,15 @@ public class SRAsteroids {
     }
     if (keyInput.getKeyDown(KeyEvent.VK_Q)) {
       zoom /= 1.05;
+    }
+    if (keyInput.getKeyDown(KeyEvent.VK_0)) {
+      mode = ProjectionMode.NO_TRANSFORM;
+    } else if (keyInput.getKeyDown(KeyEvent.VK_1)) {
+      mode = ProjectionMode.CONCURRENT_WITH;
+    } else if (keyInput.getKeyDown(KeyEvent.VK_2)) {
+      mode = ProjectionMode.SEEN_BY;
+    } else if (keyInput.getKeyDown(KeyEvent.VK_3)) {
+      mode = ProjectionMode.WILL_SEE;
     }
     view.setZoom(zoom);
 
@@ -250,7 +267,18 @@ public class SRAsteroids {
    * TODO: expensive - add cache, flush on each update
    */
   public EventImage getImage(Timeline t) {
-    return t.seenBy(observer, velocity);
+    switch (mode) {
+      case NO_TRANSFORM:
+        return t.concurrentWith(observer, Velocity.ZERO);
+      case CONCURRENT_WITH:
+        return t.concurrentWith(observer, velocity);
+      case SEEN_BY:
+        return t.seenBy(observer, velocity);
+      case WILL_SEE:
+        return t.willSee(observer, velocity);
+      default:
+        throw new RuntimeException();
+    }
   }
 
   /**
