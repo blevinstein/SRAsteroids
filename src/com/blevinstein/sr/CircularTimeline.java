@@ -4,7 +4,6 @@ import static com.blevinstein.sr.SR.c;
 
 /**
  * Represents a circular orbit around another timeline.
- * TODO: implement EllipticalTimeline
  *
  * k = 2pi / period
  * a = initial angle
@@ -18,44 +17,38 @@ import static com.blevinstein.sr.SR.c;
 public class CircularTimeline extends Timeline {
   private Timeline _center;
   private double _radius;
-  private double _period;
   private double _angle;
-
-  private double k() { return 2 * Math.PI / _period; }
 
   public CircularTimeline(Timeline center, double radius, double velocity, double angle) {
     _center = center;
     _radius = radius;
-    _period = 2 * Math.PI * _radius / velocity;
+    _k = velocity / _radius;
     _angle = angle;
   }
 
   public Event at(double t) {
-    double k = k();
     double properTime = _center.timeElapsed(0, t);
-    Event offset = new Event(_radius * Math.cos(k * properTime + _angle),
-        _radius * Math.sin(k * properTime + _angle),
+    Event offset = new Event(_radius * Math.cos(_k * properTime + _angle),
+        _radius * Math.sin(_k * properTime + _angle),
         0);
     return _center.at(t).plus(offset);
   }
 
   public Velocity velocityAt(double t) {
-    double k = k();
     double properTime = _center.timeElapsed(0, t);
-    Velocity relativeVelocity = new Velocity(_radius * k * -Math.sin(k * properTime + _angle),
-        _radius * k * Math.cos(k * properTime + _angle));
+    Velocity relativeVelocity = new Velocity(_radius * _k * -Math.sin(_k * properTime + _angle),
+        _radius * _k * Math.cos(_k * properTime + _angle));
     return _center.velocityAt(t).relativePlus(relativeVelocity);
   }
 
   public double timeElapsed(double tStart, double tEnd) {
-    double k = k();
-    double gamma = new Velocity(_radius * k, 0).gamma();
+    double gamma = new Velocity(_radius * _k, 0).gamma();
     return _center.timeElapsed(tStart, tEnd) * gamma;
   }
 
   @Override
   public String toString() {
-    return String.format("CircularTimeline around(%s) r=%f period=%f",
-        _center, _radius, _period);
+    return String.format("CircularTimeline around(%s) r=%f k=%f",
+        _center, _radius, _k);
   }
 }
