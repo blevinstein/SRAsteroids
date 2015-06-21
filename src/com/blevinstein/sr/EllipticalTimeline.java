@@ -2,14 +2,13 @@ package com.blevinstein.sr;
 
 import static com.blevinstein.util.Trig.atanh;
 
-import com.blevinstein.Event;
-import com.blevinstein.Timeline;
-import com.blevinstein.Velocity;
+import com.blevinstein.sr.Event;
+import com.blevinstein.sr.Timeline;
+import com.blevinstein.sr.Velocity;
 
 /**
  * Represents an elliptical orbit around another timeline.
  * // TODO: generalize to ConicTimeline
- *
  *
  * Notation:
  * "**" exponent, i.e. v**2 = "v squared"
@@ -48,13 +47,13 @@ public class EllipticalTimeline extends Timeline {
 
     // check eccentricity
     if (eccentricity < 0 || eccentricity >= 1) {
-      throw new InvalidArgumentException(
+      throw new IllegalArgumentException(
           String.format("eccentricity %f not in [0, 1)", eccentricity));
     }
     // TODO: check a > c * gravity / E, E = (2 / (1-e) - 1), to prevent v > c
 
     // calculate radius
-    radius = major_axis * Math.pow(1 - eccentricity, 2);
+    radius = major_axis * (1 - Math.pow(eccentricity, 2));
     // calculate S
     double r0 = radius / (1 + eccentricity); // radius at perihelion
     double v0 = vAtR(r0);
@@ -71,11 +70,20 @@ public class EllipticalTimeline extends Timeline {
    *            e1 = 1-e
    *            e2 = sqrt(1 - e**2)
    */
-  public double thetaAt(double t) {
-    return 2 * atanh( e2 / e1 * Math.tan(S * t / 2 / Math.pow(radius, 2) * e2));
+  double thetaAt(double t) {
+    return 2 * atanh(e2 / e1 * Math.tan(S * t / 2 / Math.pow(radius, 2) * e2));
   }
 
-  public double rAt(double theta) {
+  /**
+   * Calculates inverse of thetaAt(t). Used for testing purposes.
+   *
+   * t(theta) = 2 * R**2 / (S * e2) * atan(e1/e2 * tanh(theta/2));
+   */
+  double timeAt(double theta) {
+    return 2 * Math.pow(radius, 2) / (S * e2) * Math.atan(e1 / e2 * Math.tanh(theta/2));
+  }
+
+  double rAt(double theta) {
     return radius / (1 + eccentricity * Math.cos(theta));
   }
 
@@ -84,15 +92,15 @@ public class EllipticalTimeline extends Timeline {
    *
    * v**2 = gravity * (2 / r - 1 / a)
    */
-  public double vAtR(double r) {
+  double vAtR(double r) {
     return Math.sqrt(gravity * (2 / r - 1 / major_axis));
   }
 
   public Event at(double t) {
-    double properTime = _center.timeElapsed(0, t);
+    double properTime = center.timeElapsed(0, t);
     double theta = thetaAt(properTime);
     double r = rAt(theta);
-    Event offset = new Event(r * Math.cos(theta), r * Math.sin(theta), 0);
+    return new Event(r * Math.cos(theta), r * Math.sin(theta), properTime);
   }
 
   /**
@@ -102,23 +110,37 @@ public class EllipticalTimeline extends Timeline {
    *
    * dtheta/dt = omega = S / r**2
    *
-   * v = r^ * dr/dtheta * dtheta/dt + theta^ * dtheta/dt
+   * v = r^ * dr/dtheta * dtheta/dt + theta^ * dtheta/dt * r
    *
    *     r^ * dr/dtheta * dtheta/dt
    *   = r^ * r * e sin(theta) / (1 + e cos(theta)) * S / r**2
    *   = r^ * e sin(theta) / (1 + e cos(theta)) * S / r
    *
-   * v = r^ * e sin(theta) / (1 + e cos(theta)) * S / r + theta^ * S / r**2
+   * v = r^ * e sin(theta) / (1 + e cos(theta)) * S / r + theta^ * S / r**2 * r
+   *   = r^ * e sin(theta) / (1 + e cos(theta)) * S / r + theta^ * S / r
    */
   public Velocity velocityAt(double t) {
-    double properTime = _center.timeElapsed(0, t);
+    double properTime = center.timeElapsed(0, t);
     double theta = thetaAt(properTime);
     double r = rAt(theta);
     Velocity rHat = Velocity.unit(theta);
-    Velocity thetaHat = Velocity.unit(theta + Math.PI/4);
+    Velocity thetaHat = Velocity.unit(theta + Math.PI/2);
     return rHat.times(
         eccentricity * Math.sin(theta) / (1 + eccentricity * Math.cos(theta)) * S / Math.pow(r,2))
         .plus(
-        thetaHat.times(S / Math.pow(r, 2)));
+        thetaHat.times(S / r));
+  }
+
+  public double timeElapsed(double tStart, double tEnd) {
+    // NOTE: NOT ACCURATE
+    // TODO: include gamma factor
+    return center.timeElapsed(tStart, tEnd);
+  }
+
+  @Override
+  public String toString() {
+    return String.format("angle_perih=%f center=%s eccentricity=%f gravity=%f major_axis=%f " +
+        "radius=%f S=%f e1=%f e2=%f", angle_perih, center, eccentricity, gravity, major_axis,
+        radius, S, e1, e2);
   }
 }
