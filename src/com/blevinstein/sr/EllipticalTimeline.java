@@ -18,7 +18,7 @@ import com.blevinstein.sr.Velocity;
  * "e" eccentricity
  * "G" gravity
  * "R" radius of the e=0 circle
- * "a" major_axis radius along the major axis of the ellipse
+ * "a" majorAxis radius along the major axis of the ellipse
  *
  * position = (r(t), theta(t)) [polar]
  *
@@ -28,11 +28,11 @@ import com.blevinstein.sr.Velocity;
  * theta(t) = complicated, sweeps equal areas in equal times
  */
 public class EllipticalTimeline extends Timeline {
-  private double angle_perih; // angle of perihelion (on major axis)
+  private double anglePerih; // angle of perihelion (on major axis)
   private Timeline center;
   private double eccentricity; // [0, 1], e=0 circle, e=1 approaches parabola
   private double gravity;
-  private double major_axis; // half length of major axis
+  private double majorAxis; // half length of major axis
   
   // derived values
   private double radius; // radius of e=0 circle
@@ -40,13 +40,13 @@ public class EllipticalTimeline extends Timeline {
   private double e1, e2; // used by thetaAt
 
   // TODO: add initial angle, so not all orbits start at perihelion
-  public EllipticalTimeline(double angle_perih, Timeline center, double eccentricity,
-      double gravity, double major_axis) {
-    this.angle_perih = angle_perih;
+  public EllipticalTimeline(double anglePerih, Timeline center, double eccentricity,
+      double gravity, double majorAxis) {
+    this.anglePerih = anglePerih;
     this.center = center;
     this.eccentricity = eccentricity;
     this.gravity = gravity;
-    this.major_axis = major_axis;
+    this.majorAxis = majorAxis;
 
     // check eccentricity
     if (eccentricity < 0 || eccentricity >= 1) {
@@ -61,12 +61,12 @@ public class EllipticalTimeline extends Timeline {
     // v_max**2 = G E / a, where E = (2 / (1 - e) - 1)
     // a_min = G E / c**2, so that v < c at all times
     double E = 2 / (1 - eccentricity) - 1;
-    if (major_axis <= gravity * E / (c * c)) {
+    if (majorAxis <= gravity * E / (c * c)) {
       throw new IllegalArgumentException("major axis is too short");
     }
 
     // calculate radius
-    radius = major_axis * (1 - Math.pow(eccentricity, 2));
+    radius = majorAxis * (1 - Math.pow(eccentricity, 2));
     // calculate S
     double r0 = radius / (1 + eccentricity); // radius at perihelion
     double v0 = vAtR(r0);
@@ -77,16 +77,18 @@ public class EllipticalTimeline extends Timeline {
   }
 
   /**
-   * NOTE: Assumes that theta=0 at perihelion, must be rotated by angle_perih
+   * NOTE: Assumes that theta=0 at perihelion, must be rotated by anglePerih
    *
    * theta(t) = 2 atanh( sqrt(1 - e**2)/(1-e) tan(S t / (2 R**2) * sqrt(1 - e**2)) )
    *          = 2 atanh( e2/e1 tan(S t / (2 R**2) * e2) )
    *          where
    *            e1 = 1-e
    *            e2 = sqrt(1 - e**2)
+   *
+   * TODO: BROKEN, fix
    */
   double thetaAt(double t) {
-    return 2 * atanh(e2 / e1 * Math.tan(S * t / 2 / Math.pow(radius, 2) * e2));
+      return 2 * atanh(e2 / e1 * Math.tan(S * t / 2 / Math.pow(radius, 2) * e2));
   }
 
   /**
@@ -111,15 +113,15 @@ public class EllipticalTimeline extends Timeline {
    * v**2 = gravity * (2 / r - 1 / a)
    */
   double vAtR(double r) {
-    return Math.sqrt(gravity * (2 / r - 1 / major_axis));
+    return Math.sqrt(gravity * (2 / r - 1 / majorAxis));
   }
 
   public Event at(double t) {
     double properTime = center.timeElapsed(0, t);
     double theta = thetaAt(properTime);
     double r = rAt(theta);
-    return new Event(r * Math.cos(theta + angle_perih),
-        r * Math.sin(theta + angle_perih),
+    return new Event(r * Math.cos(theta + anglePerih),
+        r * Math.sin(theta + anglePerih),
         properTime);
   }
 
@@ -143,8 +145,8 @@ public class EllipticalTimeline extends Timeline {
     double properTime = center.timeElapsed(0, t);
     double theta = thetaAt(properTime);
     double r = rAt(theta);
-    Velocity rHat = Velocity.unit(theta + angle_perih);
-    Velocity thetaHat = Velocity.unit(theta + angle_perih + Math.PI/2);
+    Velocity rHat = Velocity.unit(theta + anglePerih);
+    Velocity thetaHat = Velocity.unit(theta + anglePerih + Math.PI/2);
     return rHat.times(
         eccentricity * Math.sin(theta) / (1 + eccentricity * Math.cos(theta)) * S / Math.pow(r,2))
         .plus(
@@ -159,8 +161,8 @@ public class EllipticalTimeline extends Timeline {
 
   @Override
   public String toString() {
-    return String.format("angle_perih=%f center=%s eccentricity=%f gravity=%f major_axis=%f " +
-        "radius=%f S=%f e1=%f e2=%f", angle_perih, center, eccentricity, gravity, major_axis,
+    return String.format("anglePerih=%f center=%s eccentricity=%f gravity=%f majorAxis=%f " +
+        "radius=%f S=%f e1=%f e2=%f", anglePerih, center, eccentricity, gravity, majorAxis,
         radius, S, e1, e2);
   }
 }
