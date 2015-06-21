@@ -16,6 +16,15 @@ public class SRTest {
     }
   }
 
+  public static void assertEquals(Velocity a, Velocity b, double tol) {
+    assertEquals("", a, b, tol);
+  }
+  public static void assertEquals(String message, Velocity a, Velocity b, double tol) {
+    if (!a.equals(b, tol)) {
+      Assert.fail(String.format("%s != %s. %s", a, b, message));
+    }
+  }
+
   @Test
   public void lorentz_stationary() {
     assertEquals(new Event(1, 2, 3), SR.lorentz(new Event(1, 2, 3), Velocity.ZERO), 0.001);

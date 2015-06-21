@@ -211,6 +211,11 @@ public class Velocity {
     return atanh(beta()) * c;
   }
 
+  public boolean equals(Velocity other, double tolerance) {
+    return Math.abs(this.vx - other.vx) < tolerance
+        && Math.abs(this.vy - other.vy) < tolerance;
+  }
+
   @Override
   public boolean equals(Object obj) {
     if (obj instanceof Velocity) {
