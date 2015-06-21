@@ -18,6 +18,7 @@ public class CircularTimeline extends Timeline {
   private Timeline _center;
   private double _radius;
   private double _angle;
+  private double _k;
 
   public CircularTimeline(Timeline center, double radius, double velocity, double angle) {
     _center = center;
