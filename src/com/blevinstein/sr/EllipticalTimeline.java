@@ -1,5 +1,6 @@
 package com.blevinstein.sr;
 
+import static com.blevinstein.sr.SR.c;
 import static com.blevinstein.util.Trig.atanh;
 
 import com.blevinstein.sr.Event;
@@ -15,6 +16,7 @@ import com.blevinstein.sr.Velocity;
  * "r^" and "theta^" represent polar unit vectors
  *
  * "e" eccentricity
+ * "G" gravity
  * "R" radius of the e=0 circle
  * "a" major_axis radius along the major axis of the ellipse
  *
@@ -50,7 +52,17 @@ public class EllipticalTimeline extends Timeline {
       throw new IllegalArgumentException(
           String.format("eccentricity %f not in [0, 1)", eccentricity));
     }
-    // TODO: check a > c * gravity / E, E = (2 / (1-e) - 1), to prevent v > c
+    // v_max**2 = G (2 / (R / (1 + e)) - 1 / a)
+    //    ( R = a (1 - e**2) )
+    //    = G (2 / (a (1 - e**2) / (1 + e)) - 1 / a)
+    //    = G (2 / (a (1 - e)) - 1 / a)
+    //    = G / a (2 / (1 - e) - 1)
+    // v_max**2 = G E / a, where E = (2 / (1 - e) - 1)
+    // a_min = G E / c**2, so that v < c at all times
+    double E = 2 / (1 - eccentricity) - 1;
+    if (major_axis <= gravity * E / (c * c)) {
+      throw new IllegalArgumentException("major axis is too short");
+    }
 
     // calculate radius
     radius = major_axis * (1 - Math.pow(eccentricity, 2));
