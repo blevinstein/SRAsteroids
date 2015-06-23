@@ -21,8 +21,13 @@ public class EllipticalTimelineTest {
    */
   @Test
   public void simpleEllipse() {
-    EllipticalTimeline et = new EllipticalTimeline(0 /* angle_perih */, new StaticTimeline(0, 0),
-        0.6 /* eccentricity */, 1 /* gravity */, 5 /* major_axis */);
+    EllipticalTimeline et = new EllipticalTimeline(
+        0 /* angle_init */,
+        0 /* angle_perih */,
+        new StaticTimeline(0, 0),
+        0.6 /* eccentricity */,
+        1 /* gravity */,
+        5 /* major_axis */);
 
     double t = 0; // perihelion
     assertEquals(0, t, 0.01);
@@ -43,16 +48,23 @@ public class EllipticalTimelineTest {
 
   @Test
   public void simpleEllipse_rotated() {
-    EllipticalTimeline et = new EllipticalTimeline(Math.PI/2 /* angle_perih */,
-        new StaticTimeline(0, 0), 0.6 /* eccentricity */, 1 /* gravity */, 5 /* major_axis */);
+    EllipticalTimeline et = new EllipticalTimeline(
+        0 /* angle_init */,
+        Math.PI/2 /* angle_perih */,
+        new StaticTimeline(0, 0),
+        0.6 /* eccentricity */,
+        1 /* gravity */,
+        5 /* major_axis */);
 
     double t = et.timeAt(Math.PI/2); // perihelion
-    assertEquals(0, t, 0.01);
-    assertEquals(new Event(0, 2, t), et.at(0), 0.01);
+    assertEquals(4.999, t, 0.01);
+    assertEquals(Math.PI/2, et.thetaAt(t), 0.01);
+    assertEquals(new Event(0, 2, t), et.at(t), 0.01);
     assertEquals(new Velocity(-2 / Math.sqrt(5), 0), et.velocityAt(t), 0.01);
 
     t = et.timeAt(Math.PI);
-    assertEquals(4.999, t, 0.01);
+    assertEquals(2 * 4.999, t, 0.01);
+    assertEquals(Math.PI, et.thetaAt(t), 0.01);
     assertEquals(new Event(-16.0/5, 0, t), et.at(t), 0.01);
 
     t = et.timeAt(3*Math.PI/2); // aphelion

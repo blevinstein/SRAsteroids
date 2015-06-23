@@ -41,6 +41,7 @@ public class SolarSystemGalaxy implements Galaxy {
 
   private EllipticalTimeline randomOrbit(Timeline center, double maxRadius, double gravity) {
     double angle = Math.random() * 2 * Math.PI;
+    double perihelion = Math.random() * 2 * Math.PI;
     double eccentricity = Math.random() * EllipticalTimeline.MAX_ECCENTRICITY;
     double maxMajorAxis = maxRadius / (1 + eccentricity);
     double E = 2 / (1 - eccentricity) - 1;
@@ -50,7 +51,7 @@ public class SolarSystemGalaxy implements Galaxy {
       return randomOrbit(center, maxRadius, gravity);
     }
     double majorAxis = Math.sqrt(Math.random()) * (maxMajorAxis - minMajorAxis) + minMajorAxis;
-    return new EllipticalTimeline(angle, center, eccentricity, gravity, majorAxis);
+    return new EllipticalTimeline(angle, perihelion, center, eccentricity, gravity, majorAxis);
   }
 
   private Color randomColor() {
