@@ -19,6 +19,10 @@ import com.blevinstein.sr.Velocity;
  * "G" gravity
  * "R" radius of the e=0 circle
  * "a" majorAxis radius along the major axis of the ellipse
+ * "b" minorAxis
+ * "n" meanMotion = 2pi/period = sqrt(G / a**3)
+ * "M" meanAnomaly = n * t
+ * "E" eccentricAnomaly
  *
  * position = (r(t), theta(t)) [polar]
  *
@@ -28,6 +32,9 @@ import com.blevinstein.sr.Velocity;
  * theta(t) = complicated, sweeps equal areas in equal times
  */
 public class EllipticalTimeline extends Timeline {
+  // TODO: test eccentricities > MAX_ECCENTRICITY
+  private static final double MAX_ECCENTRICITY = 0.662743; // Laplace limit
+
   private double anglePerih; // angle of perihelion (on major axis)
   private Timeline center;
   private double eccentricity; // [0, 1], e=0 circle, e=1 approaches parabola
@@ -35,9 +42,11 @@ public class EllipticalTimeline extends Timeline {
   private double majorAxis; // half length of major axis
   
   // derived values
+  private double minorAxis; // half length of minor axis
   private double radius; // radius of e=0 circle
   private double S; // S = |v(t)| * r(t), constant over time
-  private double e1, e2; // used by thetaAt
+  private double meanMotion;
+  private double period;
 
   // TODO: add initial angle, so not all orbits start at perihelion
   public EllipticalTimeline(double anglePerih, Timeline center, double eccentricity,
@@ -65,46 +74,72 @@ public class EllipticalTimeline extends Timeline {
       throw new IllegalArgumentException("major axis is too short");
     }
 
+    // calculate minorAxis
+    minorAxis = Math.sqrt(1 - Math.pow(eccentricity, 2)) * majorAxis;
     // calculate radius
     radius = majorAxis * (1 - Math.pow(eccentricity, 2));
     // calculate S
     double r0 = radius / (1 + eccentricity); // radius at perihelion
     double v0 = vAtR(r0);
     S = v0 * r0;
-    // calculate e1, e2
-    e1 = 1 - eccentricity;
-    e2 = Math.sqrt(1 - Math.pow(eccentricity, 2));
+    // calculate mean motion
+    meanMotion = Math.sqrt(gravity / Math.pow(majorAxis, 3));
+    // calculate period
+    period = 2 * Math.PI / meanMotion;
   }
 
   /**
-   * NOTE: Assumes that theta=0 at perihelion, must be rotated by anglePerih
+   * Uses iterative method to solve E - e sin(E) = M = n t
+   * E_0 = 0
+   * E_i+1 = M + e sin(E_i)
    *
-   * theta(t) = 2 atanh( sqrt(1 - e**2)/(1-e) tan(S t / (2 R**2) * sqrt(1 - e**2)) )
-   *          = 2 atanh( e2/e1 tan(S t / (2 R**2) * e2) )
-   *          where
-   *            e1 = 1-e
-   *            e2 = sqrt(1 - e**2)
-   *
-   * TODO: BROKEN, fix
+   * then x, y = a(cos(E) - e), b sin(E)
    */
+  private static final double thetaAt_TOL = 0.00001;
+  private static final int thetaAt_MAX_ITERS = 100;
   double thetaAt(double t) {
-      return 2 * atanh(e2 / e1 * Math.tan(S * t / 2 / Math.pow(radius, 2) * e2));
+    double meanAnomaly = meanMotion * t;
+
+    // find eccentricAnomaly using iterative method
+    double eccentricAnomaly = 0;
+    double iters = 0;
+    double error;
+    do {
+      double newEccentricAnomaly = meanAnomaly + eccentricity * Math.sin(eccentricAnomaly);
+      error = meanAnomaly - (eccentricAnomaly - eccentricity * Math.sin(eccentricAnomaly));
+      eccentricAnomaly = newEccentricAnomaly;
+    } while (Math.abs(error) > thetaAt_TOL && iters++ < thetaAt_MAX_ITERS);
+    return Math.atan2(minorAxis * Math.sin(eccentricAnomaly),
+        majorAxis * (Math.cos(eccentricAnomaly) - eccentricity)) + anglePerih;
   }
 
   /**
    * Calculates inverse of thetaAt(t)
    * Used for testing purposes
-   *
-   * NOTE: Assumes that theta=0 at perihelion
-   *
-   * t(theta) = 2 * R**2 / (S * e2) * atan(e1/e2 * tanh(theta/2))
    */
   double timeAt(double theta) {
-    return 2 * Math.pow(radius, 2) / (S * e2) * Math.atan(e1 / e2 * Math.tanh(theta/2));
+    // full rotations will be added back at the end
+    int rotations = (int) ((theta - anglePerih) / (2 * Math.PI));
+
+    double r = rAt(theta);
+    // coordinates with respect to center of the ellipse
+    // theta' = theta - theta_0
+    // x = r cos(theta') + f, f = a e
+    // y = r sin(theta')
+    double x = r * Math.cos(theta - anglePerih) + majorAxis * eccentricity,
+        y = r * Math.sin(theta - anglePerih);
+
+    double eccentricAnomaly = Math.atan2(y / minorAxis, x / majorAxis);
+    // want [0, 2pi) instead of [-pi, pi)
+    if (eccentricAnomaly < 0) { eccentricAnomaly += 2 * Math.PI; }
+    
+    double meanAnomaly = eccentricAnomaly - eccentricity * Math.sin(eccentricAnomaly);
+
+    return meanAnomaly / meanMotion + rotations * period;
   }
 
   double rAt(double theta) {
-    return radius / (1 + eccentricity * Math.cos(theta));
+    return radius / (1 + eccentricity * Math.cos(theta - anglePerih));
   }
 
   /**
@@ -120,8 +155,8 @@ public class EllipticalTimeline extends Timeline {
     double properTime = center.timeElapsed(0, t);
     double theta = thetaAt(properTime);
     double r = rAt(theta);
-    return new Event(r * Math.cos(theta + anglePerih),
-        r * Math.sin(theta + anglePerih),
+    return new Event(r * Math.cos(theta),
+        r * Math.sin(theta),
         properTime);
   }
 
@@ -145,12 +180,13 @@ public class EllipticalTimeline extends Timeline {
     double properTime = center.timeElapsed(0, t);
     double theta = thetaAt(properTime);
     double r = rAt(theta);
-    Velocity rHat = Velocity.unit(theta + anglePerih);
-    Velocity thetaHat = Velocity.unit(theta + anglePerih + Math.PI/2);
+    Velocity rHat = Velocity.unit(theta);
+    Velocity thetaHat = Velocity.unit(theta + Math.PI/2);
     return rHat.times(
-        eccentricity * Math.sin(theta) / (1 + eccentricity * Math.cos(theta)) * S / Math.pow(r,2))
+            eccentricity * Math.sin(theta - anglePerih)
+            / (1 + eccentricity * Math.cos(theta - anglePerih)) * S / Math.pow(r, 2))
         .plus(
-        thetaHat.times(S / r));
+            thetaHat.times(S / r));
   }
 
   public double timeElapsed(double tStart, double tEnd) {
@@ -162,7 +198,8 @@ public class EllipticalTimeline extends Timeline {
   @Override
   public String toString() {
     return String.format("anglePerih=%f center=%s eccentricity=%f gravity=%f majorAxis=%f " +
-        "radius=%f S=%f e1=%f e2=%f", anglePerih, center, eccentricity, gravity, majorAxis,
-        radius, S, e1, e2);
+        "radius=%f S=%f", anglePerih, center, eccentricity, gravity, majorAxis,
+        radius, S);
   }
 }
+
