@@ -50,8 +50,8 @@ public class SRAsteroids {
   public void reset() {
     //galaxy = new UniformBubbleGalaxy(1E4, 1E-5);
     //galaxy = new CircleGalaxy(1E4, 5E-6, 1E7);
-    //galaxy = new SolarSystemGalaxy(1E4, 10 /* planets */, 5 /* moons */, 1E7);
-    galaxy = new GridGalaxy(1E4, 1E4, 100, 100, 10);
+    galaxy = new SolarSystemGalaxy(1E4, 10 /* planets */, 5 /* moons */, 1E7);
+    //galaxy = new GridGalaxy(1E4, 1E4, 100, 100, 10);
 
     observer = new Event(1E3 * (Math.random() - 0.5), 1E3 * (Math.random() - 0.5), 0);
     velocity = Velocity.ZERO;
