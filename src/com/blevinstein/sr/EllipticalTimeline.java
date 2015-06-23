@@ -33,7 +33,7 @@ import com.blevinstein.sr.Velocity;
  */
 public class EllipticalTimeline extends Timeline {
   // TODO: test eccentricities > MAX_ECCENTRICITY
-  private static final double MAX_ECCENTRICITY = 0.662743; // Laplace limit
+  public static final double MAX_ECCENTRICITY = 0.662743; // Laplace limit
 
   private double anglePerih; // angle of perihelion (on major axis)
   private Timeline center;
@@ -157,7 +157,7 @@ public class EllipticalTimeline extends Timeline {
     double r = rAt(theta);
     return new Event(r * Math.cos(theta),
         r * Math.sin(theta),
-        properTime);
+        properTime).plus(center.at(t));
   }
 
   /**
@@ -182,11 +182,13 @@ public class EllipticalTimeline extends Timeline {
     double r = rAt(theta);
     Velocity rHat = Velocity.unit(theta);
     Velocity thetaHat = Velocity.unit(theta + Math.PI/2);
-    return rHat.times(
+    Velocity myVelocity =
+        rHat.times(
             eccentricity * Math.sin(theta - anglePerih)
             / (1 + eccentricity * Math.cos(theta - anglePerih)) * S / Math.pow(r, 2))
         .plus(
             thetaHat.times(S / r));
+    return center.velocityAt(t).relativePlus(myVelocity);
   }
 
   public double timeElapsed(double tStart, double tEnd) {
