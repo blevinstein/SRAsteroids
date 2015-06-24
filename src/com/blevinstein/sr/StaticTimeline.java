@@ -4,8 +4,10 @@ package com.blevinstein.sr;
  * Represents a stationary position.
  */
 public class StaticTimeline extends Timeline {
-  double x;
-  double y;
+  public static final StaticTimeline ZERO = new StaticTimeline(0, 0);
+
+  private final double x;
+  private final double y;
   
   public StaticTimeline(double x, double y) {
     this.x = x;
