@@ -16,16 +16,17 @@ import org.apache.commons.lang3.tuple.Pair;
 public class AutoPilot implements SRAsteroids.Pilot {
   private static final double a = 0.5;
 
-  // TODO: take optional Velocity as a ctor argument
   private Timeline _target;
   private Event _initPosition;
   private Velocity _initVelocity;
   private boolean _done = false;
   private CsvDump dump;
+  // TODO: analyze dumped logs
 
   public AutoPilot(Timeline target) {
     _target = target;
 
+    /*
     int i = 0;
     File dumpFile;
     do {
@@ -36,6 +37,7 @@ public class AutoPilot implements SRAsteroids.Pilot {
     } catch (FileNotFoundException e) {
       throw new RuntimeException("Failed to create dump file.");
     }
+    */
   }
 
   public Timeline target() { return _target; }
@@ -50,8 +52,10 @@ public class AutoPilot implements SRAsteroids.Pilot {
    *   might be interesting for simulating "jump to lightspeed"
    */
   public Pair<Velocity, Double> steer(ShipState my) {
+    /*
     dump.addRow(my.position().x(), my.position().y(), my.position().t(),
         my.velocity().x(), my.velocity().y());
+    */
     // One-time assignment
     if (_initPosition == null) { _initPosition = my.position(); }
     if (_initVelocity == null) { _initVelocity = my.velocity(); }
