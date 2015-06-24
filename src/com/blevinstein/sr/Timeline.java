@@ -99,6 +99,10 @@ public abstract class Timeline {
       eLow = errorFunction.apply(at(tLow));
     }
 
+    // Short circuit if definitely out of bounds
+    if (start() != null && start().t() > tHigh) { return tHigh; }
+    if (end() != null && end().t() < tLow) { return tLow; }
+
     return bisectionMethod(errorFunction, tLow, tHigh);
   }
 
