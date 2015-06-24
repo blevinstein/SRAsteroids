@@ -4,7 +4,15 @@ import static com.blevinstein.sr.SR.c;
 
 import java.util.function.Function;
 
-// TODO: implement equals?
+/**
+ * Represents a timeline by specifying:
+ *   position(t)
+ *   velocity(t)
+ *   timeElapsed(tStart, tEnd)
+ *
+ * I apologize for this being a class instead of an interface.
+ * TODO: implement equals?
+ */
 public abstract class Timeline {
   /**
    * Get the position of an object over time in a particular reference frame.
@@ -63,15 +71,11 @@ public abstract class Timeline {
   /**
    * @return the value of t that minimizes errorFunction(this.at(t))
    * @param tGuess starting point for solution search
-   * optional @param dError approximation of d(errorFunction)/dt
    * NOTE: This function requires that errorFunction(t) is monotonically increasing w.r.t. t,
    *   i.e. timelike
    */
   private static final int ITER_MAX = 500;
   public double solve(Function<Event, Double> errorFunction, double tGuess) {
-    return solve(errorFunction, tGuess, 0.5);
-  }
-  public double solve(Function<Event, Double> errorFunction, double tGuess, double dError) {
     // low and high guesses for time in original reference frame
     double tLow = tGuess, tHigh = tGuess;
 
@@ -106,8 +110,7 @@ public abstract class Timeline {
    */
   public EventImage concurrentWith(Event observer, Velocity v) {
     double solution = solve((Event e) -> SR.lorentz(e.minus(observer), v).t(),
-        observer.t(),
-        v.gamma() / 2);
+        observer.t());
 
     return this.contains(solution)
         ? new EventImage(this.at(solution), this.velocityAt(solution), observer, v)
@@ -126,8 +129,7 @@ public abstract class Timeline {
           // Calculates the time (relative to observer.t()) at which the observer sees an event
           return image.t() + image.dist() / c;
         },
-        observer.t() - this.at(observer.t()).minus(observer).dist() / c,
-        v.gamma() / 2);
+        observer.t() - this.at(observer.t()).minus(observer).dist() / c);
 
     return this.contains(solution)
         ? new EventImage(this.at(solution), this.velocityAt(solution), observer, v)
@@ -146,8 +148,7 @@ public abstract class Timeline {
           // Calculates the time (relative to observer.t()) at which the event sees the observer
           return image.t() - image.dist() / c;
         },
-        observer.t() + this.at(observer.t()).minus(observer).dist() / c,
-        v.gamma() / 2);
+        observer.t() + this.at(observer.t()).minus(observer).dist() / c);
 
     return this.contains(solution)
         ? new EventImage(this.at(solution), this.velocityAt(solution), observer, v)
@@ -157,6 +158,10 @@ public abstract class Timeline {
   public boolean contains(double t) {
     return (start() == null || start().t() <= t)
       && (end() == null || t <= end().t());
+  }
+
+  public LimitedTimeline limit(Event start, Event end) {
+    return new LimitedTimeline(this, start, end);
   }
 }
 
