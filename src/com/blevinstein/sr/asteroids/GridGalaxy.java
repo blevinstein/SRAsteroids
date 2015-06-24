@@ -29,7 +29,7 @@ public class GridGalaxy implements Galaxy {
       for (int j = 0; j <= dy; j++) {
         _stars.add(new Star(
             new StaticTimeline(-w / 2 + w * i / dx, -h / 2 + h * j / dy),
-            Color.getHSBColor((1f * i / dx), (1f * j / dy), 0.8f),
+            Color.getHSBColor((1f * i / dx), (1f * j / dy), 0.7f),
             r,
             10 /* twinklePeriod */));
       }

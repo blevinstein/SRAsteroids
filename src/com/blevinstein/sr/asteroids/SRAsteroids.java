@@ -50,8 +50,8 @@ public class SRAsteroids {
   public void reset() {
     //galaxy = new UniformBubbleGalaxy(1E4, 1E-5);
     //galaxy = new CircleGalaxy(1E4, 5E-6, 1E7);
-    galaxy = new SolarSystemGalaxy(2E3, 10 /* planets */, 5 /* moons */, 1E6);
-    //galaxy = new GridGalaxy(1E4, 1E4, 100, 100, 10);
+    //galaxy = new SolarSystemGalaxy(2E3, 10 /* planets */, 5 /* moons */, 1E6);
+    galaxy = new GridGalaxy(1E4, 1E4, 100, 100, 10);
 
     observer = new Event(1E3 * (Math.random() - 0.5), 1E3 * (Math.random() - 0.5), 0);
     velocity = Velocity.ZERO;
@@ -230,7 +230,7 @@ public class SRAsteroids {
       double twinklePhase = star.twinklePeriod() != 0 ?
         (star.timeline().timeElapsed(0, starImage.source().t()) / star.twinklePeriod()) % 1
         : 0;
-      view.circle(adjust(star.color(), (float) (0.2 * Math.sin(2 * Math.PI * twinklePhase))),
+      view.circle(adjust(star.color(), (float) (0.3 * Math.sin(2 * Math.PI * twinklePhase))),
           starImage,
           star.radius(),
           true);
