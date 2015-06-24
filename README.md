@@ -43,32 +43,21 @@ TODO
 
 - dump autopilot tracking data to csv, analyze to find better planning algorithm
 
-- add AcceleratingTimeline, replace ArbitraryTimeline in SRAsteroids for ship?
+- add AcceleratingTimeline to represent uniform acceleration
 
 Experiments
 -----------
 
 - implement position cache and distance cache?
 
-- show redshift/blueshift for stars?
-
-- add ability to switch between projections (seenBy, concurrentWith)
-  - NOTE: Can add light pulses in concurrentWith projection, doesn't make any sense in seenBy
-  projection
-
-- ability to change speed of light? e.g. "turn on/turn off" relativity?
-
-- ellipses split on collision
+- ellipses split/merge on collision?
   - NOTE: circle-circle collision = point-line collision, r' = r1 + r2
 
 Basic Features
 --------------
 
-- implement CircularTimeline, orbits in a circle
-- implement EllipticalTimeline, add orbits around central point, fake gravity
 - create dynamic galaxies that are stable over time
-
-- implement OffsetTimeline, shifted version of another Timeline
+  - fractal galaxy generation?
 
 Procedural Generation
 ---------------------
