@@ -204,6 +204,7 @@ public class SRAsteroids {
   private static final int TRAIL_LEN = 100;
   public synchronized void draw() {
     // Show the observer
+    // NOTE: assumes getImage(observer) != null
     view.ship(Color.GREEN, getImage(observer), angle);
 
     // TODO: refactor into View#ship?
@@ -224,7 +225,7 @@ public class SRAsteroids {
     // Show the stars
     for (Star star : galaxy.stars()) {
       EventImage starImage = getImage(star.timeline());
-      if (!view.isOnScreen(starImage, star.radius())) {
+      if (starImage == null || !view.isOnScreen(starImage, star.radius())) {
         continue;
       }
       double twinklePhase = star.twinklePeriod() != 0 ?
@@ -241,6 +242,7 @@ public class SRAsteroids {
     view.circle(Color.RED, cursorImage, 50, false);
     // Show autopilot target
     if (autoPilot != null) {
+      // NOTE: assumes that getImage(target) != null
       EventImage targetImage = getImage(autoPilot.target());
       view.circle(Color.BLUE, targetImage, 10, false);
     }
