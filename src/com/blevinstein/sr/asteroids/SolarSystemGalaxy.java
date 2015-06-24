@@ -16,25 +16,21 @@ import java.util.List;
 /**
  * Represents a solar system, with moons orbiting planets orbiting the sun
  */
-public class SolarSystemGalaxy implements Galaxy {
-  public List<Star> _stars;
-
+public class SolarSystemGalaxy extends MutableGalaxy {
   public SolarSystemGalaxy(double maxRadius, double expPlanets, double expMoons,
       double gravity) {
-    _stars = new ArrayList<>();
-    
     StaticTimeline sun = new StaticTimeline(0, 0);
-    _stars.add(new Star(sun, Color.YELLOW, 50 /* radius */, 100 /* twinklePeriod */));
+    add(new Star(sun, Color.YELLOW, 50 /* radius */, 100 /* twinklePeriod */));
 
     int numPlanets = poisson(expPlanets);
     for (int i = 0; i < numPlanets; i++) {
       EllipticalTimeline planet = randomOrbit(sun, maxRadius, gravity);
-      _stars.add(new Star(planet, randomColor(), 10 /* radius */, 0 /* no twinkle */));
+      add(new Star(planet, randomColor(), 10 /* radius */, 0 /* no twinkle */));
       
       int numMoons = poisson(expMoons);
       for (int j = 0; j < numMoons; j++) {
         EllipticalTimeline moon = randomOrbit(planet, maxRadius/numPlanets, gravity/numPlanets);
-        _stars.add(new Star(moon, randomColor(), 5 /* radius */, 0 /* no twinkle */));
+        add(new Star(moon, randomColor(), 5 /* radius */, 0 /* no twinkle */));
       }
     }
   }
@@ -56,10 +52,5 @@ public class SolarSystemGalaxy implements Galaxy {
 
   private Color randomColor() {
     return Color.getHSBColor((float) Math.random(), (float) Math.random(), 0.8f);
-  }
-
-  public List<Star> stars() {
-    // return defensive copy
-    return new ArrayList<>(_stars);
   }
 }

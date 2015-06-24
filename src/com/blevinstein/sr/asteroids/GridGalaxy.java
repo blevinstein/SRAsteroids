@@ -13,9 +13,7 @@ import java.util.List;
 /**
  * Represents a simple grid of stars.
  */
-public class GridGalaxy implements Galaxy {
-  public List<Star> _stars;
-
+public class GridGalaxy extends MutableGalaxy {
   /**
    * @param w width of galaxy
    * @param h height of galaxy
@@ -24,20 +22,14 @@ public class GridGalaxy implements Galaxy {
    * @param r radius of each star
    */
   public GridGalaxy(double w, double h, int dx, int dy, double r) {
-    _stars = new ArrayList<>();
     for (int i = 0; i <= dx; i++) {
       for (int j = 0; j <= dy; j++) {
-        _stars.add(new Star(
+        add(new Star(
             new StaticTimeline(-w / 2 + w * i / dx, -h / 2 + h * j / dy),
             Color.getHSBColor((1f * i / dx), (1f * j / dy), 0.7f),
             r,
             10 /* twinklePeriod */));
       }
     }
-  }
-
-  public List<Star> stars() {
-    // return defensive copy
-    return new ArrayList<>(_stars);
   }
 }

@@ -31,7 +31,7 @@ public class SRAsteroids {
   private ManualPilot manualPilot;
   private AutoPilot autoPilot;
 
-  private Galaxy galaxy;
+  private MutableGalaxy galaxy;
   private Event observer;
   private Velocity velocity;
   private double angle;
@@ -274,7 +274,7 @@ public class SRAsteroids {
         return t.concurrentWith(observer, velocity);
       case SEEN_BY:
         return t.seenBy(observer, velocity);
-      case WILL_SEE:
+      case WILL_SEE: // TODO: rm if not useful?
         return t.willSee(observer, velocity);
       default:
         throw new RuntimeException();

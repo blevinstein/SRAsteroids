@@ -17,13 +17,10 @@ import java.util.List;
  * @param density in stars per area
  * @param gravity of central black hole (units meter^3/second^2)
  */
-public class CircleGalaxy implements Galaxy {
-  public List<Star> _stars;
-
+public class CircleGalaxy extends MutableGalaxy {
   public CircleGalaxy(double maxRadius, double density, double gravity) {
     StaticTimeline blackHole = new StaticTimeline(0, 0);
 
-    _stars = new ArrayList<>();
     int numStars = (int)(Math.PI * maxRadius * maxRadius * density);
     for (int i = 0; i < numStars; i++) {
       // Create a new star
@@ -32,16 +29,11 @@ public class CircleGalaxy implements Galaxy {
       double dist = Math.sqrt(Math.random()) * (maxRadius - minRadius) + minRadius;
       double velocity = Math.sqrt(gravity  / dist) * (Math.random() < 0.5 ? 1 : -1);
       CircularTimeline starTimeline = new CircularTimeline(blackHole, dist, velocity, angle);
-      _stars.add(new Star(
+      add(new Star(
             starTimeline,
             Color.GRAY,
             10 /* radius */,
             10 /* twinklePeriod */));
     }
-  }
-
-  public List<Star> stars() {
-    // return defensive copy
-    return new ArrayList<>(_stars);
   }
 }
