@@ -16,6 +16,11 @@ public class MutableGalaxy implements Galaxy {
     return this;
   }
 
+  public synchronized MutableGalaxy remove(Star toRemove) {
+    _stars.remove(toRemove);
+    return this;
+  }
+
   public synchronized List<Star> stars() {
     // return defensive copy
     return new ArrayList<>(_stars);
