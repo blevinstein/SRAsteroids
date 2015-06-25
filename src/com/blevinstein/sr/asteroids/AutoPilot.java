@@ -101,9 +101,7 @@ public class AutoPilot implements SRAsteroids.Pilot {
     if (Double.isNaN(dtdr) || dtdr <= 0) dtdr = 0.01;
 
     // Calculate leanIn/leanOut boosts for accelerating and decelerating
-    // NOTE: Must do withT(1) before toVelocity() because targetEvent is perceived as being in
-    //   the past, so targetOffset.toVelocity() points in the wrong direction
-    Velocity towardsTarget = targetOffset.withT(1).toVelocity().checked(0.99);
+    Velocity towardsTarget = targetOffset.toUnitVelocity().times(a);
     Velocity leanIn = towardsTarget.relativeMinus(my.velocity()).norm().times(a);
     Velocity leanOut = my.velocity().norm().times(-a);
 

@@ -27,13 +27,6 @@ public class Event {
   }
 
   /**
-   * Returns a new Event with its t coordinate changed.
-   */
-  public Event withT(double t) {
-    return new Event(_x, _y, t);
-  }
-
-  /**
    * Adds together two spacetime intervals.
    */
   public Event plus(Event other) {
@@ -131,6 +124,10 @@ public class Event {
    */
   public Velocity toVelocity() {
     return new Velocity(_x / _t, _y / _t);
+  }
+
+  public Velocity toUnitVelocity() {
+    return new Velocity(_x, _y).norm();
   }
 
   /**
