@@ -16,7 +16,7 @@ public class ConstantTimeline extends Timeline {
   }
   
   public Event at(double t) {
-    return _v.over(t).plus(_e);
+    return _v.over(t - _e.t()).plus(_e);
   }
 
   public Velocity velocityAt(double t) {
