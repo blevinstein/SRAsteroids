@@ -8,7 +8,7 @@ import java.awt.Color;
  * Container object for a Star.
  */
 public class Star {
-  private final Timeline _timeline;
+  private Timeline _timeline;
   private final Color _color;
   private final double _radius;
   private final double _twinklePeriod; // rate of twinkling in Hz
@@ -27,5 +27,14 @@ public class Star {
   public Color color() { return _color; }
   public double radius() { return _radius; }
   public double twinklePeriod() { return _twinklePeriod; }
+
+  // TODO: refactor code smell, remove this?
+  public boolean dead() {
+    return _timeline.end() != null;
+  }
+
+  public void destroy(double t) {
+    _timeline = _timeline.limit(null, _timeline.at(t));
+  }
 }
 
