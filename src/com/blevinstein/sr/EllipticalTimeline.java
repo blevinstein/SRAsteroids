@@ -106,6 +106,12 @@ public class EllipticalTimeline extends Timeline {
     double radius = Math.pow(h, 2) / gravity; // radius of e=0 circle
     // calculate eccentricity from R and a
     double e = Math.sqrt(1 - radius / a);
+    if (e == 1) {
+      throw new IllegalStateException("e=0 would create a parabola not an ellipse");
+    } else if (e > 1) {
+      throw new IllegalStateException(
+          String.format("e=%f would create a hyperbola not an ellipse", e));
+    }
     // theta = angle with respect to perihelion
     // r0 = R / (1 + e cos(theta))
     // -> cos(theta) = (R - r0) / (r0 e)
