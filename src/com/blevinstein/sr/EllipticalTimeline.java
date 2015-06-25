@@ -90,6 +90,37 @@ public class EllipticalTimeline extends Timeline {
     meanAnomalyInit = meanAnomalyAt(angleInit);
   }
 
+  public static EllipticalTimeline create(Timeline center, double gravity, Event p0, Velocity v0) {
+    double t0 = p0.t();
+    Event c = center.at(t0);
+    Event r0 = p0.minus(c);
+    double thetaActual = r0.toUnitVelocity().angle();
+    // v0**2 = G (2 / r0 - 1 / a)
+    // -> a = 1 / (2 / r0 - v0**2 / G)
+    double a = 1 / (2 / r0.dist() - Math.pow(v0.mag(), 2) / gravity);
+    // angular momentum h = r0 cross v0 = r0 v0 sin(phi), phi = angle between r0 and v0
+    // h = sqrt((1 - e**2) a G) = sqrt(R G)
+    // -> R = h**2/g
+    double phi = r0.toUnitVelocity().angleTo(v0);
+    double h = r0.dist() * v0.mag() * Math.sin(phi);
+    double radius = Math.pow(h, 2) / gravity; // radius of e=0 circle
+    // calculate eccentricity from R and a
+    double e = Math.sqrt(1 - radius / a);
+    // theta = angle with respect to perihelion
+    // r0 = R / (1 + e cos(theta))
+    // -> cos(theta) = (R - r0) / (r0 e)
+    double theta = Math.acos((radius - r0.dist()) / (r0.dist() * e));
+    // v0_r^ = S / (R r0) * e sin(theta)
+    // S, R, r0, and e are all > 0
+    // -> if v0_r^ > 0, sin(theta) > 0 and theta > 0
+    // -> if v0_r^ < 0, sin(theta) < 0 and theta < 0
+    double dotProduct = r0.x() * v0.x() + r0.y() * v0.y();
+    if (dotProduct < 0) {
+      theta = -theta;
+    }
+    return new EllipticalTimeline(thetaActual, thetaActual - theta, center, e, gravity, a, t0);
+  }
+
   /**
    * Uses iterative method to solve E - e sin(E) = M = n t
    * E_0 = 0
