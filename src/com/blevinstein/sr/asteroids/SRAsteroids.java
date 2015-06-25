@@ -43,6 +43,9 @@ public class SRAsteroids {
   private KeyInput keyInput;
   private MouseInput mouseInput;
 
+  // feature flags
+  private boolean enableStarCollision = false;
+
   public SRAsteroids() {
     reset();
   }
@@ -50,10 +53,15 @@ public class SRAsteroids {
   public void reset() {
     //galaxy = new UniformBubbleGalaxy(1E4, 1E-5);
     //galaxy = new CircleGalaxy(1E4, 5E-6, 1E7);
-    //galaxy = new SolarSystemGalaxy(2E3, 10 /* planets */, 5 /* moons */, 1E6);
-    galaxy = new GridGalaxy(1E4, 1E4, 100, 100, 10);
+    galaxy = new SolarSystemGalaxy(2E3, 10 /* planets */, 5 /* moons */, 1E6);
+    //galaxy = new GridGalaxy(1E4, 1E4, 100, 100, 10);
+    //galaxy = new MutableGalaxy()
+    //    .add(new Star(new ConstantTimeline(new Event(200, 0, 0), new Velocity(-10, 0)),
+    //        Color.GRAY, 10))
+    //    .add(new Star(new ConstantTimeline(Event.ORIGIN, new Velocity(10, 0)),
+    //        Color.GRAY, 10));
 
-    observer = new Event(1E3 * (Math.random() - 0.5), 1E3 * (Math.random() - 0.5), 0);
+    observer = Event.ORIGIN;
     velocity = Velocity.ZERO;
     angle = 0;
     zoom = 1;
@@ -128,24 +136,70 @@ public class SRAsteroids {
     }
 
     // Handle collision
-    /*
-    // TODO: optimize?
-    boolean death = false;
-    for (Star star : galaxy.stars()) {
-      Event image = getImage(star.timeline());
-      if (!view.isOnScreen(image, star.radius())) {
-        continue;
-      }
-      Event event = getEvent(image);
-      Velocity vObject = star.timeline().velocityAt(event.t()).relativeMinus(velocity);
-      if (collide(observer, event, star.radius(), vObject)) {
-        death = true;
+    // TODO: refactor collision into galaxy, make consistent with local physics
+    // TODO: optimize
+    if (enableStarCollision) {
+      for (Star star1 : galaxy.stars()) {
+        if (star1.dead()) { continue; }
+        EventImage image1 = getImage(star1.timeline());
+        if (image1 == null) { continue; }
+
+        for (Star star2 : galaxy.stars()) {
+          if (star2.dead()) { continue; }
+          EventImage image2 = getImage(star2.timeline());
+          if (image2 == null) { continue; }
+
+          if (star1.hashCode() < star2.hashCode() || star1 == star2) {
+            continue;
+          }
+
+          Velocity vRelative = image1.velocity().relativeMinus(image2.velocity());
+          if (collide(image1.source(), image2.source(), star1.radius() + star2.radius(),
+                vRelative)) {
+            double collision = image1.source().t();
+            Star newStar = mergeStars(star1, star2, collision);
+            // HACK: add addition length of radius / velocity to each object
+            star1.destroy(
+                collision + star1.radius() / star1.timeline().velocityAt(collision).mag());
+            star2.destroy(
+                collision + star2.radius() / star2.timeline().velocityAt(collision).mag());
+            galaxy.add(newStar);
+            System.out.printf("end %s\n", star1.timeline().end());
+            System.out.printf("end %s\n", star2.timeline().end());
+            System.out.printf("start %s\n", newStar.timeline().start());
+          }
+        }
       }
     }
-    if (death) {
-      reset();
-    }
-    */
+  }
+
+  private Star mergeStars(Star star1, Star star2, double collision) {
+    Event event1 = star1.timeline().at(collision);
+    Velocity v1 = star1.timeline().velocityAt(collision);
+    Event event2 = star2.timeline().at(collision);
+    Velocity v2 = star2.timeline().velocityAt(collision);
+
+    double w1 = Math.pow(star1.radius(), 2);
+    double w2 = Math.pow(star2.radius(), 2);
+    double f = w2 / (w1 + w2);
+
+    Event wEvent = event1.times(1-f).plus(event2.times(f));
+    Velocity wVelocity = v1.times(1-f).plus(v2.times(f));
+    Color wColor = interpolate(star1.color(), star2.color(), (float) f);
+
+    double newRadius = Math.sqrt(Math.pow(star1.radius(), 2) + Math.pow(star2.radius(), 2));
+    // DEBUG
+    //System.out.printf("%f + %f => %f", star1.radius(), star2.radius(), newRadius);
+
+    Timeline newTimeline = new ConstantTimeline(wEvent, wVelocity);
+    double tStart = collision - newRadius / newTimeline.velocityAt(collision).mag();
+    // DEBUG
+    Event eStart = newTimeline.at(tStart);
+    System.out.printf("collision %f start %f %s\n", collision, tStart, eStart);
+    newTimeline = newTimeline.limit(eStart, null);
+
+    return new Star(newTimeline, wColor, newRadius,
+        star1.twinklePeriod() + star2.twinklePeriod());
   }
 
   /**
@@ -260,6 +314,20 @@ public class SRAsteroids {
     if (newB > 1) newB = 1;
 
     return Color.getHSBColor(hsb[0], hsb[1], newB);
+  }
+
+  /**
+   * interpolate(a, b, 0) -> a
+   * interpolate(a, b, 0.5) -> (a + b) / 2
+   * interpolate(a, b, 1) -> b
+   */
+  private Color interpolate(Color a, Color b, float f) {
+    float[] hsb_a = Color.RGBtoHSB(a.getRed(), a.getGreen(), a.getBlue(), new float[3]);
+    float[] hsb_b = Color.RGBtoHSB(b.getRed(), b.getGreen(), b.getBlue(), new float[3]);
+
+    return Color.getHSBColor(f * hsb_b[0] + (1 - f) * hsb_a[0],
+        f * hsb_b[1] + (1 - f) * hsb_a[1],
+        f * hsb_b[2] + (1 - f) * hsb_a[2]);
   }
 
   // Projections
