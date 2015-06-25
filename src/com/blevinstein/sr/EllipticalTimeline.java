@@ -40,6 +40,7 @@ public class EllipticalTimeline extends Timeline {
   private double eccentricity; // [0, 1], e=0 circle, e=1 approaches parabola
   private double gravity;
   private double majorAxis; // half length of major axis
+  private double t0;
   
   // derived values
   private double minorAxis; // half length of minor axis
@@ -49,13 +50,14 @@ public class EllipticalTimeline extends Timeline {
   private double meanAnomalyInit;
 
   public EllipticalTimeline(double angleInit, double anglePerih, Timeline center, double eccentricity,
-      double gravity, double majorAxis) {
+      double gravity, double majorAxis, double t0) {
     this.anglePerih = anglePerih;
     this.angleInit = angleInit;
     this.center = center;
     this.eccentricity = eccentricity;
     this.gravity = gravity;
     this.majorAxis = majorAxis;
+    this.t0 = t0;
 
     // check eccentricity
     if (eccentricity < 0 || eccentricity >= 1) {
@@ -94,6 +96,8 @@ public class EllipticalTimeline extends Timeline {
    * E_i+1 = M + e sin(E_i)
    *
    * then x, y = a(cos(E) - e), b sin(E)
+   *
+   * NOTE: expects to be given time since t0
    */
   private static final double thetaAt_TOL = 0.00001;
   private static final int thetaAt_MAX_ITERS = 100;
@@ -138,7 +142,7 @@ public class EllipticalTimeline extends Timeline {
    * Used for testing purposes
    */
   double timeAt(double theta) {
-    return (meanAnomalyAt(theta) - meanAnomalyInit) / meanMotion;
+    return (meanAnomalyAt(theta) - meanAnomalyInit) / meanMotion + t0;
   }
 
   double rAt(double theta) {
@@ -155,7 +159,7 @@ public class EllipticalTimeline extends Timeline {
   }
 
   public Event at(double t) {
-    double properTime = center.timeElapsed(0, t);
+    double properTime = center.timeElapsed(t0, t);
     double theta = thetaAt(properTime);
     double r = rAt(theta);
     return new Event(r * Math.cos(theta), r * Math.sin(theta), 0)
@@ -179,7 +183,7 @@ public class EllipticalTimeline extends Timeline {
    *   = r^ * e sin(theta) / (1 + e cos(theta)) * S / r + theta^ * S / r
    */
   public Velocity velocityAt(double t) {
-    double properTime = center.timeElapsed(0, t);
+    double properTime = center.timeElapsed(t0, t);
     double theta = thetaAt(properTime);
     double r = rAt(theta);
     Velocity rHat = Velocity.unit(theta);

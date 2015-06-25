@@ -27,15 +27,16 @@ public class EllipticalTimelineTest {
         new StaticTimeline(0, 0),
         0.6 /* eccentricity */,
         1 /* gravity */,
-        5 /* major_axis */);
+        5 /* major_axis */,
+        1 /* t0 */);
 
-    double t = 0; // perihelion
-    assertEquals(0, t, 0.01);
-    assertEquals(new Event(2, 0, t), et.at(0), 0.01);
+    double t = et.timeAt(0); // perihelion
+    assertEquals(1, t, 0.01);
+    assertEquals(new Event(2, 0, t), et.at(t), 0.01);
     assertEquals(new Velocity(0, 2 / Math.sqrt(5)), et.velocityAt(t), 0.01);
    
     t = et.timeAt(Math.PI/2);
-    assertEquals(4.999, t, 0.01);
+    assertEquals(1 + 4.999, t, 0.01);
     assertEquals(new Event(0, 16.0/5, t), et.at(t), 0.01);
 
     t = et.timeAt(Math.PI); // aphelion
@@ -54,7 +55,8 @@ public class EllipticalTimelineTest {
         new StaticTimeline(0, 0),
         0.6 /* eccentricity */,
         1 /* gravity */,
-        5 /* major_axis */);
+        5 /* major_axis */,
+        0 /* t0 */);
 
     double t = et.timeAt(Math.PI/2); // perihelion
     assertEquals(4.999, t, 0.01);
