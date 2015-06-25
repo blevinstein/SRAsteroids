@@ -3,6 +3,7 @@ package com.blevinstein.sr;
 /**
  * Wrapper class for another timeline
  * Allows you to modify the start and end times of the timeline
+ * TODO: optimize ctor to extract original if original instanceof LimitedTimeline
  */
 public class LimitedTimeline extends Timeline {
   private Timeline original;
