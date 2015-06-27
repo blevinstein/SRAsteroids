@@ -47,8 +47,8 @@ public class SolarSystemGalaxy extends MutableGalaxy {
       return randomOrbit(center, maxRadius, gravity);
     }
     double majorAxis = Math.sqrt(Math.random()) * (maxMajorAxis - minMajorAxis) + minMajorAxis;
-    return new EllipticalTimeline(angle, perihelion, center, eccentricity, gravity, majorAxis,
-        0 /* t0 */);
+    return new EllipticalTimeline(angle, perihelion, center, false /* cw */, eccentricity,
+        gravity, majorAxis, 0 /* t0 */);
   }
 
   private Color randomColor() {

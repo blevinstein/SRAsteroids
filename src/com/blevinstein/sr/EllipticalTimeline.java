@@ -37,6 +37,7 @@ public class EllipticalTimeline extends Timeline {
   private double angleInit; // angle at t=0
   private double anglePerih; // angle of perihelion (on major axis)
   private Timeline center;
+  private boolean clockwise;
   private double eccentricity; // [0, 1], e=0 circle, e=1 approaches parabola
   private double gravity;
   private double majorAxis; // half length of major axis
@@ -49,11 +50,12 @@ public class EllipticalTimeline extends Timeline {
   private double meanMotion;
   private double meanAnomalyInit;
 
-  public EllipticalTimeline(double angleInit, double anglePerih, Timeline center, double eccentricity,
-      double gravity, double majorAxis, double t0) {
+  public EllipticalTimeline(double angleInit, double anglePerih, Timeline center,
+      boolean clockwise, double eccentricity, double gravity, double majorAxis, double t0) {
     this.anglePerih = anglePerih;
     this.angleInit = angleInit;
     this.center = center;
+    this.clockwise = clockwise;
     this.eccentricity = eccentricity;
     this.gravity = gravity;
     this.majorAxis = majorAxis;
@@ -124,7 +126,9 @@ public class EllipticalTimeline extends Timeline {
     if (dotProduct < 0) {
       theta = -theta;
     }
-    return new EllipticalTimeline(thetaActual, thetaActual - theta, center, e, gravity, a, t0);
+    boolean clockwise = r0.toUnitVelocity().cross(v0) < 0;
+    return new EllipticalTimeline(thetaActual, thetaActual - theta, center, clockwise, e,
+        gravity, a, t0);
   }
 
   /**
@@ -179,7 +183,7 @@ public class EllipticalTimeline extends Timeline {
    * Used for testing purposes
    */
   double timeAt(double theta) {
-    return (meanAnomalyAt(theta) - meanAnomalyInit) / meanMotion + t0;
+    return (meanAnomalyAt(theta) - meanAnomalyInit) * (clockwise ? -1 : 1) / meanMotion + t0;
   }
 
   double rAt(double theta) {
@@ -197,7 +201,7 @@ public class EllipticalTimeline extends Timeline {
 
   public Event at(double t) {
     double properTime = center.timeElapsed(t0, t);
-    double theta = thetaAt(properTime);
+    double theta = thetaAt(properTime) * (clockwise ? -1 : 1);
     double r = rAt(theta);
     return new Event(r * Math.cos(theta), r * Math.sin(theta), 0)
         .plus(center.at(t));
@@ -224,7 +228,7 @@ public class EllipticalTimeline extends Timeline {
     double theta = thetaAt(properTime);
     double r = rAt(theta);
     Velocity rHat = Velocity.unit(theta);
-    Velocity thetaHat = Velocity.unit(theta + Math.PI/2);
+    Velocity thetaHat = Velocity.unit(theta + Math.PI/2 * (clockwise ? -1 : 1));
     Velocity myVelocity =
         rHat.times(
             eccentricity * Math.sin(theta - anglePerih)
@@ -243,8 +247,8 @@ public class EllipticalTimeline extends Timeline {
   @Override
   public String toString() {
     return String.format("anglePerih=%f center=%s eccentricity=%f gravity=%f majorAxis=%f " +
-        "radius=%f S=%f", anglePerih, center, eccentricity, gravity, majorAxis,
-        radius, S);
+        "radius=%f S=%f cw=%s", anglePerih, center, eccentricity, gravity, majorAxis,
+        radius, S, clockwise);
   }
 }
 

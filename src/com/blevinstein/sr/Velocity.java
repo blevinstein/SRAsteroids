@@ -175,6 +175,13 @@ public class Velocity {
   }
 
   /**
+   * Calculates the magnitude of the cross product of two velocities.
+   */
+  public double cross(Velocity other) {
+    return this.vx * other.vy - this.vy * other.vx;
+  }
+
+  /**
    * Adds two velocities together, using component-wise addition (no relativistic effects).
    */
   public Velocity plus(Velocity other) {
