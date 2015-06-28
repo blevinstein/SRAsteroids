@@ -41,6 +41,9 @@ Effects demonstrated
 TODO
 ====
 
+- improve projection code (map all stars to images first) - implement GalaxyImage?
+- use heuristic to improve collision
+
 - dump autopilot tracking data to csv, analyze to find better planning algorithm
 
 - add AcceleratingTimeline to represent uniform acceleration
