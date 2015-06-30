@@ -24,11 +24,10 @@ public class GridGalaxy extends MutableGalaxy {
   public GridGalaxy(double w, double h, int dx, int dy, double r) {
     for (int i = 0; i <= dx; i++) {
       for (int j = 0; j <= dy; j++) {
-        add(new Star(
-            new StaticTimeline(-w / 2 + w * i / dx, -h / 2 + h * j / dy),
-            Color.getHSBColor((1f * i / dx), (1f * j / dy), 0.7f),
-            r,
-            10 /* twinklePeriod */));
+        add(new Star(new StaticTimeline(-w / 2 + w * i / dx, -h / 2 + h * j / dy),
+            new StarDef(Color.getHSBColor((1f * i / dx), (1f * j / dy), 0.7f),
+              r,
+              10 /* twinklePeriod */)));
       }
     }
   }

@@ -29,11 +29,8 @@ public class CircleGalaxy extends MutableGalaxy {
       double dist = Math.sqrt(Math.random()) * (maxRadius - minRadius) + minRadius;
       double velocity = Math.sqrt(gravity  / dist) * (Math.random() < 0.5 ? 1 : -1);
       CircularTimeline starTimeline = new CircularTimeline(blackHole, dist, velocity, angle);
-      add(new Star(
-            starTimeline,
-            Color.GRAY,
-            10 /* radius */,
-            10 /* twinklePeriod */));
+      add(new Star(starTimeline,
+          new StarDef(Color.GRAY, 10 /* radius */, 10 /* twinklePeriod */)));
     }
   }
 }

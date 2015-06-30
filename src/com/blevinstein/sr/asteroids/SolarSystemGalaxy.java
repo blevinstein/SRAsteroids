@@ -20,17 +20,20 @@ public class SolarSystemGalaxy extends MutableGalaxy {
   public SolarSystemGalaxy(double maxRadius, double expPlanets, double expMoons,
       double gravity) {
     StaticTimeline sun = new StaticTimeline(0, 0);
-    add(new Star(sun, Color.YELLOW, 50 /* radius */, 100 /* twinklePeriod */));
+    add(new Star(sun,
+        new StarDef(Color.YELLOW, 50 /* radius */, 100 /* twinklePeriod */)));
 
     int numPlanets = poisson(expPlanets);
     for (int i = 0; i < numPlanets; i++) {
       EllipticalTimeline planet = randomOrbit(sun, maxRadius, gravity);
-      add(new Star(planet, randomColor(), 10 /* radius */, 0 /* no twinkle */));
+      add(new Star(planet,
+          new StarDef(randomColor(), 10 /* radius */, 0 /* no twinkle */)));
       
       int numMoons = poisson(expMoons);
       for (int j = 0; j < numMoons; j++) {
         EllipticalTimeline moon = randomOrbit(planet, maxRadius/numPlanets, gravity/numPlanets);
-        add(new Star(moon, randomColor(), 5 /* radius */, 0 /* no twinkle */));
+        add(new Star(moon,
+            new StarDef(randomColor(), 5 /* radius */, 0 /* no twinkle */)));
       }
     }
   }

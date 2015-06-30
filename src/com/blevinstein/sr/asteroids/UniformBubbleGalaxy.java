@@ -27,11 +27,8 @@ public class UniformBubbleGalaxy extends MutableGalaxy {
       Event starPosition = new Event(dist * Math.cos(angle), dist * Math.sin(angle), 0);
       Velocity starVelocity = Velocity.randomUnit().times(Math.random() * 0.999 * c);
       ConstantTimeline starTimeline = new ConstantTimeline(starPosition, starVelocity);
-      add(new Star(
-            starTimeline,
-            Color.GRAY,
-            10 /* radius */,
-            10 /* twinklePeriod */));
+      add(new Star(starTimeline,
+          new StarDef(Color.GRAY, 10 /* radius */, 10 /* twinklePeriod */)));
     }
   }
 }

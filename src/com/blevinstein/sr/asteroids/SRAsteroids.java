@@ -188,8 +188,7 @@ public class SRAsteroids {
     Color wColor = interpolate(star1.color(), star2.color(), (float) f);
 
     double newRadius = Math.sqrt(Math.pow(star1.radius(), 2) + Math.pow(star2.radius(), 2));
-    // DEBUG
-    //System.out.printf("%f + %f => %f", star1.radius(), star2.radius(), newRadius);
+    double newGravity = star1.gravity() + star2.gravity();
 
     Timeline newTimeline = new ConstantTimeline(wEvent, wVelocity);
     double tStart = collision - newRadius / newTimeline.velocityAt(collision).mag();
@@ -198,8 +197,8 @@ public class SRAsteroids {
     System.out.printf("collision %f start %f %s\n", collision, tStart, eStart);
     newTimeline = newTimeline.limit(eStart, null);
 
-    return new Star(newTimeline, wColor, newRadius,
-        star1.twinklePeriod() + star2.twinklePeriod());
+    return new Star(newTimeline,
+        new StarDef(wColor, newRadius, star1.twinklePeriod() + star2.twinklePeriod(), newGravity));
   }
 
   /**
