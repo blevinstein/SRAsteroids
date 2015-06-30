@@ -7,7 +7,7 @@ import java.awt.geom.AffineTransform;
 /**
  * Represents a transformed view of an Event in another reference frame.
  */
-public class EventImage {
+public class Image {
   private Event _source;
   private Event _offset;
   private Event _image;
@@ -19,16 +19,16 @@ public class EventImage {
    * @param observer the observer in the original reference frame
    * @param vObserver the velocity of the observer in the reference frame
    */
-  public EventImage(Event source, Velocity vSource, Event observer, Velocity vObserver) {
+  public Image(Event source, Velocity vSource, Event observer, Velocity vObserver) {
     _source = source;
     _offset = source.minus(observer);
     _image = SR.lorentz(_offset, vObserver);
     _velocity = vSource.relativeMinus(vObserver);
   }
 
-  public static final EventImage fromImage(Event image, Event observer, Velocity vObserver) {
+  public static final Image fromImage(Event image, Event observer, Velocity vObserver) {
     Event source = SR.lorentz(image, vObserver.times(-1)).plus(observer);
-    return new EventImage(source, Velocity.ZERO, observer, vObserver);
+    return new Image(source, Velocity.ZERO, observer, vObserver);
   }
 
   public Event source() { return _source; }

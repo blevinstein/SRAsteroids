@@ -113,22 +113,22 @@ public abstract class Timeline {
    *     accelerated frame of reference
    * NOTE: naive implementation finds a solution using bisection method, can be overridden
    */
-  public EventImage concurrentWith(Event observer, Velocity v) {
+  public Image concurrentWith(Event observer, Velocity v) {
     double solution = solve((Event e) -> SR.lorentz(e.minus(observer), v).t(),
         observer.t());
 
     return this.contains(solution)
-        ? new EventImage(this.at(solution), this.velocityAt(solution), observer, v)
+        ? new Image(this.at(solution), this.velocityAt(solution), observer, v)
         : null;
   }
 
   /**
-   * @return EventImage ei such that
-   *   {@code ei.offset().interval() == 0 && ei.offset().t() < observer.t()}
+   * @return Image i such that
+   *   {@code i.offset().interval() == 0 && ei.offset().t() < observer.t()}
    *   i.e. a lightlike interval between this timeline and the observer, extending from the
    *   observer into the past
    */
-  public EventImage seenBy(Event observer, Velocity v) {
+  public Image seenBy(Event observer, Velocity v) {
     double solution = solve((Event e) -> {
           Event image = SR.lorentz(e.minus(observer), v);
           // Calculates the time (relative to observer.t()) at which the observer sees an event
@@ -137,17 +137,17 @@ public abstract class Timeline {
         observer.t() - this.at(observer.t()).minus(observer).dist() / c);
 
     return this.contains(solution)
-        ? new EventImage(this.at(solution), this.velocityAt(solution), observer, v)
+        ? new Image(this.at(solution), this.velocityAt(solution), observer, v)
         : null;
   }
 
   /**
-   * @return EventImage ei such that
-   *   {@code ei.offset().interval() == 0 && ei.offset().t() > observer.t()}
+   * @return Image i such that
+   *   {@code i.offset().interval() == 0 && i.offset().t() > observer.t()}
    *   i.e. a lightlike interval between this timeline and the observer, extending from the
    *   observer into the future
    */
-  public EventImage willSee(Event observer, Velocity v) {
+  public Image willSee(Event observer, Velocity v) {
     double solution = solve((Event e) -> {
           Event image = SR.lorentz(e.minus(observer), v);
           // Calculates the time (relative to observer.t()) at which the event sees the observer
@@ -156,7 +156,7 @@ public abstract class Timeline {
         observer.t() + this.at(observer.t()).minus(observer).dist() / c);
 
     return this.contains(solution)
-        ? new EventImage(this.at(solution), this.velocityAt(solution), observer, v)
+        ? new Image(this.at(solution), this.velocityAt(solution), observer, v)
         : null;
   }
 

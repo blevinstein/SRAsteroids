@@ -3,7 +3,7 @@ package com.blevinstein.sr.asteroids;
 import static com.blevinstein.sr.SR.c;
 
 import com.blevinstein.sr.Event;
-import com.blevinstein.sr.EventImage;
+import com.blevinstein.sr.Image;
 import com.blevinstein.sr.SR;
 import com.blevinstein.sr.Timeline;
 import com.blevinstein.sr.Velocity;
@@ -163,7 +163,7 @@ public class JOGLDriver implements SRAsteroids.View {
   private static int SHIP_LEN = 10;
   // NOTE: ship exists at a point, is shown large for convenience, scales with zoom and is not
   //   subject to lorentz contraction
-  public void ship(Color color, EventImage position, double angle) {
+  public void ship(Color color, Image position, double angle) {
     setColor(color);
     Event iOffset = Velocity.unit(angle).over(1).times(SHIP_LEN / zoom);
     Event jOffset = Velocity.unit(angle).perp().over(1).times(SHIP_LEN/3 / zoom);
@@ -175,7 +175,7 @@ public class JOGLDriver implements SRAsteroids.View {
     gl.glEnd();
   }
 
-  public void line(Color c1, Color c2, EventImage p1, EventImage p2) {
+  public void line(Color c1, Color c2, Image p1, Image p2) {
     gl.glLineWidth(2);
     gl.glBegin(GL2.GL_LINES);
       setColor(c1);
@@ -186,7 +186,7 @@ public class JOGLDriver implements SRAsteroids.View {
   }
 
   private static int CIRCLE_SEG_LEN = 5;
-  public void circle(Color color, EventImage center, double radius, boolean fill) {
+  public void circle(Color color, Image center, double radius, boolean fill) {
     setColor(color);
     if (!isOnScreen(center, radius)) { return; }
 
@@ -216,7 +216,7 @@ public class JOGLDriver implements SRAsteroids.View {
     return new Event(xx, yy, t);
   }
 
-  public boolean isOnScreen(EventImage point, double radius) {
+  public boolean isOnScreen(Image point, double radius) {
     return point.image().x() * zoom > -width/2-radius
         && point.image().x() * zoom < width/2+radius
         && point.image().y() * zoom > -height/2-radius

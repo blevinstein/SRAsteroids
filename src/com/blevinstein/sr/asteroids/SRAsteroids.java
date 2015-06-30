@@ -5,7 +5,7 @@ import static com.blevinstein.sr.SR.c;
 import com.blevinstein.sr.ArbitraryTimeline;
 import com.blevinstein.sr.ConstantTimeline;
 import com.blevinstein.sr.Event;
-import com.blevinstein.sr.EventImage;
+import com.blevinstein.sr.Image;
 import com.blevinstein.sr.SR;
 import com.blevinstein.sr.StaticTimeline;
 import com.blevinstein.sr.Timeline;
@@ -120,7 +120,7 @@ public class SRAsteroids {
     view.setZoom(zoom);
 
     // Handle mouse input
-    EventImage cursorImage = getEvent(view.getImageOnScreen(mouseInput.x(), mouseInput.y()));
+    Image cursorImage = getEvent(view.getImageOnScreen(mouseInput.x(), mouseInput.y()));
     ConstantTimeline target = new ConstantTimeline(cursorImage.source(), velocity);
     for (MouseEvent e : mouseInput.events()) {
       switch (e.getID()) {
@@ -141,12 +141,12 @@ public class SRAsteroids {
     if (enableStarCollision) {
       for (Star star1 : galaxy.stars()) {
         if (star1.dead()) { continue; }
-        EventImage image1 = getImage(star1.timeline());
+        Image image1 = getImage(star1.timeline());
         if (image1 == null) { continue; }
 
         for (Star star2 : galaxy.stars()) {
           if (star2.dead()) { continue; }
-          EventImage image2 = getImage(star2.timeline());
+          Image image2 = getImage(star2.timeline());
           if (image2 == null) { continue; }
 
           if (star1.hashCode() < star2.hashCode() || star1 == star2) {
@@ -236,22 +236,22 @@ public class SRAsteroids {
      * Draw a ship around an image on screen.
      * @param angle of the ship
      */
-    void ship(Color color, EventImage position, double angle);
+    void ship(Color color, Image position, double angle);
 
     /**
      * Draw a line from p1 to p2.
      */
-    void line(Color c1, Color c2, EventImage p1, EventImage p2);
+    void line(Color c1, Color c2, Image p1, Image p2);
 
     /**
      * Draw a circle around an image on screen.
      */
-    void circle(Color color, EventImage center, double radius, boolean fill);
+    void circle(Color color, Image center, double radius, boolean fill);
 
     /**
      * @return whether an image is on-screen
      */
-    boolean isOnScreen(EventImage image, double radius);
+    boolean isOnScreen(Image image, double radius);
   }
 
   private static final int TRAIL_LEN = 100;
@@ -277,7 +277,7 @@ public class SRAsteroids {
 
     // Show the stars
     for (Star star : galaxy.stars()) {
-      EventImage starImage = getImage(star.timeline());
+      Image starImage = getImage(star.timeline());
       if (starImage == null || !view.isOnScreen(starImage, star.radius())) {
         continue;
       }
@@ -291,12 +291,12 @@ public class SRAsteroids {
     }
 
     // Show a cursor
-    EventImage cursorImage = EventImage.fromImage(view.getImageOnScreen(mouseInput.x(), mouseInput.y()), observer, velocity);
+    Image cursorImage = Image.fromImage(view.getImageOnScreen(mouseInput.x(), mouseInput.y()), observer, velocity);
     view.circle(Color.RED, cursorImage, 50, false);
     // Show autopilot target
     if (autoPilot != null) {
       // NOTE: assumes that getImage(target) != null
-      EventImage targetImage = getImage(autoPilot.target());
+      Image targetImage = getImage(autoPilot.target());
       view.circle(Color.BLUE, targetImage, 10, false);
     }
   }
@@ -335,7 +335,7 @@ public class SRAsteroids {
    * Given a Timeline, projects onto the view screen.
    * TODO: expensive - add cache, flush on each update
    */
-  public EventImage getImage(Timeline t) {
+  public Image getImage(Timeline t) {
     switch (mode) {
       case NO_TRANSFORM:
         return t.concurrentWith(observer, Velocity.ZERO);
@@ -353,15 +353,15 @@ public class SRAsteroids {
   /**
    * Given an Event, projects onto the view screen.
    */
-  private EventImage getImage(Event event) {
-    return new EventImage(event, Velocity.ZERO, observer, velocity);
+  private Image getImage(Event event) {
+    return new Image(event, Velocity.ZERO, observer, velocity);
   }
 
   /**
    * Given an Event on the view screen, project back into the world.
    */
-  public EventImage getEvent(Event image) {
-    return EventImage.fromImage(image, observer, velocity);
+  public Image getEvent(Event image) {
+    return Image.fromImage(image, observer, velocity);
   }
 
   // Convenience methods
