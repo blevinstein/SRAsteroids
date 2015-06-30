@@ -12,6 +12,7 @@ import java.util.function.Function;
  *
  * I apologize for this being a class instead of an interface.
  * TODO: implement equals?
+ * TODO: fix code smell, start() and end() are HACKy
  */
 public abstract class Timeline {
   /**
