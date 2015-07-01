@@ -168,10 +168,10 @@ public class JOGLDriver implements SRAsteroids.View {
     Event iOffset = Velocity.unit(angle).over(1).times(SHIP_LEN / zoom);
     Event jOffset = Velocity.unit(angle).perp().over(1).times(SHIP_LEN/3 / zoom);
     gl.glBegin(GL2.GL_TRIANGLE_FAN);
-      vertex(position.image());
-      vertex(position.image().plus(jOffset));
-      vertex(position.image().plus(iOffset));
-      vertex(position.image().minus(jOffset));
+      vertex(position.projected());
+      vertex(position.projected().plus(jOffset));
+      vertex(position.projected().plus(iOffset));
+      vertex(position.projected().minus(jOffset));
     gl.glEnd();
   }
 
@@ -179,9 +179,9 @@ public class JOGLDriver implements SRAsteroids.View {
     gl.glLineWidth(2);
     gl.glBegin(GL2.GL_LINES);
       setColor(c1);
-      vertex(p1.image());
+      vertex(p1.projected());
       setColor(c2);
-      vertex(p2.image());
+      vertex(p2.projected());
     gl.glEnd();
   }
 
@@ -204,7 +204,7 @@ public class JOGLDriver implements SRAsteroids.View {
         + contraction.getTranslateX();
       double yy = y * contraction.getScaleY() + x * contraction.getShearY()
         + contraction.getTranslateY();
-      vertex(center.image().advance(xx, yy, 0));
+      vertex(center.projected().advance(xx, yy, 0));
     }
     gl.glEnd();
   }
@@ -217,10 +217,10 @@ public class JOGLDriver implements SRAsteroids.View {
   }
 
   public boolean isOnScreen(Image point, double radius) {
-    return point.image().x() * zoom > -width/2-radius
-        && point.image().x() * zoom < width/2+radius
-        && point.image().y() * zoom > -height/2-radius
-        && point.image().y() * zoom < height/2+radius;
+    return point.projected().x() * zoom > -width/2-radius
+        && point.projected().x() * zoom < width/2+radius
+        && point.projected().y() * zoom > -height/2-radius
+        && point.projected().y() * zoom < height/2+radius;
   }
 }
 

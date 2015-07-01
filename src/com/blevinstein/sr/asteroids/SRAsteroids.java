@@ -22,8 +22,7 @@ public class SRAsteroids {
   public enum ProjectionMode {
     NO_TRANSFORM,
     CONCURRENT_WITH,
-    SEEN_BY,
-    WILL_SEE
+    SEEN_BY
   }
 
   public static final double dt = 0.1;
@@ -108,14 +107,12 @@ public class SRAsteroids {
     if (keyInput.getKeyDown(KeyEvent.VK_Q)) {
       zoom /= 1.05;
     }
-    if (keyInput.getKeyDown(KeyEvent.VK_0)) {
+    if (keyInput.getKeyDown(KeyEvent.VK_1)) {
       mode = ProjectionMode.NO_TRANSFORM;
-    } else if (keyInput.getKeyDown(KeyEvent.VK_1)) {
-      mode = ProjectionMode.CONCURRENT_WITH;
     } else if (keyInput.getKeyDown(KeyEvent.VK_2)) {
-      mode = ProjectionMode.SEEN_BY;
+      mode = ProjectionMode.CONCURRENT_WITH;
     } else if (keyInput.getKeyDown(KeyEvent.VK_3)) {
-      mode = ProjectionMode.WILL_SEE;
+      mode = ProjectionMode.SEEN_BY;
     }
     view.setZoom(zoom);
 
@@ -138,6 +135,7 @@ public class SRAsteroids {
     // Handle collision
     // TODO: refactor collision into galaxy, make consistent with local physics
     // TODO: optimize
+    /*
     if (enableStarCollision) {
       for (Star star1 : galaxy.stars()) {
         if (star1.dead()) { continue; }
@@ -171,6 +169,7 @@ public class SRAsteroids {
         }
       }
     }
+    */
   }
 
   private Star mergeStars(Star star1, Star star2, double collision) {
@@ -256,8 +255,11 @@ public class SRAsteroids {
 
   private static final int TRAIL_LEN = 100;
   public synchronized void draw() {
+    Projection p = getProjection();
+    GalaxyImage visibleGalaxy = GalaxyImage.of(galaxy, p);
+
     // Show the observer
-    // NOTE: assumes getImage(observer) != null
+    // NOTE: assumes observer exists
     view.ship(Color.GREEN, getImage(observer), angle);
 
     // TODO: refactor into View#ship?
@@ -276,16 +278,12 @@ public class SRAsteroids {
     }
 
     // Show the stars
-    for (Star star : galaxy.stars()) {
-      Image starImage = getImage(star.timeline());
-      if (starImage == null || !view.isOnScreen(starImage, star.radius())) {
-        continue;
-      }
+    for (StarImage star : visibleGalaxy.stars()) {
       double twinklePhase = star.twinklePeriod() != 0 ?
-        (star.timeline().timeElapsed(0, starImage.source().t()) / star.twinklePeriod()) % 1
+        (star.properTime() / star.twinklePeriod()) % 1
         : 0;
       view.circle(adjust(star.color(), (float) (0.3 * Math.sin(2 * Math.PI * twinklePhase))),
-          starImage,
+          star.image(),
           star.radius(),
           true);
     }
@@ -293,10 +291,11 @@ public class SRAsteroids {
     // Show a cursor
     Image cursorImage = Image.fromImage(view.getImageOnScreen(mouseInput.x(), mouseInput.y()), observer, velocity);
     view.circle(Color.RED, cursorImage, 50, false);
+
     // Show autopilot target
     if (autoPilot != null) {
-      // NOTE: assumes that getImage(target) != null
-      Image targetImage = getImage(autoPilot.target());
+      // NOTE: assumes that target exists
+      Image targetImage = p.project(autoPilot.target());
       view.circle(Color.BLUE, targetImage, 10, false);
     }
   }
@@ -331,20 +330,36 @@ public class SRAsteroids {
 
   // Projections
 
+  public Projection noTransformProj() {
+    return new Projection() {
+      public Image project(Timeline t) { return t.concurrentWith(observer, Velocity.ZERO); }
+    };
+  }
+
+  public Projection concurrentWithProj() {
+    return new Projection() {
+      public Image project(Timeline t) { return t.concurrentWith(observer, velocity); }
+    };
+  }
+
+  public Projection seenByProj() {
+    return new Projection() {
+      public Image project(Timeline t) { return t.seenBy(observer, velocity); }
+    };
+  }
+
   /**
    * Given a Timeline, projects onto the view screen.
    * TODO: expensive - add cache, flush on each update
    */
-  public Image getImage(Timeline t) {
+  public Projection getProjection() {
     switch (mode) {
       case NO_TRANSFORM:
-        return t.concurrentWith(observer, Velocity.ZERO);
+        return noTransformProj();
       case CONCURRENT_WITH:
-        return t.concurrentWith(observer, velocity);
+        return concurrentWithProj();
       case SEEN_BY:
-        return t.seenBy(observer, velocity);
-      case WILL_SEE: // TODO: rm if not useful?
-        return t.willSee(observer, velocity);
+        return seenByProj();
       default:
         throw new RuntimeException();
     }
@@ -354,7 +369,7 @@ public class SRAsteroids {
    * Given an Event, projects onto the view screen.
    */
   private Image getImage(Event event) {
-    return new Image(event, Velocity.ZERO, observer, velocity);
+    return new Image(event, Velocity.ZERO, observer, velocity, 0);
   }
 
   /**

@@ -118,7 +118,8 @@ public abstract class Timeline {
         observer.t());
 
     return this.contains(solution)
-        ? new Image(this.at(solution), this.velocityAt(solution), observer, v)
+        ? new Image(this.at(solution), this.velocityAt(solution), observer, v,
+            this.timeElapsed(0, solution))
         : null;
   }
 
@@ -137,7 +138,8 @@ public abstract class Timeline {
         observer.t() - this.at(observer.t()).minus(observer).dist() / c);
 
     return this.contains(solution)
-        ? new Image(this.at(solution), this.velocityAt(solution), observer, v)
+        ? new Image(this.at(solution), this.velocityAt(solution), observer, v,
+            this.timeElapsed(0, solution))
         : null;
   }
 
@@ -156,7 +158,8 @@ public abstract class Timeline {
         observer.t() + this.at(observer.t()).minus(observer).dist() / c);
 
     return this.contains(solution)
-        ? new Image(this.at(solution), this.velocityAt(solution), observer, v)
+        ? new Image(this.at(solution), this.velocityAt(solution), observer, v,
+            this.timeElapsed(0, solution))
         : null;
   }
 

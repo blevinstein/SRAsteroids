@@ -17,6 +17,7 @@ public class Star {
   }
   
   public Timeline timeline() { return _timeline; }
+  public StarDef def() { return _def; }
 
   // delegate to def
   public Color color() { return _def.color(); }
