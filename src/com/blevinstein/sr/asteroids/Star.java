@@ -5,7 +5,11 @@ import com.blevinstein.sr.Timeline;
 import java.awt.Color;
 
 /**
- * Container object for a Star.
+ * Container object for a Star
+ *
+ * Contains dynamic data about a Star that changes during simulation
+ *
+ * A static definition of the star's properties is contained in StarDef _def
  */
 public class Star {
   private Timeline _timeline;
