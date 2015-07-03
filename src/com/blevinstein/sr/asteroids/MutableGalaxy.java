@@ -8,6 +8,8 @@ import com.blevinstein.sr.Velocity;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -63,12 +65,37 @@ public class MutableGalaxy implements Galaxy {
     return _stars.get(find(def)).dead();
   }
 
-  // TODO: optimize with heuristic
+  /**
+   * NOTE: if abs(heuristic(x) - heuristic(y)) > r, then x and y are not within radius r
+   */
+  private static double heuristic(StarImage image) {
+    return (image.source().x() + image.source().y()) / Math.sqrt(2);
+  }
+
+  private static final Comparator<StarImage> heuristicOrder = new Comparator<StarImage>() {
+    @Override
+    public int compare(StarImage s1, StarImage s2) {
+      return Double.compare(heuristic(s1), heuristic(s2));
+    }
+  };
+
   public synchronized void handleCollision(Event observer, Velocity v) {
     Projection p = new Projection() {
       public Image project(Timeline t) { return t.concurrentWith(observer, v); }
     };
     List<StarImage> stars = GalaxyImage.of(this, p).stars();
+
+    // precalculate max radius
+    double maxRadius = 0;
+    for (StarImage starImage : stars) {
+      if (starImage.radius() > maxRadius) {
+        maxRadius = starImage.radius();
+      }
+    }
+
+    // sort by heuristic
+    Collections.sort(stars, heuristicOrder);
+
     for (int i = 0; i < stars.size(); i++) {
       StarImage star1 = stars.get(i);
       if (isDead(star1.def())) continue;
@@ -76,15 +103,19 @@ public class MutableGalaxy implements Galaxy {
         StarImage star2 = stars.get(j);
         if (isDead(star2.def())) continue;
 
+        // no collisions possible for star1
+        if (heuristic(star2) > heuristic(star1) + maxRadius) break;
+
         Velocity vRelative = star1.vSource().relativeMinus(star2.vSource());
         if (collide(star1.source(), star2.source(), star1.radius() + star2.radius(),
               vRelative)) {
           double collision = (star1.source().t() + star2.source().t()) / 2;
-          // HACK: add addition length of radius / velocity to each object
+          // HACK: add additional duration of radius / velocity to each object
+          double min = 0.1;
           destroy(star1.def(),
-              collision + star1.radius() / star1.vSource().mag());
+              collision + star1.radius() / (star1.vSource().mag() + min));
           destroy(star2.def(),
-              collision + star2.radius() / star2.vSource().mag());
+              collision + star2.radius() / (star2.vSource().mag() + min));
           mergeStars(star1, star2, collision);
         }
       }
@@ -108,7 +139,8 @@ public class MutableGalaxy implements Galaxy {
     double newRadius = Math.sqrt(Math.pow(star1.radius(), 2) + Math.pow(star2.radius(), 2));
     double newGravity = star1.gravity() + star2.gravity();
 
-    add(new StarDef(wColor, newRadius, star1.twinklePeriod() + star2.twinklePeriod(), newGravity), wEvent, wVelocity);
+    add(new StarDef(wColor, newRadius, star1.twinklePeriod() + star2.twinklePeriod(), newGravity),
+        wEvent, wVelocity);
   }
 
   /**
