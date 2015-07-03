@@ -111,11 +111,10 @@ public class MutableGalaxy implements Galaxy {
               vRelative)) {
           double collision = (star1.source().t() + star2.source().t()) / 2;
           // HACK: add additional duration of radius / velocity to each object
-          double min = 0.1;
-          destroy(star1.def(),
-              collision + star1.radius() / (star1.vSource().mag() + min));
-          destroy(star2.def(),
-              collision + star2.radius() / (star2.vSource().mag() + min));
+          double tail1 = Math.min(star1.radius() / star1.vSource().mag(), 1);
+          double tail2 = Math.min(star2.radius() / star2.vSource().mag(), 1);
+          destroy(star1.def(), collision + tail1);
+          destroy(star2.def(), collision + tail2);
           mergeStars(star1, star2, collision);
         }
       }
