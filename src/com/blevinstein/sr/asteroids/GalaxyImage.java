@@ -12,13 +12,20 @@ public class GalaxyImage {
     _stars = stars;
   }
 
-  public List<StarImage> stars() { return _stars; }
+  public List<StarImage> stars() {
+    // return defensive copy
+    return new ArrayList<>(_stars);
+  }
 
   public static GalaxyImage of(Galaxy galaxy, Projection p) {
     List<StarImage> images = new ArrayList<>();
     for (Star star : galaxy.stars()) {
       Image image = p.project(star.timeline());
-      images.add(new StarImage(star.def(), image));
+      if (image != null) {
+        // Ignore stars no longer in existence
+        // TODO: remove 'dead' stars when after light cone?
+        images.add(new StarImage(star.def(), image));
+      }
     }
     return new GalaxyImage(images);
   }
