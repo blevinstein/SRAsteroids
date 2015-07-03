@@ -9,9 +9,11 @@ import java.awt.geom.AffineTransform;
  */
 public class Image {
   private Event _source;
+  private Velocity _vSource;
   private Event _offset;
+  private Velocity _vObserver;
   private Event _projected;
-  private Velocity _velocity;
+  private Velocity _vRelative;
   private double _properTime;
 
   /**
@@ -25,7 +27,9 @@ public class Image {
     _source = source;
     _offset = source.minus(observer);
     _projected = SR.lorentz(_offset, vObserver);
-    _velocity = vSource.relativeMinus(vObserver);
+    _vSource = vSource;
+    _vObserver = vObserver;
+    _vRelative = vSource.relativeMinus(vObserver);
     _properTime = properTime;
   }
 
@@ -37,14 +41,16 @@ public class Image {
   public Event source() { return _source; }
   public Event offset() { return _offset; }
   public Event projected() { return _projected; }
-  public Velocity velocity() { return _velocity; }
+  public Velocity vRelative() { return _vRelative; }
+  public Velocity vSource() { return _vSource; }
+  public Velocity vObserver() { return _vObserver; }
   public double properTime() { return _properTime; }
 
   /**
    * Local transformation around the image.
    */
   public AffineTransform localTransform() {
-    return SR.lorentzContraction(_velocity);
+    return SR.lorentzContraction(_vRelative);
   }
 }
 

@@ -28,7 +28,9 @@ public class StarImage {
   public Event source() { return _image.source(); }
   public Event offset() { return _image.offset(); }
   public Event projected() { return _image.projected(); }
-  public Velocity velocity() { return _image.velocity(); }
+  public Velocity vObserver() { return _image.vObserver(); }
+  public Velocity vRelative() { return _image.vRelative(); }
+  public Velocity vSource() { return _image.vSource(); }
   public double properTime() { return _image.properTime(); }
 }
 
