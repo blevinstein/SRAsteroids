@@ -1,5 +1,12 @@
 package com.blevinstein.sr.asteroids;
 
+import com.blevinstein.sr.ConstantTimeline;
+import com.blevinstein.sr.Event;
+import com.blevinstein.sr.Image;
+import com.blevinstein.sr.Timeline;
+import com.blevinstein.sr.Velocity;
+
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,9 +23,117 @@ public class MutableGalaxy implements Galaxy {
     return this;
   }
 
-  public synchronized MutableGalaxy remove(Star toRemove) {
-    _stars.remove(toRemove);
+  // TODO: add classes that extend MutableGalaxy, override this method
+  public synchronized MutableGalaxy add(StarDef newDef, Event start, Velocity init) {
+    Timeline newTimeline = new ConstantTimeline(start, init).limit(start, null);
+    add(new Star(newTimeline, newDef));
+
     return this;
+  }
+
+  private int find(StarDef toFind) {
+    for (int i = 0; i < _stars.size(); i++) {
+      if (_stars.get(i).def() == toFind) {
+        return i;
+      }
+    }
+    throw new IllegalArgumentException();
+  }
+
+  public synchronized MutableGalaxy destroy(StarDef def, double atTime) {
+    int index = find(def);
+    Star toDestroy = _stars.get(index);
+
+    Star destroyed = new Star(
+        toDestroy.timeline().limit(null, toDestroy.timeline().at(atTime)),
+        toDestroy.def());
+
+    _stars.set(index, destroyed);
+
+    return this;
+  }
+
+  public synchronized MutableGalaxy remove(StarDef toRemove) {
+    int index = find(toRemove);
+    _stars.remove(index);
+    return this;
+  }
+
+  public boolean isDead(StarDef def) {
+    return _stars.get(find(def)).dead();
+  }
+
+  // TODO: optimize with heuristic
+  public synchronized void handleCollision(Event observer, Velocity v) {
+    Projection p = new Projection() {
+      public Image project(Timeline t) { return t.concurrentWith(observer, v); }
+    };
+    List<StarImage> stars = GalaxyImage.of(this, p).stars();
+    for (int i = 0; i < stars.size(); i++) {
+      StarImage star1 = stars.get(i);
+      if (isDead(star1.def())) continue;
+      for (int j = i + 1; j < stars.size(); j++) {
+        StarImage star2 = stars.get(j);
+        if (isDead(star2.def())) continue;
+
+        Velocity vRelative = star1.vSource().relativeMinus(star2.vSource());
+        if (collide(star1.source(), star2.source(), star1.radius() + star2.radius(),
+              vRelative)) {
+          double collision = (star1.source().t() + star2.source().t()) / 2;
+          // HACK: add addition length of radius / velocity to each object
+          destroy(star1.def(),
+              collision + star1.radius() / star1.vSource().mag());
+          destroy(star2.def(),
+              collision + star2.radius() / star2.vSource().mag());
+          mergeStars(star1, star2, collision);
+        }
+      }
+    }
+  }
+
+  private void mergeStars(StarImage star1, StarImage star2, double collision) {
+    Event event1 = star1.source();
+    Velocity v1 = star1.vSource();
+    Event event2 = star2.source();
+    Velocity v2 = star2.vSource();
+
+    double w1 = Math.pow(star1.radius(), 2);
+    double w2 = Math.pow(star2.radius(), 2);
+    double f = w2 / (w1 + w2);
+
+    Event wEvent = event1.times(1-f).plus(event2.times(f));
+    Velocity wVelocity = v1.times(1-f).plus(v2.times(f));
+    Color wColor = interpolate(star1.color(), star2.color(), (float) f);
+
+    double newRadius = Math.sqrt(Math.pow(star1.radius(), 2) + Math.pow(star2.radius(), 2));
+    double newGravity = star1.gravity() + star2.gravity();
+
+    add(new StarDef(wColor, newRadius, star1.twinklePeriod() + star2.twinklePeriod(), newGravity), wEvent, wVelocity);
+  }
+
+  /**
+   * interpolate(a, b, 0) -> a
+   * interpolate(a, b, 0.5) -> (a + b) / 2
+   * interpolate(a, b, 1) -> b
+   */
+  private Color interpolate(Color a, Color b, float f) {
+    float[] hsb_a = Color.RGBtoHSB(a.getRed(), a.getGreen(), a.getBlue(), new float[3]);
+    float[] hsb_b = Color.RGBtoHSB(b.getRed(), b.getGreen(), b.getBlue(), new float[3]);
+
+    return Color.getHSBColor(f * hsb_b[0] + (1 - f) * hsb_a[0],
+        f * hsb_b[1] + (1 - f) * hsb_a[1],
+        f * hsb_b[2] + (1 - f) * hsb_a[2]);
+  }
+
+  /**
+   * Point-circle collision.
+   */
+  private boolean collide(Event point, Event cCenter, double cRadius, Velocity cVelocity) {
+    if (point.equals(cCenter)) { return true; } // avoid division by zero
+    // vProj = mag of velocity in direction of ship
+    double vProj = cVelocity.dot(point.minus(cCenter).toUnitVelocity());
+    double gamma = new Velocity(vProj, 0).gamma();
+    return point.minus(cCenter).dist() < cRadius / gamma;
   }
 
   public synchronized List<Star> stars() {

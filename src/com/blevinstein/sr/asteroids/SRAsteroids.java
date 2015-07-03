@@ -43,7 +43,7 @@ public class SRAsteroids {
   private MouseInput mouseInput;
 
   // feature flags
-  private boolean enableStarCollision = false;
+  private boolean enableStarCollision = true;
 
   public SRAsteroids() {
     reset();
@@ -132,83 +132,9 @@ public class SRAsteroids {
       }
     }
 
-    // Handle collision
-    // TODO: refactor collision into galaxy, make consistent with local physics
-    // TODO: optimize
-    /*
     if (enableStarCollision) {
-      for (Star star1 : galaxy.stars()) {
-        if (star1.dead()) { continue; }
-        Image image1 = getImage(star1.timeline());
-        if (image1 == null) { continue; }
-
-        for (Star star2 : galaxy.stars()) {
-          if (star2.dead()) { continue; }
-          Image image2 = getImage(star2.timeline());
-          if (image2 == null) { continue; }
-
-          if (star1.hashCode() < star2.hashCode() || star1 == star2) {
-            continue;
-          }
-
-          Velocity vRelative = image1.velocity().relativeMinus(image2.velocity());
-          if (collide(image1.source(), image2.source(), star1.radius() + star2.radius(),
-                vRelative)) {
-            double collision = image1.source().t();
-            Star newStar = mergeStars(star1, star2, collision);
-            // HACK: add addition length of radius / velocity to each object
-            star1.destroy(
-                collision + star1.radius() / star1.timeline().velocityAt(collision).mag());
-            star2.destroy(
-                collision + star2.radius() / star2.timeline().velocityAt(collision).mag());
-            galaxy.add(newStar);
-            System.out.printf("end %s\n", star1.timeline().end());
-            System.out.printf("end %s\n", star2.timeline().end());
-            System.out.printf("start %s\n", newStar.timeline().start());
-          }
-        }
-      }
+      galaxy.handleCollision(observer, velocity);
     }
-    */
-  }
-
-  private Star mergeStars(Star star1, Star star2, double collision) {
-    Event event1 = star1.timeline().at(collision);
-    Velocity v1 = star1.timeline().velocityAt(collision);
-    Event event2 = star2.timeline().at(collision);
-    Velocity v2 = star2.timeline().velocityAt(collision);
-
-    double w1 = Math.pow(star1.radius(), 2);
-    double w2 = Math.pow(star2.radius(), 2);
-    double f = w2 / (w1 + w2);
-
-    Event wEvent = event1.times(1-f).plus(event2.times(f));
-    Velocity wVelocity = v1.times(1-f).plus(v2.times(f));
-    Color wColor = interpolate(star1.color(), star2.color(), (float) f);
-
-    double newRadius = Math.sqrt(Math.pow(star1.radius(), 2) + Math.pow(star2.radius(), 2));
-    double newGravity = star1.gravity() + star2.gravity();
-
-    Timeline newTimeline = new ConstantTimeline(wEvent, wVelocity);
-    double tStart = collision - newRadius / newTimeline.velocityAt(collision).mag();
-    // DEBUG
-    Event eStart = newTimeline.at(tStart);
-    System.out.printf("collision %f start %f %s\n", collision, tStart, eStart);
-    newTimeline = newTimeline.limit(eStart, null);
-
-    return new Star(newTimeline,
-        new StarDef(wColor, newRadius, star1.twinklePeriod() + star2.twinklePeriod(), newGravity));
-  }
-
-  /**
-   * Point-circle collision.
-   */
-  private boolean collide(Event point, Event cCenter, double cRadius, Velocity cVelocity) {
-    if (point.equals(cCenter)) { return true; } // avoid division by zero
-    // vProj = mag of velocity in direction of ship
-    double vProj = cVelocity.dot(point.minus(cCenter).toVelocity().norm());
-    double gamma = new Velocity(vProj, 0).gamma();
-    return point.minus(cCenter).dist() < cRadius / gamma;
   }
 
   public interface Pilot {
@@ -312,20 +238,6 @@ public class SRAsteroids {
     if (newB > 1) newB = 1;
 
     return Color.getHSBColor(hsb[0], hsb[1], newB);
-  }
-
-  /**
-   * interpolate(a, b, 0) -> a
-   * interpolate(a, b, 0.5) -> (a + b) / 2
-   * interpolate(a, b, 1) -> b
-   */
-  private Color interpolate(Color a, Color b, float f) {
-    float[] hsb_a = Color.RGBtoHSB(a.getRed(), a.getGreen(), a.getBlue(), new float[3]);
-    float[] hsb_b = Color.RGBtoHSB(b.getRed(), b.getGreen(), b.getBlue(), new float[3]);
-
-    return Color.getHSBColor(f * hsb_b[0] + (1 - f) * hsb_a[0],
-        f * hsb_b[1] + (1 - f) * hsb_a[1],
-        f * hsb_b[2] + (1 - f) * hsb_a[2]);
   }
 
   // Projections
