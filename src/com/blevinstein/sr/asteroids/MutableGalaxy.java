@@ -134,12 +134,12 @@ public class MutableGalaxy implements Galaxy {
     Event wEvent = event1.times(1-f).plus(event2.times(f));
     Velocity wVelocity = v1.times(1-f).plus(v2.times(f));
     Color wColor = interpolate(star1.color(), star2.color(), (float) f);
+    double wTwinklePeriod = star1.twinklePeriod() * (1-f) + star2.twinklePeriod() * f;
 
     double newRadius = Math.sqrt(Math.pow(star1.radius(), 2) + Math.pow(star2.radius(), 2));
     double newGravity = star1.gravity() + star2.gravity();
 
-    add(new StarDef(wColor, newRadius, star1.twinklePeriod() + star2.twinklePeriod(), newGravity),
-        wEvent, wVelocity);
+    add(new StarDef(wColor, newRadius, wTwinklePeriod, newGravity), wEvent, wVelocity);
   }
 
   /**
