@@ -16,9 +16,11 @@ import java.util.List;
 /**
  * Represents a solar system, with moons orbiting planets orbiting the sun
  */
-public class SolarSystemGalaxy extends MutableGalaxy {
+public class SolarSystemGalaxy extends BlackHoleGalaxy {
   public SolarSystemGalaxy(double maxRadius, double expPlanets, double expMoons,
       double gravity) {
+    super(gravity);
+
     StaticTimeline sun = new StaticTimeline(0, 0);
     add(new Star(sun,
         new StarDef(Color.YELLOW, 50 /* radius */, 100 /* twinklePeriod */)));
