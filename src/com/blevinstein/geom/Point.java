@@ -20,10 +20,17 @@ public class Point {
   public double y() { return _y; }
 
   public double mag() { return Math.sqrt(_x * _x + _y * _y); }
+  public Point perp() { return new Point(-_y, _x); }
+  public Point norm() {
+    double m = mag(); // don't call mag() twice
+    if (m == 0) { return new Point(1, 0); } // avoid division by zero
+    return this.times(1 / m);
+  }
 
   public Point plus(Point other) { return new Point(_x + other._x, _y + other._y); }
   public Point minus(Point other) { return new Point(_x - other._x, _y - other._y); }
   public Point times(double k) { return new Point(_x * k, _y * k); }
+  public double dot(Point other) { return _x * other._x + _y * other._y; }
 
   public boolean equals(Point other, double tol) {
     return Math.abs(_x - other._x) < tol && Math.abs(_y - other._y) < tol;
