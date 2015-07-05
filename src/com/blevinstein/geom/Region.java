@@ -10,12 +10,12 @@ public interface Region {
    */
   Point boundary(double t);
 
-  default Region intersect(Region other) {
+  static Region and(Region a, Region b) {
     // TODO: implement IntersectRegion
     throw new UnsupportedOperationException();
   }
 
-  default Region negate() {
+  static Region not(Region other) {
     // TODO: implement NegativeRegion
     throw new UnsupportedOperationException();
   }
