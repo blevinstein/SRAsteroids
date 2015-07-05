@@ -3,7 +3,7 @@ package com.blevinstein.geom;
 /**
  * Defines a region on one side of a line
  */
-public class LineRegion {
+public class LineRegion implements Region {
   private final Point _line;
   private final Point _containsDir;
   private final Point _lineDir;

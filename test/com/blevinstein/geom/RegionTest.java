@@ -60,4 +60,16 @@ public class RegionTest {
     assertTrue(aOrB.contains(inBoth));
     assertFalse(aOrB.contains(inNone));
   }
+
+  @Test
+  public void semicircle() {
+    // circle around origin, radius = 10, where y > 0
+    Region r = Region.and(
+        new CircleRegion(new Point(0, 0), 10),
+        new LineRegion(new Point(0, 0), new Point(0, 1)));
+
+    assertTrue(r.contains(new Point(0, 9)));
+    assertFalse(r.contains(new Point(0, 11)));
+    assertFalse(r.contains(new Point(0, -1)));
+  }
 }
