@@ -14,8 +14,12 @@ public interface Region {
     return new IntersectRegion(a, b);
   }
 
+  static Region or(Region a, Region b) {
+    // a OR b = NOT NOT a OR b = NOT (NOT a AND NOT b)
+    return not(and(not(a), not(b)));
+  }
+
   static Region not(Region other) {
-    // TODO: implement NegativeRegion
-    throw new UnsupportedOperationException();
+    return new InvertRegion(other);
   }
 }
