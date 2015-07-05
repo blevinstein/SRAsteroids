@@ -41,20 +41,15 @@ Effects demonstrated
 TODO
 ====
 
-- improve projection code (map all stars to images first) - implement GalaxyImage?
-- use heuristic to improve collision
+- implement EllipticalGalaxy, like CircleGalaxy
 
 - dump autopilot tracking data to csv, analyze to find better planning algorithm
-
-- add AcceleratingTimeline to represent uniform acceleration
+- OR add AcceleratingTimeline to represent uniform acceleration
 
 Experiments
 -----------
 
 - implement position cache and distance cache?
-
-- ellipses split/merge on collision?
-  - NOTE: circle-circle collision = point-line collision, r' = r1 + r2
 
 Basic Features
 --------------
@@ -75,30 +70,4 @@ Procedural Generation
 - OR use fractal generation
   - galaxy has clusters, clusters have systems, systems have stars?
   - more effective with circular/elliptical movement
-
-Physics Engine
---------------
-
-- implement a lazy physics engine, RK4?
-- implement WorldView : the position of all objects in a simulation, as seen by a particular
-  observer moving at a particular speed. To simulate, an object should request a WorldView from
-  the World, giving its own position and relative velocity, and use that to simulate a timestep.
-- implement SimulatedTimeline
-    ctor: SimulatedTimeline(Event initialEvent)
-    state: ArbitraryTimeline path
-    update(Event observer, Velocity velocity, float tMin):
-      simulate the path of this timeline until this.end() > tMin as observer by the observer
-      moving at velocity. Problem: use seenBy or concurrentWith? seenBy exhibits weird behavior,
-      not sure if buggy or just not intuitive.
-- write Force abstraction, then in mainLoop
-    for (Entity e : entities) {
-      for (Force f : e.getForces()) {
-        e.accelerate(f, dt)
-      }
-    }
-- add SpringForce
-- research GR: what would it take to add gravity?
-- research EM: what would it take to add electromagnetic forces? I know electrical forces and
-  magnetic forces can be transformed into each other through lorentz transformations, if I
-  implement naive "k q1 q2 / d12^2" without magnetism it will be inconsistent when transformed.
 
