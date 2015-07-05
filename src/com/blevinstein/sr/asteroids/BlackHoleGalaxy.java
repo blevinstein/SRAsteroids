@@ -25,10 +25,16 @@ public class BlackHoleGalaxy extends MutableGalaxy {
     Timeline timeline;
     try {
       timeline = EllipticalTimeline.create(CENTER, gravity, start, init).limit(start, null);
+      // DEBUG
       System.out.println("new ellipse");
     } catch (IllegalArgumentException | IllegalStateException e) {
       timeline = new ConstantTimeline(start, init).limit(start, null);
-      System.out.println("fallback");
+      // DEBUG
+      if (e instanceof IllegalArgumentException) {
+        System.out.println("illegal argument");
+      } else {
+        System.out.println("illegal state");
+      }
     }
     add(new Star(timeline, newDef));
   }
