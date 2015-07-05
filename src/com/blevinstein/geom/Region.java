@@ -11,8 +11,7 @@ public interface Region {
   Point boundary(double t);
 
   static Region and(Region a, Region b) {
-    // TODO: implement IntersectRegion
-    throw new UnsupportedOperationException();
+    return new IntersectRegion(a, b);
   }
 
   static Region not(Region other) {
