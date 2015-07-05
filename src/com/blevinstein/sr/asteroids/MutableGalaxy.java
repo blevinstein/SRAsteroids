@@ -26,11 +26,9 @@ public class MutableGalaxy implements Galaxy {
   }
 
   // TODO: add classes that extend MutableGalaxy, override this method
-  public synchronized MutableGalaxy create(StarDef newDef, Event start, Velocity init) {
+  public synchronized void create(StarDef newDef, Event start, Velocity init) {
     Timeline newTimeline = new ConstantTimeline(start, init).limit(start, null);
     add(new Star(newTimeline, newDef));
-
-    return this;
   }
 
   private int find(StarDef toFind) {

@@ -100,6 +100,7 @@ public class EllipticalTimeline extends Timeline {
     // v0**2 = G (2 / r0 - 1 / a)
     // -> a = 1 / (2 / r0 - v0**2 / G)
     double a = 1 / (2 / r0.dist() - Math.pow(v0.mag(), 2) / gravity);
+    // TODO: check if major axis is too short, v > c
     // angular momentum h = r0 cross v0 = r0 v0 sin(phi), phi = angle between r0 and v0
     // h = sqrt((1 - e**2) a G) = sqrt(R G)
     // -> R = h**2/g
