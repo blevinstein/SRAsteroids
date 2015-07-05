@@ -26,7 +26,7 @@ public class MutableGalaxy implements Galaxy {
   }
 
   // TODO: add classes that extend MutableGalaxy, override this method
-  public synchronized MutableGalaxy add(StarDef newDef, Event start, Velocity init) {
+  public synchronized MutableGalaxy create(StarDef newDef, Event start, Velocity init) {
     Timeline newTimeline = new ConstantTimeline(start, init).limit(start, null);
     add(new Star(newTimeline, newDef));
 
@@ -139,7 +139,7 @@ public class MutableGalaxy implements Galaxy {
     double newRadius = Math.sqrt(Math.pow(star1.radius(), 2) + Math.pow(star2.radius(), 2));
     double newGravity = star1.gravity() + star2.gravity();
 
-    add(new StarDef(wColor, newRadius, wTwinklePeriod, newGravity), wEvent, wVelocity);
+    create(new StarDef(wColor, newRadius, wTwinklePeriod, newGravity), wEvent, wVelocity);
   }
 
   /**
