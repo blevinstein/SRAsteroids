@@ -2,9 +2,6 @@ package com.blevinstein.geom;
 
 /**
  * Defines a region in 2D space
- *
- * TODO: CircleRegion
- * TODO: LineRegion
  */
 public interface Region {
   boolean contains(Point p);
