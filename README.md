@@ -41,10 +41,12 @@ Effects demonstrated
 TODO
 ====
 
+- implement HyperbolicTimeline
+- implement AcceleratingTimeline to represent uniform acceleration
+
 - implement EllipticalGalaxy, like CircleGalaxy
 
 - dump autopilot tracking data to csv, analyze to find better planning algorithm
-- OR add AcceleratingTimeline to represent uniform acceleration
 
 Experiments
 -----------
