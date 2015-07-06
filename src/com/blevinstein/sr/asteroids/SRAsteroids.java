@@ -257,7 +257,6 @@ public class SRAsteroids {
 
   /**
    * Given a Timeline, projects onto the view screen.
-   * TODO: expensive - add cache, flush on each update
    */
   public Projection getProjection() {
     switch (mode) {
