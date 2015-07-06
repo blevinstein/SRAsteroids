@@ -44,11 +44,7 @@ public class MutableGalaxy implements Galaxy {
     int index = find(def);
     Star toDestroy = _stars.get(index);
 
-    Star destroyed = new Star(
-        toDestroy.timeline().limit(null, toDestroy.timeline().at(atTime)),
-        toDestroy.def());
-
-    _stars.set(index, destroyed);
+    toDestroy.setTimeline(toDestroy.timeline().limit(null, toDestroy.timeline().at(atTime)));
 
     return this;
   }
@@ -60,7 +56,7 @@ public class MutableGalaxy implements Galaxy {
   }
 
   public boolean isDead(StarDef def) {
-    return _stars.get(find(def)).dead();
+    return _stars.get(find(def)).timeline().end() != null;
   }
 
   /**

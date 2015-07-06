@@ -12,8 +12,8 @@ import java.awt.Color;
  * A static definition of the star's properties is contained in StarDef _def
  */
 public class Star {
-  private Timeline _timeline;
   private final StarDef _def;
+  private Timeline _timeline;
 
   public Star(Timeline timeline, StarDef def) {
     _timeline = timeline;
@@ -23,18 +23,15 @@ public class Star {
   public Timeline timeline() { return _timeline; }
   public StarDef def() { return _def; }
 
+  public Star setTimeline(Timeline timeline) {
+    _timeline = timeline;
+    return this;
+  }
+
   // delegate to def
   public Color color() { return _def.color(); }
   public double radius() { return _def.radius(); }
   public double twinklePeriod() { return _def.twinklePeriod(); }
   public double gravity() { return _def.gravity(); }
-
-  // TODO: refactor code smell, remove this?
-  public boolean dead() {
-    return _timeline.end() != null;
-  }
-  public void destroy(double t) {
-    _timeline = _timeline.limit(null, _timeline.at(t));
-  }
 }
 
