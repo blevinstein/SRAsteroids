@@ -10,6 +10,8 @@ import java.awt.Color;
  * Contains dynamic data about a Star that changes during simulation
  *
  * A static definition of the star's properties is contained in StarDef _def
+ *
+ * TODO: add field indicating "capture" gravity?
  */
 public class Star {
   private final StarDef _def;
