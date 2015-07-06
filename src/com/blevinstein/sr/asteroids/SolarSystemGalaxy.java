@@ -43,7 +43,7 @@ public class SolarSystemGalaxy extends BlackHoleGalaxy {
   private EllipticalTimeline randomOrbit(Timeline center, double maxRadius, double gravity) {
     double angle = Math.random() * 2 * Math.PI;
     double perihelion = Math.random() * 2 * Math.PI;
-    double eccentricity = Math.random() * EllipticalTimeline.MAX_ECCENTRICITY;
+    double eccentricity = Math.random();
     double maxMajorAxis = maxRadius / (1 + eccentricity);
     double E = 2 / (1 - eccentricity) - 1;
     double minMajorAxis = gravity * E / (c * c);

@@ -31,9 +31,6 @@ import com.blevinstein.sr.Velocity;
  * theta(t) = complicated, sweeps equal areas in equal times
  */
 public class EllipticalTimeline extends Timeline {
-  // TODO: test eccentricities > MAX_ECCENTRICITY
-  public static final double MAX_ECCENTRICITY = 0.662743; // Laplace limit
-
   private double angleInit; // angle at t=0
   private double anglePerih; // angle of perihelion (on major axis)
   private Timeline center;
