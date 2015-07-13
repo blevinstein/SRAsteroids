@@ -134,7 +134,7 @@ public class Event {
    * Calculates the time elapsed for an object moving along this spacetime interval.
    */
   public double timeElapsed() {
-    return this.toVelocity().gamma() * _t;
+    return _t / this.toVelocity().gamma();
   }
 
   /**
