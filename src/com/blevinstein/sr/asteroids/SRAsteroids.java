@@ -43,16 +43,16 @@ public class SRAsteroids {
   private MouseInput mouseInput;
 
   // feature flags
-  private boolean enableStarCollision = true;
+  private boolean enableStarCollision = false;
 
   public SRAsteroids() {
     reset();
   }
 
   public void reset() {
-    //galaxy = new UniformBubbleGalaxy(1E4, 1E-5);
+    galaxy = new UniformBubbleGalaxy(1E4, 1E-5);
     //galaxy = new CircleGalaxy(1E4, 5E-6, 1E7);
-    galaxy = new SolarSystemGalaxy(2E3, 10 /* planets */, 20 /* moons */, 1E6);
+    //galaxy = new SolarSystemGalaxy(2E3, 10 /* planets */, 20 /* moons */, 1E6);
     //galaxy = new GridGalaxy(1E4, 1E4, 100, 100, 10);
 
     observer = Event.ORIGIN;
