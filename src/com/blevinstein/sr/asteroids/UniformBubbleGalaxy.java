@@ -17,8 +17,9 @@ public class UniformBubbleGalaxy extends MutableGalaxy {
   /**
    * @param radius of the bubble
    * @param density in stars per area
+   * @param starRadius radius of the stars in this galaxy
    */
-  public UniformBubbleGalaxy(double radius, double density) {
+  public UniformBubbleGalaxy(double radius, double density, double starRadius) {
     int numStars = (int) (Math.PI * radius * radius * density);
     for (int i = 0; i < numStars; i++) {
       // Create a new star
@@ -28,7 +29,7 @@ public class UniformBubbleGalaxy extends MutableGalaxy {
       Velocity starVelocity = Velocity.randomUnit().times(Math.random() * 0.999 * c);
       ConstantTimeline starTimeline = new ConstantTimeline(starPosition, starVelocity);
       add(new Star(starTimeline,
-          new StarDef(Color.GRAY, 10 /* radius */, 10 /* twinklePeriod */)));
+          new StarDef(Color.GRAY, starRadius, 10 /* twinklePeriod */)));
     }
   }
 }

@@ -50,7 +50,7 @@ public class SRAsteroids {
   }
 
   public void reset() {
-    galaxy = new UniformBubbleGalaxy(1E4, 1E-5);
+    galaxy = new UniformBubbleGalaxy(1E5, 1E-10, 1E3);
     //galaxy = new CircleGalaxy(1E4, 5E-6, 1E7);
     //galaxy = new SolarSystemGalaxy(2E3, 10 /* planets */, 20 /* moons */, 1E6);
     //galaxy = new GridGalaxy(1E4, 1E4, 100, 100, 10);
