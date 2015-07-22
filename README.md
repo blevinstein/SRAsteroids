@@ -41,6 +41,9 @@ Effects demonstrated
 TODO
 ====
 
+- EXPERIMENT with arcade features - lasers, missiles, etc.
+  - may require better object system than Galaxy currently supports
+
 - IMPORTANT fix AutoPilot, it flounders helplessly [git bisect? new implementation?]
 
 - add HUD, allow lock on to Star, show relative velocity arrow
@@ -51,11 +54,6 @@ TODO
 - implement EllipticalGalaxy, like CircleGalaxy
 
 - dump autopilot tracking data to csv, analyze to find better planning algorithm
-
-Experiments
------------
-
-- implement position cache and distance cache?
 
 Basic Features
 --------------
