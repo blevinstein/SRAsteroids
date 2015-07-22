@@ -41,6 +41,10 @@ Effects demonstrated
 TODO
 ====
 
+- IMPORTANT fix AutoPilot, it flounders helplessly [git bisect? new implementation?]
+
+- add HUD, allow lock on to Star, show relative velocity arrow
+
 - implement HyperbolicTimeline
 - implement AcceleratingTimeline to represent uniform acceleration
 
